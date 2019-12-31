@@ -1,0 +1,31 @@
+
+* Greenland liquid water runoff from 1979 through 2017
+
+This repository contains the source for "Greenland liquid water runoff from 1979 through 2017" and subsequent versions. 
+
++ The original paper is located at TBD
++ The data sets are located at [[http://dx.doi.org/10.22008/promice/data/freshwater_runoff/v01][doi:10.22008/promice/data/freshwater_runoff/v01]]/.
++ Companion paper: Greenland Ice Sheet solid ice discharge from 1986 through 2019 at https://github.com/mankoff/ice_discharge/
+
+The source file for the project is [[https://github.com/mankoff/freshwater/blob/master/freshwater.org][freshwater.org]].
+
+GitHub [[https://github.com/mankoff/freshwater/issues?utf8=%E2%9C%93&q=is%3Aissue][issues]] are used to collect suggestions, issues, and mention of similar papers that have been published after this one.
+
+The [[https://github.com/mankoff/freshwater/tree/submitted][submitted tag]] is the submitted paper. The [[https://github.com/mankoff/freshwater/tree/master][master branch]] contains any updates since then publication. Differences between the two can be seen in this [[https://github.com/mankoff/freshwater/compare/submitted...master][diff]].
+
+* Citation
+
+#+BEGIN_EXAMPLE
+@article{mankoff_YYYY_freshwater,
+  doi = {TBD},
+  url = {https://doi.org/TBD},
+  year = {yyyy},
+  volume = v,
+  issue = i,
+  pages = {p -- p},
+  publisher = {TBD},
+  author = {Kenneth D. Mankoff and others TBD},
+  title = {{G}reenland liquid water runoff from 1979 through 2017},
+  journal = {TBD}
+}
+#+END_EXAMPLE
