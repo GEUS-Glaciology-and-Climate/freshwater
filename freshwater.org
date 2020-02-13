@@ -74,7 +74,7 @@
 #+END_EXPORT
 
 #+BEGIN_abstract
-We present a high-resolution map of Greenland hydrologic outlets, basins, and streams, and a 1979 through 2017 time series of Greenland liquid water runoff for each outlet. Outlets, basins, and streams are derived from traditional hydrologic routing algorithms over the surface of a 100 m ArcticDEM digital elevation model (DEM) twice: Once to the ice margin and once to the coast. We then partition liquid water runoff from both ice and land from two regional climate models (RCMs; MAR and RACMO) into each basin and at each outlet location. The data include call_bsc[:session](d="ice", m=0) {{{results(=18903=)}}} ice basins and outlets (call_bsc[:session](d="ice", m=10) {{{results(=614=)}}} basins greater than 10 km^2), call_bsc[:session](d="land", m=0) {{{results(=30241=)}}} land basins and outlets (call_bsc[:session](d="land", m=10) {{{results(=958=)}}} basins greater than 10 km^2), major streams in each basin, and daily runoff water volume flow rate at each outlet from each of two RCMs. We perform a sensitivity study of outlet location change for every ice sheet location over a range of hydrologic routing assumptions and data sets. Annual ice runoff ranges from ~136 km^{3} in 1992 to ~785 km^{3} in 2012. Daily maximum ice runoff from one basin is as large as 4380 m^{3} s^{-1}. Both ice runoff magnitude and variability increase over the time series. Land runoff contributes an additional ~35 % to the ice runoff. Comparison with 8 basins instrumented with stream gauges shows a range of (dis)agreement from poor to excellent between our estimated discharge and observations. As part of the journal's living archive option, and our goal to make an operational product, all input data, code, and results from this study will be updated as needed (when new input data are available, as new features are added, or to fix bugs) and made available at
+We provide high-resolution datasets of Greenland hydrologic outlets, basins, and streams, and a 1979 through 2017 time series of Greenland liquid water runoff for each outlet. Outlets, basins, and streams are derived from traditional hydrologic routing algorithms over the surface of a 100 m ArcticDEM digital elevation model (DEM) twice: Once to the ice margin and once to the coast. We then partition liquid water runoff from both ice and land from two regional climate models (RCMs; MAR and RACMO) into each basin and at each outlet location. The data include call_bsc[:session](d="ice", m=0) {{{results(=18903=)}}} ice basins and outlets (call_bsc[:session](d="ice", m=10) {{{results(=614=)}}} basins greater than 10 km^2), call_bsc[:session](d="land", m=0) {{{results(=30241=)}}} land basins and outlets (call_bsc[:session](d="land", m=10) {{{results(=958=)}}} basins greater than 10 km^2), major streams in each basin, and daily runoff water volume flow rate at each outlet from each of two RCMs. We perform a sensitivity study of outlet location change for every ice sheet location over a range of hydrologic routing assumptions and data sets. Annual runoff from the ice ranges from ~136 km^{3} in 1992 to ~785 km^{3} in 2012. Daily maximum ice runoff from one basin is as large as 4380 m^{3} s^{-1}. Both ice runoff magnitude and variability increase over the time series. Land runoff contributes an additional ~35 % to the ice runoff. Comparison with 9 basins instrumented with stream gauges shows a range of (dis)agreement from poor to excellent between our estimated discharge and observations. As part of the journal's living archive option, and our goal to make an operational product, all input data, code, and results from this study will be updated as needed (when new input data are available, as new features are added, or to fix bugs) and made available at
 doi:10.22008/promice/data/freshwater_runoff/v01 citep:GEUS_freshwater_paper and at http://github.com/mankoff/freshwater.
 #+END_abstract
 
@@ -118,7 +118,7 @@ awk -v m2="${m2}" -F, '$2 > m2 { count++ } END {print count}' freshwater/${d}_su
 - [[#quality-control][Quality control]]
   - [[#streams-outlets-and-basins-2][Streams, Outlets, and Basins]]
   - [[#outputs][Outputs]]
-  - [[#raw-v-processed-for-ice--land][Raw v. processed for ice & land]]
+  - [[#raw-vs-processed-for-ice--land][Raw vs. processed for ice & land]]
   - [[#watson][Watson]]
   - [[#gem-rivers][GEM rivers]]
 - [[#usage-examples][Usage Examples]]
@@ -139,6 +139,8 @@ awk -v m2="${m2}" -F, '$2 > m2 { count++ } END {print count}' freshwater/${d}_su
   - [[#change-in-outlet][Change in Outlet]]
   - [[#gem-basin][GEM Basin]]
   - [[#qaanaaq][Qaanaaq]]
+  - [[#leverett-glacier][Leverett Glacier]]
+  - [[#narsarsuaq][Narsarsuaq]]
 - [[#appendix][Appendix]]
   - [[#software][Software]]
   - [[#changing-basins-with-changing-routing-schemes][Changing basins with changing routing schemes]]
@@ -180,7 +182,7 @@ This is captured programatically by [[workflow-update]]
 
 # The mass budget of the Greenland ice sheet has on average been negative since the beginning of the new millennium citep:mouginot_2019_forty. The mass budget of the ice sheet is primarily the net balance between mass gain by snow accumulation, mass loss from the surface from melting (runoff) and mass loss across the grounding line from iceberg production and submarine melt. The runoff mass losses originate from changes in the surface energy balance, e.g. temperature, incoming solar radiation, and precipitation, which in turn governs the liquid water runoff (REFS).
 
-Over the past decades, liquid runoff from Greenland has increased citep:mernild_2012_greenland,bamber_2018_freshwater,trusel_2018_nonlinear,perner_2019_greenland. When that runoff leaves the ice sheet and enters fjords and coastal seas, it influences a wide range of physical citep:straneo_2011_impact,an_2012_impact,mortensen_2013_seasonal,bendtsen_2015_heat,cowton_2015_modeling,mankoff_2016_structure,fried_2019_distinct,cowton_2019_sensitivity,beckmann_2019_modeling, chemical citep:kanna_2018_upwelling,balmonte_2019_sharp, and biological citep:kamenos_2012_reconstructing,kanna_2018_upwelling,balmonte_2019_sharp systems citep:catania_2019_future. The influence of freshwater on multiple domains and disciplines citep:catania_2019_future is the reason several past studies have estimated runoff at various temporal and spatial scales citep:mernild_2008_surface,mernild_2009_greenland,mernild_2010_freshwater,langen_2015_quantifying,ahlstrom_2017_abrupt,citterio_2017_towards,van-as_2018_reconstructing,bamber_2018_freshwater,perner_2019_greenland,slater_2019_estimating. 
+Over the past decades, liquid runoff from Greenland has increased citep:mernild_2012_greenland,bamber_2018_freshwater,trusel_2018_nonlinear,perner_2019_greenland. When that runoff leaves the ice sheet and enters fjords and coastal seas, it influences a wide range of physical citep:straneo_2011_impact,an_2012_impact,mortensen_2013_seasonal,bendtsen_2015_heat,cowton_2015_modeling,mankoff_2016_structure,fried_2019_distinct,cowton_2019_sensitivity,beckmann_2019_modeling, chemical citep:kanna_2018_upwelling,balmonte_2019_sharp, and biological citep:kamenos_2012_reconstructing,kanna_2018_upwelling,balmonte_2019_sharp systems citep:catania_2019_future. The scale of impacts ranges from the ice-ocean boundary to the distal open ocean citep:gillard_2016_meltwater. The influence of freshwater on multiple domains and disciplines citep:catania_2019_future is the reason several past studies have estimated runoff at various temporal and spatial scales citep:mernild_2008_surface,mernild_2009_greenland,mernild_2010_freshwater,langen_2015_quantifying,ahlstrom_2017_abrupt,citterio_2017_towards,van-as_2018_reconstructing,bamber_2018_freshwater,perner_2019_greenland,slater_2019_estimating. 
 
 Freshwater discharge from Greenland primarily takes three forms: solid ice from calving at marine terminating glaciers, submarine meltwater at marine terminating glaciers, and liquid runoff from surface melt, condensation, and rainfall. Immediately upstream from the grounding line, no submarine melting has occurred and that water is still solid ice. A recent paper by citet:mankoff_2019_ice targets the solid ice discharge budget by estimating solid ice discharge across flux gates 5 km upstream from all fast-flowing marine terminating glaciers in Greenland. Complementing that paper, this paper targets Greenland's point-source liquid water runoff budget by partitioning RCM runoff estimates to all ice margin and coastal outlets. The sum of this data product and citet:mankoff_2019_ice is an estimate of the majority of freshwater (liquid and solid ice) volume flow rates into Greenland fjords. Those two terms comprise the bulk but not all of freshwater volume - they exclude relatively minor contributions from precipitation directly onto the fjord surface, evaporation and condensation, sea ice formation and melt, or subglacial basal melting. Much work remains to determine which portion of solid ice across a flux gate becomes submarine melt, and where and when the solid ice, i.e. icebergs, melts in the fjord.
 
@@ -192,14 +194,14 @@ In this data set description we present a Greenland wide product of liquid water
 
 The static products (streams, outlets, and basins (Fig. [[fig:overview]])) are derived from an ice-sheet surface DEM, an ice-sheet mask, the land surface DEM, and an ocean mask. For the surface DEM, we use the ArcticDEM v7 100 m product citep:ArcticDEM. When using subglacial routing, we use ice thickness from BedMachine v3 citep:morlighem_2017_bedmachine,NSIDC_BedMachine_GL. For the ice mask we use the Programme for Monitoring of the Greenland Ice Sheet (PROMICE) Ice Extent citep:citterio_2013_brief. For the ocean mask we use the Making Earth System Data Records for Use in Research Environments (MEaSUREs) Greenland Ice Mapping Project (GIMP) Land Ice and Ocean Classification Mask, Version 1 citep:NSIDC_0714,howat_2014_greenland. Satellite basemap imagery comes from citep:howat_2014_greenland, specifically the National Snow and Ice Data Center (NSIDC) MEaSUREs GIMP data set with ID 0713 citep:NSIDC_0713.
 
-The time series product (daily runoff) is derived from gridded daily runoff estimates from RCM calculations over the land and ice areas of Greenland. The daily runoff comes from the Modèle Atmosphérique Régional (MAR; citet:fettweis_2017_reconstructions, 15 km resolution) and the Regional Atmospheric Climate Model (RACMO; citet:noel_2018_modelling, 5.5 km resolution) and runoff, \(R\), is defined by
+The time series product (daily runoff) is derived from gridded daily runoff estimates from RCM calculations over the land and ice areas of Greenland. The daily runoff comes from the Modèle Atmosphérique Régional (MAR; citet:fettweis_2017_reconstructions, 15 km resolution) and the Regional Atmospheric Climate Model (RACMO; citet:noel_2019_rapid, 5.5 km resolution) and runoff, \(R\), is defined by
 
 #+NAME: eq:runoff
 \begin{equation}
 R = ME + RA - RT - RF
 \end{equation}
 
-where \(ME\) is melt, \(RA\) is rainfall, \(RT\) is retention, and \(RF\) is refreezing. In RACMO, retention occurs only when there is firn, not with bare ice, while MAR has a runoff delay for bare ice runoff, but not land runoff. Both RCM results were provided regridded to a 1 km resolution using an offline statistical down-scaling technique based on local vertical runoff gradient applied to the sub-grid topography. MAR simulations were run using version 3.9.6 citep:delhasse_2019_brief. RACMO simulations were run using version 2.3p2. Both RCMs use ERA-Interim 6-hour forcing.
+where \(ME\) is melt, \(RA\) is rainfall, \(RT\) is retention, and \(RF\) is refreezing. In RACMO, retention occurs only when there is firn, not with bare ice, while MAR has a runoff delay for bare ice runoff, but not land runoff. Both RCM results were provided regridded to a 1 km resolution using an offline statistical down-scaling technique based on local vertical runoff gradient applied to the sub-grid topography. MAR simulations were run using version 3.9.6 citep:delhasse_2019_brief. RACMO simulations were run using version 2.3p2 citep:noel_2018_modelling. Both RCMs use ERA-Interim 6-hour forcing.
 
 * Methods
 ** Streams, Outlets, and Basins                           :ignore:
@@ -257,7 +259,7 @@ The time-series discharge product is provided as annual NetCDF files, four per y
 
 Results of this work include 1) ice-margin terminating streams, outlets, and basins, 2) coast-terminating streams, outlets, and basins (this product is a super-set of (1), and includes the upstream ice streams and basins), 3) runoff at the ice-marginal outlets from ice runoff and 4) runoff at the coastal outlets from land runoff. Runoff ice products are in duplicate from the MAR and RACMO RCMs.
 
-Fig. [[fig:overview]] illustrates call_bsc(d="ice", m=0) {{{results(=18903=)}}} ice basins and outlets and call_bsc(d="land", m=0) {{{results(=30241=)}}} land basins and outlets. Among these ice basins  we find call_bsc(d="ice", m=10) {{{results(=614=)}}} greater than 10 km^2 and call_bsc(d="ice", m=100) {{{results(=42=)}}} greater than 100 km^2, while the land basins have call_bsc(d="land", m=10) {{{results(=958=)}}} greater than 10 km^2 and call_bsc(d="land", m=100) {{{results(=47=)}}} grater than 100 km^2. 
+Fig. [[fig:overview]] illustrates call_bsc(d="ice", m=0) {{{results(=18903=)}}} ice basins and outlets and call_bsc(d="land", m=0) {{{results(=30241=)}}} land basins and outlets. Among these ice basins  we find call_bsc(d="ice", m=10) {{{results(=614=)}}} greater than 10 km^2 and call_bsc(d="ice", m=100) {{{results(=42=)}}} greater than 100 km^2, while the land basins have call_bsc(d="land", m=10) {{{results(=958=)}}} greater than 10 km^2 and call_bsc(d="land", m=100) {{{results(=47=)}}} greater than 100 km^2. 
 
 Overall this amounts to 1,807,264 km^{2} of basin ice cells, of which 1,769,087 km^{2} are covered by ice in MAR, 37,669 km^{2} are covered by land, and 479 km^{2} are covered by fjord. There are 336,497 km^{2} of basin land cells, of which 306,256 km^{2} are covered by land in MAR, 10,569 km^{2} are covered by ice, and 19,672 km^{2} are covered by fjord. The total Greenland coverage of RACMO is similar (Table and data available in Supplemental Online Material).
 
@@ -402,9 +404,9 @@ min    367.479877  112.613981  387.134118  18.167711  481.077824
 max    785.475995  158.919493  693.245624  34.812381  928.179007
 #+end_example
 
-Annual average ice runoff has a 1979 through 2017 mean of ~400 km^{3}, a 1992 minimum of 136 km^{3} (MAR ice) and 191 km^{3} (RACMO ice), and a 2012 maximum of 785 km^{3} (MAR) and 693 km^{3} (RACMO) (Fig. [[fig:annual_runoff]]). The 1992 low is likely due to the Mt. Pinatubo eruption, and then 2nd lowest runoff year, 1983, due to El Chichón eruption. The land runoff (MAR only) contributes an additional 35 % to the ice runoff on average, with a range from 18 % (142 km^{3} during the 2012 high ice-runoff year) to 83 % (112 km^{3} during the 1992 low ice-runoff year).
+Annual average ice runoff has a 1979 through 2017 mean of ~400 \pm30 km^{3} (\pm 15 %), a 1992 minimum of 136 \pm 10 km^{3} (MAR ice) and 191 \pm 14 km^{3} (RACMO ice), and a 2012 maximum of 785 \pm 59 km^{3} (MAR) and 693 \pm 50 km^{3} (RACMO) (Fig. [[fig:annual_runoff]]). The 1992 low is likely due to the Mt. Pinatubo eruption, and then 2nd lowest runoff year, 1983, due to El Chichón eruption. The land runoff (MAR only) contributes an additional 35 % to the ice runoff on average, with a range from 18 % (142 \pm 10 km^{3} during the 2012 high ice-runoff year) to 83 % (112 \pm 8 km^{3} during the 1992 low ice-runoff year).
 
-During the first decade of the time series, ice runoff had a mean of 305 km^{3} (MAR) or 325 km^{3} (RACMO), ranged from ~200 km^{3} to ~390 km^{3}, and had an annual standard deviation of 60 km^{3}. During the last decade of the time series, ice runoff had a mean of 531 km^{3} (MAR) or 519 km^{3} (RACMO), ranged from ~370 km^{3} to 785 km^{3}, and had an annul standard deviation of 130 km^{3}. From this, it is evident that ice runoff varies widely but increases in both magnitude and variability over the duration of the time-series.
+During the first decade of the time series, ice runoff had a mean of 305 \pm 23 km^{3} (MAR) or 325 \pm 24 km^{3} (RACMO), ranged from ~200 \pm 15 km^{3} to ~390 \pm 30 km^{3}, and had an annual standard deviation of 60 km^{3}. During the last decade of the time series, ice runoff had a mean of 531 \pm 38 km^{3} (MAR) or 519 \pm 38 km^{3} (RACMO), ranged from ~370 \pm 28 km^{3} to 785 \pm 59 km^{3}, and had an annual standard deviation of 130 km^{3}. From this, it is evident that ice runoff varies widely but increases in both magnitude and variability over the duration of the time-series.
 
 # We also compare our runoff estimate with discharge measurements at eight land- and glacier- fed rivers including a major basin on the western part of the Greenland ice sheet (Watson River, from citet:van-as_2018_reconstructing), six stream gauges from the Greenland Ecosystem Monitoring (GEM) project, and one in northwest Greenland near Qaanaaq.
 
@@ -424,7 +426,7 @@ Our static products - streams, outlets, and basins - have been previously estima
 
 # We are unable to quantitatively compare changes in the basin outlet location for all upstream grid cells between citet:lewis_2009_hydrologic and our basins (as we do for different versions of our basins in the Appendix) because citet:lewis_2009_hydrologic has outlets on a different land mask and a shift exists for all outlets due to the boundary.
 
-Our time-series product - runoff, also has existing similar products. The most recent of these is from citet:bamber_2018_freshwater (Fig. [[fig:annual_runoff]]) who provide a data product at lower spatial resolution (5 km), lower temporal resolution (monthly), and only coastal discharge, not coastal basins, nor ice basins, nor ice margin outlets and discharge. However, citet:bamber_2018_freshwater surpasses our product in that the time-series extends back to 1958, and spatial coverage includes a larger portion of the Arctic including Iceland, Svalbard, and Arctic Canada. Furthemore, by provide data at 5 km spatial and monthly temporal resolution, citet:bamber_2018_freshwater implements the main strategy suggested here to increase the signal-to-noise ratio of the data.
+Our time-series product - runoff, also has existing similar products. The most recent of these is from citet:bamber_2018_freshwater (Fig. [[fig:annual_runoff]]) who provide a data product at lower spatial resolution (5 km), lower temporal resolution (monthly), and only coastal discharge, not coastal basins, nor ice basins, nor ice margin outlets and discharge. However, citet:bamber_2018_freshwater surpasses our product in that the time-series extends back to 1958, and spatial coverage includes a larger portion of the Arctic including Iceland, Svalbard, and Arctic Canada. Furthemore, by providing data at 5 km spatial and monthly temporal resolution, citet:bamber_2018_freshwater implements the main strategy suggested here to increase the signal-to-noise ratio of the data.
 
 ** Validation against observations
 
@@ -461,23 +463,33 @@ Our basin is smaller than the basin used in citet:van-as_2018_reconstructing and
 
 # We attempt to recreate the citet:lindback_2015_subglacial basins using the raw citet:lindback_2014_high bed and thickness, and BedMachine v2 citep:morlighem_2014_deeply, BedMachine v3, and ArcticDEM surface elevations, and a range of subglacial pressure assumptions. In no case were we able to generate a Kangerlussuaq basin that a) included the ice excluded to the south in our basin or b) reached the ice divide as in citet:lindback_2015_subglacial - instead all our basins resemble those of citet:bartholomew_2011_supraglacial and are similar to the basins shown in Fig [[fig:watson_basins]]. Because this work intends to maintain an updated data product when improved and open data become available in the future, we expect the basin delineations and runoff estimates that are part of this product to improve and better match observations over time.
 
-*** GEM Basins
+*** GEM Basin Outlets
 
-Six basins from the GEM project have a time-series of runoff, and comparisons between our basin-partitioned RCM runoff and observations show better agreement than the for the Watson River basin(s). We note that these basins are significantly smaller than the Watson River basin, but because the basin is primarily defined by a land surface rather than an ice basin, basin delineation is more accurate. Therefore disagreement here between GEM observation and our product is likely attributable to errors in the RCM runoff, not the basin delineation.
+Six basins from the GEM project have a time-series of runoff citep:GEM_data, and comparisons between our basin-partitioned RCM runoff and observations show better agreement than for the Watson River basin(s). We note that these basins are significantly smaller than the Watson River basin, but because the basin is primarily defined by a land surface rather than an ice basin, basin delineation is more accurate. Therefore disagreement here between GEM observation and our product is likely attributable to errors in the RCM runoff, not the basin delineation.
 
-Of the six basins with GEM runoff, the two largest (Zackenberg (Fig. [[fig:GEM_map_Zackenberg]]) and Röde Elv (Fig. [[fig:GEM_map_Rode]])) show good agreement between the ice basins and the MAR and RACMO ice cells. The four smallest GEM basins (Fig. [[fig:GEM_map_others]]) have only one MAR and RACMO ice cell over an ice basin, several ice basins with no simulated runoff, and several MAR and RACMO ice cells with no co-located ice basin. The discussion of how these (mis)alignments are treated is in Sec. \ref{sec:methods:coverage}.
+Of the six basins with GEM runoff, the two largest (Zackenberg (Fig. [[fig:GEM_map_Zackenberg]]) and Røde Elv (Fig. [[fig:GEM_map_Rode]])) show most ice basins are overlapped by MAR and RACMO ice cells, although two ice basins are not covered by RCM ice cells in the Zackenberg basin, and a without an ice basin does have RCM ice cells in the Røde Elv basin. The four smallest GEM basins (Fig. [[fig:GEM_map_others]]) have only one MAR and RACMO ice cell over an ice basin, several ice basins with no simulated runoff, and several MAR and RACMO ice cells with no co-located ice basin. The discussion of how these (mis)alignments are treated is in Sec. \ref{sec:methods:coverage}.
 
-We show both daily time-series (Fig. [[fig:GEM_ts]]) and 10-day smoothed scatter-plot (Fig. [[fig:GEM_scatter]]) of the six GEM basin runoff observations and estimates. We use only MAR as the comparison here because the MAR product includes land and ice runoff, while RACMO only includes ice runoff. The daily time series, limited to 2017 because that is the only year of Röde Elv data, shows an agreement in both magnitude and variability between the MAR and GEM runoff products. However, all basins except Zackenberg show a MAR step-change decrease between day 168 and 169, after which variability continues to match (e.g. modeled v. observed day-long precipitation events roughly align) but magnitude does not agree as well as prior to day 169.
+We show both daily time-series (Fig. [[fig:GEM_ts]]) and 10-day smoothed scatter-plot (Fig. [[fig:GEM_scatter]]) of the six GEM basin runoff observations and estimates. We use only MAR as the comparison here because the MAR product includes land and ice runoff, while RACMO only includes ice runoff. The daily time series, limited to 2017 because that is the only year of Røde Elv data, shows an agreement in both magnitude and variability between the MAR and GEM runoff products. However, all basins except Zackenberg show a MAR step-change decrease between day 168 and 169, after which variability continues to match (e.g. modeled vs. observed day-long precipitation events roughly align) but magnitude does not agree as well as prior to day 169.
 
 The scatter plot has a 10-day smooth applied as in citet:van-as_2017_hypsometric, and shows all available days of data not just 2017. Color represents day of year, and similar to Fig. [[fig:GEM_ts]] shows that the MAR runoff slightly overestimates the GEM observations early in the year, and slightly underestimates the observations late in the year. 
 
 This seasonal disagreement is apparent as a step-change in all years, but not always on day 169 (18 June for non-leap-years). However, sometime in June of all years where GEM data and MAR data exist and in five of six basins (excluding Zackenberg), a step-decrease in MAR produces an underestimate of runoff relative to observations. The cause for this disagreement is not yet known.
 
-*** Qaanaaq
+*** Qaanaaq Glacier Outlet
 
-We validate our basins and runoff against one additional observation and highlight that in some locations strong agreement exists but may or may not exist for the right or wrong reason. A small basin near Qaanaaq has been instrumented for the past several summers citep:sugiyama_2014_initial,tsutaki_2017_surface, with overlap in August 2017. 
+We validate our basins and runoff against one additional observation and highlight that in some locations strong agreement exists but may or may not exist for the right or wrong reason. A small basin near Qaanaaq has been instrumented for the past several summers citep:sugiyama_2014_initial,tsutaki_2017_surface,qaanaaq_data, with overlap in August 2017. 
 
-From Fig. [[fig:map_Qaanaaq]], the Qaanaaq glacier outline is closely matched by the ice basin product generated here. However, only one nearby MAR ice cell covers 4 of the 1075 basin grid cells. Even so, that single MAR cell combined with our coverage algorithm (Sec. \ref{sec:methods:coverage}) generates very good agreement between MAR runoff and observations (Fig. [[fig:ts_Qaanaaq]]). RACMO ice cells cover almost the entire ice basin, yet do not agree as well. The comparison here is among observations from a stream, MAR ice and land, and RACMO ice only. Land area is not included in the RACMO product, but excluding it here is not likely to be the reason for the disagreement given a) the relatively small  portion of the catchment that is land and b) the magnitude of the MAR-estimated land runoff. Regardless, here RACMO does not capture the 5-fold increase seen in both the MAR and observations. This (dis)agreement among MAR, RACMO, and the observations highlights the uncertainty in the results presented here.
+From Fig. [[fig:map_Qaanaaq]], the Qaanaaq glacier outline is closely matched by the ice basin product generated here. However, only one nearby MAR ice cell covers 4 of the 1075 basin grid cells. Even so, that single MAR cell combined with our coverage algorithm (Sec. \ref{sec:methods:coverage}) generates very good agreement between MAR runoff and observations (Fig. [[fig:ts_Qaanaaq]]). MAR runoff relative to observations ranges from 20 % under (last day of time series) to 140 % over (28 July). When excluding 27 and 28 July where MAR runoff increases prior to observations, maximum overestimate is 50 % on 31 July. The total summed difference between MAR and observations over the course of this time-series is 12 %.
+
+RACMO ice cells cover almost the entire ice basin, yet RACMO runoff does not agree as well with observations as MAR runoff. The comparison here is among observations from a stream, MAR ice and land, and RACMO ice only. Land area is not included in the RACMO product, but excluding it here is not likely to be the reason for the disagreement given a) the relatively small  portion of the catchment that is land and b) the magnitude of the MAR-estimated land runoff. Regardless, here RACMO does not capture the 5-fold increase seen in both the MAR and observations. The total summed difference between RACMO and observations over the course of this time-series is 43 %. This (dis)agreement among MAR, RACMO, and the observations highlights the uncertainty in the results presented here.
+
+*** Leverett Glacier Outlet
+
+Leverett glacier runoff from 2009 through 2012 (Figs. [[fig:leverett_ts]] and [[fig:leverett_scatter]]) show a range of agreements and disagreements relative to observations citep:tedstone_2017_leverett,hawkings_2015_greenland. In 2009 and 2010, early season magnitude and variability matches (MAR better than RACMO), but there is more runoff in the models than the observations in July and August when large runoff occurs. All of 2011 is overestimated by the model, except a late August melt spike showing good agreement, albeit a slight lag between the model signals and the observations. The high runoff 2012 year shows better agreement between models and observations than the previous three years. In all cases, RACMO has significantly higher variability than MAR and the observations.
+
+*** Other Proxy Observations
+
+We are unaware of any additional stream gauge observations with open data that support comparison. However, a range of indirect and proxy observations exist, such as citet:mankoff_2016_structure and citet:stevens_2016_linking who find good agreement between runoff estimates using the same basin delineation theory as used here, observations of fjord salinity, and a plume model driving submarine glacier terminus melt.
 
 ** Uncertainty
 
@@ -497,7 +509,9 @@ Basins delineated using the ice surface are likely to be more precise than basin
 
 We note that the ice surface is responsible for ~90 % of the subglacial routing assuming equal gradients at the ice surface and base. If basal features are ~10x the size of surface features, then the ice surface is effectively responsible for ~50 % of subglacial routing.
 
-Given all of the above considerations, we opted for surface routing rather than subglacial (similar to citet:ahlstrom_2017_abrupt and citet:mernild_2018_high). However, we compare surface and subglacial basins, and the influence of those basins on the final outflow location, across a variety of products, where we quantify for every grid cell how far the eventual outlet for that grid cell moves under different basin delineation schemes.
+Finally, subglacial routing introduces hydraulic jumps because the BedMachine bed and thickness products, the citet:citterio_2013_brief ice and land mask, and the ArcticDEM ice surface are not all perfectly aligned.
+
+Given all of the above considerations, we opted for surface routing rather than subglacial (similar to citet:ahlstrom_2017_abrupt and citet:mernild_2018_high). However, we compare surface and subglacial basins (even with hydraulic jumps), and the influence of those basins on the final outflow location, across a variety of products, where we quantify for every grid cell how far the eventual outlet for that grid cell moves under different basin delineation schemes.
 
 When routing subglacially, we define the head \(h\) as
 
@@ -508,7 +522,7 @@ h = z_b + k \frac{\rho_i}{\rho_w} (z_s - z_b),
 
 where \(h\) is the hydraulic head at each location, \(z_b\) the ice-free land surface and basal topography, \(k\) the flotation fraction, \(\rho_i\) the density of ice (917 kg m^{-3}), \(\rho_w\) the density of water (1000 kg m^{-3}), and \(z_s\) the land surface for both ice free and ice covered surfaces. Equation [[eq:head]] comes from citet:shreve_1972_movement where they define the hydropotential (units Pa), but here is divided by gravity \(g\) times the density of water \(\rho_w\) to convert the units from units Pa to m. Equation [[eq:head]] makes the assumption that when ice is present (\(z_s \ne z_b\)) all water routes subglacially. When \(k\) is equal to \(\rho_w/\rho_i\) \approx 1.0905, then Eq. [[eq:head]] simplifies to \(h = z_s\).
 
-Fig. [[fig:diff_land_surf_aDEM_BM3_jako]], comparing ArcticDEM surface routing v. BedMachine surface routing, shows that part of one basin shifts its coastal outlet by 30 to < 100 km, a few smaller portions of basins shift their outlets by 10 to < 30 km, Sermeq Kujalleq (Jakobshavn Isbræ) by 3 to < 10 km, and the majority by < 1 km. A range of additional routing scheme and input data set comparisons are shown in the Appendix.
+Fig. [[fig:diff_land_surf_aDEM_BM3_jako]], comparing ArcticDEM surface routing vs. BedMachine surface routing, shows that part of one basin shifts its coastal outlet by 30 to < 100 km, a few smaller portions of basins shift their outlets by 10 to < 30 km, Sermeq Kujalleq (Jakobshavn Isbræ) by 3 to < 10 km, and the majority by < 1 km. A range of additional routing scheme and input data set comparisons are shown in the Appendix.
 
 Finally, even when we perform surface routing for basin delineation, we provide the BedMachine elevation of each outlet. Outlet elevations less than 0 indicate marine terminating subglacial outlets. However, even though this method provides an estimate of the initial subglacial discharge depth, much work remains to determine the effective depth of subglacial discharge, where effective depth is defined as the neutrally buoyant isopycnal that the subglacial discharge rapidly reaches once it enters the fjord (c.f. citet:mankoff_2016_structure).
 
@@ -553,7 +567,7 @@ Traditional uncertainty propagation is further complicated because it is not cle
 
 Many of the uncertainties discussed here can be mitigated by increasing the signal to noise ratio of the product provided here. Because we provide a high spatial and temporal resolution product, this is equivalent to a large number of signals, each of which has some uncertainty (noise). Averaging results spatially or temporally, if possible for a downstream use of this product, will increase the signal to noise ratio and reduce uncertainty. 
 
-For example, because we provide basins for the entire ice sheet, total runoff is not subject to basin uncertainty. Any error in the delineation of one basin must necessarily be corrected by the inclusion (if underestimate) or exclusion (if overestimate) of a neighboring basin, although neighboring basins may introduce their own errors. Therefore, summing basins reduces the error introduced by basin outline uncertainty, and should be done if a downstream product does not need an estimate of runoff from a single outlet. This feature is built-in to coastal outlet discharge which is not as sensitive to our routing algorithm as ice margin outlet discharge because most coast outlets include a range of upstream ice margin outlets (e.g. Figs. [[fig:outlet_change_1]] v. [[fig:outlet_change_2]] in Appendix). Conversely, at the ice margin, outlet location and discharge volume is more uncertain. However, most runoff is generated near the ice margin and as runoff approaches the margin, there is less opportunity for it to switch basins.
+For example, because we provide basins for the entire ice sheet, total runoff is not subject to basin uncertainty. Any error in the delineation of one basin must necessarily be corrected by the inclusion (if underestimate) or exclusion (if overestimate) of a neighboring basin, although neighboring basins may introduce their own errors. Therefore, summing basins reduces the error introduced by basin outline uncertainty, and should be done if a downstream product does not need an estimate of runoff from a single outlet. This feature is built-in to coastal outlet discharge which is not as sensitive to our routing algorithm as ice margin outlet discharge because most coast outlets include a range of upstream ice margin outlets (e.g. Figs. [[fig:outlet_change_1]] vs. [[fig:outlet_change_2]] in Appendix). Conversely, at the ice margin, outlet location and discharge volume is more uncertain. However, most runoff is generated near the ice margin and as runoff approaches the margin, there is less opportunity for it to switch basins.
 
 Temporally, errors introduced by this study's assumption of instantaneous runoff can be reduced by summing or averaging runoff over larger time periods. Although a given volume of water may remain in storage long term, the assumption of steady state storage means that long-term storage shown by, for example, dye trace studies, can be ignored - the volume with the dye may be stored, but a similar volume should be discharged in its place.
 
@@ -563,11 +577,11 @@ The liquid water runoff product provided here is only one source of freshwater t
 
 Both this product and citet:mankoff_2019_ice provide liquid or solid freshwater volume flow rates at outlets (this product, which includes elevation of discharge, equal to depth when negative) or grounding lines citep:mankoff_2019_ice, but actual freshwater into a fjord occurs at a more complicated range of locations. Solid ice melts throughout the fjord and beyond (e.g. citet:enderlin_2016_iceberg,moon_2017_subsurface), and the freshwater discharge presented here may enter at a depth, but rapidly rises up the ice front and eventually flows into the fjord at some isopycnal citep:mankoff_2016_structure. The eventual downstream location of the fresh water is not addressed in this work.
 
-Freshwater inputs directly to the water surface are also not included in this product. The flux (per square meter) to the water surface must be similar to the flux from the non-ice-covered the land surface. The land runoff volume accounts for ~35 % of the total runoff volume presented in this work (Fig. [[fig:annual_runoff]]), so the freshwater input (i.e. precipitation) directly to the fjord surface must also be ~35 % when considering a fjord and ocean area with area equal to the non-ice-covered land area.
+Freshwater inputs directly to the water surface are also not included in this product. The flux (per square meter) to the water surface should be similar to the flux to the non-ice-covered land surface - assuming the orographic effects on precipitation produce similar fluxes to the near-land water surface. The land runoff volume accounts for ~35 % of the total runoff volume presented in this work (Fig. [[fig:annual_runoff]]), so the freshwater input (i.e. precipitation) directly to the fjord surface may be of similar magnitude.
 
 Finally, basal melt from 1) geothermal heating (e.g. citet:fahnestock_2001_high) 2) frictional heating (e.g. citet:echelmeyer_1990_jakobshavns) and 3) viscous heat dissipation from all previous freshwater sources (c.f. citet:mankoff_2017_past) contributes up to 10 % additional runoff to the surface melt. Geothermal and frictional heating are approximately steady state and contribute freshwater throughout the winter months.
 
-Importantly, ice sheet runoff may not be the majority source of freshwater into some fjords, even though it is traditionally considered the majority, or even only, source of freshwater. The combination of land runoff, freshwater inputs (snow and rain) directly onto the fjord surface, and basal runoff, suggests that GIS-wide ice sheet surface runoff may account for < 50 % of total runoff. The percent contribution of ice sheet surface runoff is likely to vary widely depending on the downstream fjord, upstream basin, and dates and time-span of the estimates.
+Importantly, ice sheet runoff may not be the majority source of freshwater into some fjords, even though it is traditionally considered the majority, or even only, source of freshwater. The combination of land runoff, freshwater inputs (snow and rain) directly onto the near-land fjord surface, and basal runoff, suggests that GIS-wide ice sheet surface runoff may account for < 50 % of total freshwater input. The percent contribution of ice sheet surface runoff to total freshwater input is likely to vary widely depending on the area considered for the downstream fjord, the upstream basin, and the dates and time-span of the estimates.
 
 * Data and Code Availability
 
@@ -583,6 +597,7 @@ Runoff can only change in the future - the true past runoff is fixed - yet diffe
 README for "Greenland liquid water runoff from 1979 through 2017"
 
 DOI: doi:10.22008/promice/data/freshwater_runoff/v01
+PROMICE page: https://www.promice.org/PromiceDataPortal/#FreshwaterRunoff
 Source: https://github.com/mankoff/freshwater
 
 ,* Data Description
@@ -609,13 +624,16 @@ Each of these computed on the following domains:
 In the runoff folder, 
 + margin :: Ice surface runoff routed to the ice margin
 + coast :: Land surface runoff routed to the coast
+
+Complete documentation and example use cases with code are available at https://github.com/mankoff/freshwater, or by contacting Ken Mankoff <kdm@geus.dk>
+
 #+END_SRC
 
 
 
 * Conclusions
 
-Our new outlet, basin, stream, and liquid water discharge data provide a high spatial (100 m) and temporal (1 day) resolution estimate of freshwater fluxes into Greenland fjords and coastal seas for the entire ice-sheet area from 1979 through 2017. We find an annual average Greenland runoff of 400 \pm 130 km^{3} ranging from 136 km^{3} in 1992 to 785 km^{3} in 2012, and displaying and overall increase in both magnitude and variability.
+Our new outlet, basin, stream, and liquid water discharge data provide a high spatial (100 m) and temporal (1 day) resolution estimate of freshwater fluxes into Greenland fjords and coastal seas for the entire ice-sheet area from 1979 through 2017. We find an annual average Greenland runoff of 400 \pm 30 km^{3} ranging from 136 \pm 10 km^{3} in 1992 to 785 \pm 59 km^{3} in 2012, and displaying and overall increase in both magnitude and variability.
 
 Because of the high spatial and temporal resolution, quality issues exist at basin and daily scale that do not exist when working over larger areas or times. 
 
@@ -3367,6 +3385,106 @@ Year MonthOfYear DayOfMonth DayOfYear DayOfCentury WaterFluxDiversOnly(m3/s) Unc
  2017   10   27  300 6510 -999.00 -999.00    0.00    0.00    4.28    0.65
 #+end_example
 
+*** Qaanaaq
+
+#+NAME: provenance_Qaanaaq
+#+BEGIN_SRC bash :results verbatim
+root=~/data.me/qaanaaq
+md5sum ${root}/discharge2018.txt
+head ${root}/discharge2018.txt
+#+END_SRC
+
+#+RESULTS: Provenance_Qaanaaq
+#+begin_example
+
+8f76120d03ddd9b435db797b3ceb95d4  /home/kdm/data.me/qaanaaq/discharge2018.txt
+Time(UTC),Discharge
+2018/07/05 16:45:00,0.81
+2018/07/05 16:50:00,0.8
+2018/07/05 16:55:00,0.81
+2018/07/05 17:00:00,0.8
+2018/07/05 17:05:00,0.81
+2018/07/05 17:10:00,0.82
+2018/07/05 17:15:00,0.82
+2018/07/05 17:20:00,0.82
+2018/07/05 17:25:00,0.84
+#+end_example
+
+*** Leverett
+#+NAME: provenance_Leverett
+#+BEGIN_SRC bash :results verbatim
+for f in $(ls ${DATADIR}/Tedstone_2017/leverett_Q_????_UTC.csv); do
+  md5sum ${f}
+done
+echo " "
+head -n15 ${f}
+#+END_SRC
+
+#+RESULTS: Provenance_Leverett
+#+begin_example
+
+> fbd61f2153544e7f47118ea5048c7f72  /home/kdm/data/Tedstone_2017/leverett_Q_2009_UTC.csv
+b105d03e1654a8f282e6023d217e4411  /home/kdm/data/Tedstone_2017/leverett_Q_2010_UTC.csv
+bf555e42f03590af778e23c63628c94d  /home/kdm/data/Tedstone_2017/leverett_Q_2011_UTC.csv
+0af991e890bf8a06df16fff9e5270efd  /home/kdm/data/Tedstone_2017/leverett_Q_2012_UTC.csv
+
+# River discharge, Leverett Glacier, Greenland, 2012
+67°03'53.8"N 50°13'01.2"W
+School of GeoSciences, University of Edinburgh
+email: a.j.tedstone@bristol.ac.uk
+column 1: Julian fractional day of year
+column 2: river discharge, cubic metres per second
+fill value: nan
+DOY,Discharge m3 s-1
+134.625,0.9
+134.6285,1.0
+134.6319,1.0
+134.6354,1.0
+134.6389,0.7
+134.6424,1.0
+134.6458,1.0
+#+end_example
+
+
+*** GEM
+#+NAME: provenance_GEM
+#+BEGIN_SRC bash :results verbatim
+# ls ${DATADIR}/GEM
+md5sum ${DATADIR}/GEM/GEM.csv
+echo ""
+head ${DATADIR}/GEM/GEM.csv
+echo ""
+tail ${DATADIR}/GEM/GEM.csv
+#+END_SRC
+
+#+RESULTS: provenance_GEM
+#+begin_example
+
+c8109aa54bb646dcf773406ce7ceb871  /home/kdm/data/GEM/GEM.csv
+
+Date_Time,Kingigtorssuaq,Kobbefjord,Oriartorfik,Røde_Elv,Teqinngalip,Zackenberg
+1996-06-02,,,,,,0.606
+1996-06-03,,,,,,1.812
+1996-06-04,,,,,,3.024
+1996-06-05,,,,,,4.236
+1996-06-06,,,,,,5.448
+1996-06-07,,,,,,6.660
+1996-06-08,,,,,,7.872
+1996-06-09,,,,,,9.084
+1996-06-10,,,,,,10.298
+
+2018-09-17,0.375,,0.210,,0.710,2.283
+2018-09-18,0.337,,0.185,,0.641,
+2018-09-19,0.318,,0.170,,,
+2018-09-20,0.307,,0.154,,,
+2018-09-21,0.287,,0.139,,,
+2018-09-22,0.269,,0.127,,,
+2018-09-23,0.262,,0.132,,,
+2018-09-24,0.248,,0.116,,,
+2018-09-25,0.257,,0.106,,,
+2018-09-26,0.233,,0.088,,,
+#+end_example
+
 ** Import Data
 :PROPERTIES:
 :header-args:bash+: :tangle import.sh :eval no
@@ -3449,32 +3567,15 @@ log_info "Importing BedMachine"
 g.mapset -c BedMachine
 
 ROOT=${DATADIR}/Morlighem_2017
+# cdo sinfon ${ROOT}/BedMachineGreenland-2017-09-20.nc
 r.external source=netCDF:${ROOT}/BedMachineGreenland-2017-09-20.nc:bed output=z_b
 r.external source=netCDF:${ROOT}/BedMachineGreenland-2017-09-20.nc:surface output=z_s
+r.external source=netCDF:${ROOT}/BedMachineGreenland-2017-09-20.nc:mask output=mask
 r.external source=netCDF:${ROOT}/BedMachineGreenland-2017-09-20.nc:thickness output=thickness
 r.external source=netCDF:${ROOT}/BedMachineGreenland-2017-09-20.nc:errbed output=errbed
 r.external source=netCDF:${ROOT}/BedMachineGreenland-2017-09-20.nc:geoid output=geoid
 r.external source=netCDF:${ROOT}/BedMachineGreenland-2017-09-20.nc:source output=source
 g.region raster=z_b -pa
-#+END_SRC
-
-*** TODO GEM
-*** INPROGRESS WMS
- 
-#+BEGIN_SRC bash :results verbatim
-grass -c ./G/WMS
-g.region rows=50 cols=50
-export GRASS_OVERWRITE=1
-
-# r.in.wms --verbose output=img format=png layers=s2cloudless-2018_3857 srs=3857 url="https://tiles.maps.eox.at/wms?service=wms&request=getcapabilities"
-
-# r.in.wms url=http://irs.gis-lab.info layers=landsat output=img format=png
-
-r.in.wms output=akl_srtm url="http://onearth.jpl.nasa.gov/wms.cgi" -c layers=worldwind_dem format=geotiff style=short_int maxcols=1600 maxrows=1600
-
-d.mon start=wx0
-d.erase
-d.rast img
 #+END_SRC
 
 *** NSIDC 0713 Basemap
@@ -3699,7 +3800,7 @@ variables:
 }
 #+end_example
 
-** Raw v. processed for ice & land
+** Raw vs. processed for ice & land
 
 Build a data frame with 
 + The final product
@@ -3986,7 +4087,7 @@ View in QGIS. Select basin IDs next to each GEM outlet
 | Oriartorfik    |   140660 |
 | Teqinngalip    |   140669 |
 | Kingigtorssuaq |   140937 |
-| Röde_Elv       |    91818 |
+| Røde_Elv       |    91818 |
 | Zackenberg     |    49123 |
 
 *** Scatter Plot
@@ -4006,7 +4107,7 @@ GEM_meta['Kobbefjord']     = 141100
 GEM_meta['Oriartorfik']    = 140660
 GEM_meta['Teqinngalip']    = 140669
 GEM_meta['Kingigtorssuaq'] = 140937
-GEM_meta['Röde_Elv']       = 91818
+GEM_meta['Røde_Elv']       = 91818
 GEM_meta['Zackenberg']     = 49123
 
 ds_land = xr.open_mfdataset('./freshwater/runoff/coast/runoff_land_MAR_*.nc', combine='by_coords')
@@ -4132,6 +4233,12 @@ plt.savefig(fname, transparent=False, bbox_inches='tight', dpi=150)
 #+RESULTS:
 
 #+RESULTS: GEM_compare
+: [64248]
+: [64110]
+: [54222 54286 54298 54302 54348 54352]
+: [64177 64214 64220]
+: [29308 29369 29372 29410 29420 29425 29429 29443 29445 29449 29460 29463
+:  29477 29478 29479 29491 29504 29516 29521 29554 29563 29575]
 : /home/kdm/local/anaconda/envs/sci/lib/python3.6/site-packages/matplotlib/figure.py:2369: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
 :   warnings.warn("This figure includes Axes that are not compatible "
 
@@ -4159,11 +4266,14 @@ for i in np.arange(6):
     
     tmp = tmp[tmp.index.year == 2017]
 
-    plt.plot(tmp.index.dayofyear, tmp['GEM'], color='orange', drawstyle='steps')
-    plt.plot(tmp.index.dayofyear, tmp['MAR'], color='k', drawstyle='steps')
+    # https://github.com/pandas-dev/pandas/issues/31965
+    tmp.loc[tmp.index[-1] + (tmp.index[-1]-tmp.index[-2])] = tmp.iloc[-1]
+
+    plt.plot(tmp.index.dayofyear, tmp['GEM'], color='orange', drawstyle='steps-post')
+    plt.plot(tmp.index.dayofyear, tmp['MAR'], color='k', drawstyle='steps-post')
 
     plt.fill_between(tmp.index.dayofyear, tmp['MAR']*0.925, tmp['MAR']*1.075, 
-                     color='k', step='pre', alpha=0.25)
+                     color='k', step='post', alpha=0.25)
 
     # tmp2 = tmp.rolling('10 D').mean()
     # tmp2 = tmp.ewm(span=10).mean()
@@ -4191,6 +4301,7 @@ plt.savefig(fname, transparent=False, bbox_inches='tight', dpi=150)
 #+END_SRC
 
 #+RESULTS:
+[[file:~/tmp/ob-jupyter-figs/c43e9b6eca277e363d15cef3aaf686c706dcec65.png]]
 
 
 * Usage Examples                                        :noexport:
@@ -4260,8 +4371,6 @@ if 'b2018' not in locals():
         .sum(dim=['X','Y'])\
         .to_dataframe()\
         .rename({'runoff_ice':'B2018 ice','runoff_tundra':'B2018 land'}, axis='columns')
-
-# b2018_runoff.head()
 
 df_b2018 = b2018_runoff.merge(df.resample('A').sum(), left_index=True, right_index=True)
 #+END_SRC
@@ -5317,6 +5426,8 @@ g.region -d
 #+BEGIN_SRC bash :results verbatim :session *freshwater-shell* :export no :results none
 g.mapset -c figs
 
+export GRASS_OVERWRITE=1
+
 # Figure 2: Alignment
 # g.mapset -c test_alignment
 # g.region n=-3227490 s=-3253500 w=7110 e=48960 res=90 -pa align=mask_ice_basin@MAR
@@ -5325,33 +5436,62 @@ g.region region=test@test_alignment
 v.mkgrid map=fig2_outline grid=1,1 position=region 
 eval $(g.region -pg)
 topleft_fig2=$( echo ${w} ${n} )
-text_fig2="Fig. 2"
+text_fig2="2"
 g.region -d
-
 
 g.region n=-2464500 s=-2557600 w=-282200 e=-119000 res=100 align=mask_ice_basin@MAR
 g.region save=watson
 v.mkgrid map=fig5_outline grid=1,1 position=region 
 eval $(g.region -pg)
 topleft_fig5=$( echo ${w} ${n} )
-text_fig5="Fig. 5"
+text_fig5="5"
 g.region -d
 
+# g.region region=BM_v_ArcticDEM@BM_v_ArcticDEM
+# v.mkgrid map=fig6_outline grid=1,1 position=region 
+# eval $(g.region -pg)
+# topleft_fig6=$( echo ${w} ${n} )
+# text_fig6="6"
+# g.region -d
 
-g.region region=BM_v_ArcticDEM@BM_v_ArcticDEM
+g.region n=-2200000 s=-2400000 w=-276000 e=-90000 res=100 -p # Jakobshavn
 v.mkgrid map=fig6_outline grid=1,1 position=region 
 eval $(g.region -pg)
 topleft_fig6=$( echo ${w} ${n} )
-text_fig6="Fig. 6"
+text_fig6="6"
 g.region -d
 
-
-g.region n=-2200000 s=-2400000 w=-276000 e=-90000 res=100 -p # Jakobshavn
+g.region region=Zackenberg@GEM_figs_Zackenberg
 v.mkgrid map=fig7_outline grid=1,1 position=region 
 eval $(g.region -pg)
 topleft_fig7=$( echo ${w} ${n} )
-text_fig7="Fig. 7"
+text_fig7="7"
 g.region -d
+
+
+g.region region=RodeElv@GEM_figs_RodeElv
+v.mkgrid map=fig8_outline grid=1,1 position=region 
+eval $(g.region -pg)
+topleft_fig8=$( echo ${w} ${n} )
+text_fig8="8"
+g.region -d
+
+
+g.region region=OtherFour@GEM_figs_OtherFour
+v.mkgrid map=fig9_outline grid=1,1 position=region 
+eval $(g.region -pg)
+topleft_fig9=$( echo ${w} ${n} )
+text_fig9="9"
+g.region -d
+
+
+g.region region=Qaanaaq@GEM_figs_Qaanaaq
+v.mkgrid map=fig12_outline grid=1,1 position=region 
+eval $(g.region -pg)
+topleft_fig12=$( echo ${w} ${n} )
+text_fig12="12"
+g.region -d
+
 #+END_SRC
 
 #+NAME: fig_overview
@@ -5368,6 +5508,7 @@ vareas fig2_outline
   end
 
 text ${topleft_fig2} ${text_fig2}
+  background white
   fontsize 14
   ref lower left
   xoffset -5
@@ -5380,6 +5521,7 @@ vareas fig5_outline
   end
 
 text ${topleft_fig5} ${text_fig5}
+  background white
   fontsize 14
   ref lower left
   xoffset -5
@@ -5392,6 +5534,7 @@ vareas fig6_outline
   end
 
 text ${topleft_fig6} ${text_fig6}
+  background white
   fontsize 14
   ref lower left
   xoffset -5
@@ -5404,6 +5547,49 @@ vareas fig7_outline
   end
 
 text ${topleft_fig7} ${text_fig7}
+  background white
+  fontsize 14
+  ref lower left
+  xoffset -5
+  yoffset -5
+  end
+
+
+
+
+vareas fig8_outline
+  fcolor none
+  lpos 0
+  end
+
+text ${topleft_fig8} ${text_fig8}
+  background white
+  fontsize 14
+  ref lower left
+  xoffset -5
+  yoffset -5
+  end
+
+vareas fig9_outline
+  fcolor none
+  lpos 0
+  end
+
+text ${topleft_fig9} ${text_fig9}
+  background white
+  fontsize 14
+  ref lower left
+  xoffset -5
+  yoffset -5
+  end
+
+vareas fig12_outline
+  fcolor none
+  lpos 0
+  end
+
+text ${topleft_fig12} ${text_fig12}
+  background white
   fontsize 14
   ref lower left
   xoffset -5
@@ -5435,7 +5621,10 @@ o ./fig/overview.png
 #+RESULTS: fig_overview
 #+begin_example
 
-> > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > Scale set to 1 : 10967002
+> > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > Scale set to 1 : 10967002
+...
+...
+...
 ...
 ...
 ...
@@ -5451,7 +5640,7 @@ ps.map complete. PostScript file './fig/overview.eps' successfully written.
 
 #+NAME: fig:overview
 #+ATTR_LATEX: :height 0.8\textheight :placement [!h]
-#+CAPTION: Overview showing ice basins (blue) and land basins (green), and insets of Figures [[fig:coverage]], [[fig:watson_basins]], and [[fig:diff_land_surf_aDEM_BM3_jako]].
+#+CAPTION: Overview showing ice basins (blue) and land basins (green), and insets of all other figures.
 [[./fig/overview.png]]
 
 
@@ -5485,9 +5674,10 @@ import matplotlib.pyplot as plt
 <<B2018>>
 
 runoff = df_b2018.copy(deep=True)
-runoff.loc[runoff.index[0] - datetime.timedelta(365)] = runoff.iloc[0]
-runoff.sort_index(inplace=True)
-runoff = runoff.shift(1, freq='Y')
+runoff.index = runoff.index - pd.DateOffset(years=1) + pd.DateOffset(days=1)
+
+# https://github.com/pandas-dev/pandas/issues/31965
+runoff.loc[runoff.index[-1] + (runoff.index[-1]-runoff.index[-2])] = runoff.iloc[-1]
 
 fig = plt.figure(1, figsize=(5,4)) # w,h
 fig.clf()
@@ -5497,32 +5687,31 @@ gs = gridspec.GridSpec(10, 1) #w,h
 ax = plt.subplot(gs[0:6,:])
 axins = plt.subplot(gs[6:,:])
 
-
 runoff[['MAR ice','RACMO ice','B2018 ice']].plot(ax=ax, 
-                                         drawstyle='steps', 
+                                         drawstyle='steps-post', 
                                          legend=False, 
                                          fontsize=12,
                                          figsize=(6,4))
 
 runoff['MAR land'].plot(ax=ax,
-                        drawstyle='steps', 
+                        drawstyle='steps-post', 
                         color=ax.lines[0].get_c(),
                         linestyle='--',
                         # legend=False,
                         use_index=True)
 runoff['B2018 land'].plot(ax=ax,
-                        drawstyle='steps', 
+                        drawstyle='steps-post', 
                         color=ax.lines[2].get_c(),
                         linestyle='--',
                         # legend=False,
                         use_index=True)
 
 ax.fill_between(runoff.index, runoff['MAR ice']*0.925, runoff['MAR ice']*1.075,
-                color=ax.lines[0].get_c(), alpha=0.25, step='pre')
+                color=ax.lines[0].get_c(), alpha=0.25, step='post')
 ax.fill_between(runoff.index, runoff['MAR land']*0.925, runoff['MAR land']*1.075,
-                color=ax.lines[0].get_c(), alpha=0.25, step='pre')
+                color=ax.lines[0].get_c(), alpha=0.25, step='post')
 ax.fill_between(runoff.index, runoff['RACMO ice']*0.925, runoff['RACMO ice']*1.075,
-                color=ax.lines[1].get_c(), alpha=0.25, step='pre')
+                color=ax.lines[1].get_c(), alpha=0.25, step='post')
 
 
 # ax.legend(loc=4, fontsize=6)
@@ -5562,40 +5751,51 @@ if 'MAR_daily' not in locals():
 
 M1999 = MAR_daily[MAR_daily.index.year == 1999]
 R1999 = RACMO_daily[RACMO_daily.index.year == 1999]
+
+# https://github.com/pandas-dev/pandas/issues/31965
+M1999.loc[M1999.index[-1] + (M1999.index[-1]-M1999.index[-2])] = M1999.iloc[-1]
+R1999.loc[R1999.index[-1] + (R1999.index[-1]-R1999.index[-2])] = R1999.iloc[-1]
+
 M1999.plot(ax=axins, 
-           drawstyle='steps', 
+           drawstyle='steps-post', 
            color=ax.lines[0].get_c(),
            legend=False,
            use_index=True)
 R1999.plot(ax=axins, 
-           drawstyle='steps', 
+           drawstyle='steps-post', 
            color=ax.lines[1].get_c(),
            legend=False,
            use_index=True)
 
 axins.fill_between(M1999.index, M1999.values.flatten()*0.925, M1999.values.flatten()*1.075,
-                color=ax.lines[0].get_c(), alpha=0.25, step='pre')
+                color=ax.lines[0].get_c(), alpha=0.25, step='post')
 axins.fill_between(R1999.index, R1999.values.flatten()*0.925, R1999.values.flatten()*1.075,
-                color=ax.lines[1].get_c(), alpha=0.25, step='pre')
+                color=ax.lines[1].get_c(), alpha=0.25, step='post')
 
-Bamber_monthly.loc['1998-12-01':'1999-12-01']\
-    .resample('1M', loffset='1M').mean()\
-                                  .plot(ax=axins, 
-                                        drawstyle='steps', 
-                                        color=ax.lines[2].get_c(),
-                                        legend=False,
-                                        use_index=True)
+Bamber_tmp = Bamber_monthly.loc['1999-01-01':'1999-12-01']\
+    .resample('1M').mean()
+
+# https://github.com/pandas-dev/pandas/issues/31965
+Bamber_tmp.loc[Bamber_tmp.index[-1] + (Bamber_tmp.index[-1]-Bamber_tmp.index[-2])] = Bamber_tmp.iloc[-1]
+
+Bamber_tmp.plot(ax=axins, 
+                drawstyle='steps-post', 
+                color=ax.lines[2].get_c(),
+                legend=False,
+                use_index=True)
 
 axins.set_xlabel("")
 axins.set_ylim([0,10])
 axins.set_ylabel("[km$^{3}$ d$^{-1}$]", labelpad=10)
-axins.set_xlim(np.array(axins.get_xlim())-[0,31])
+# axins.set_xlim(np.array(axins.get_xlim())-[0,31])
+# axins.set_xminor
 
 from adjust_spines import adjust_spines as adj
 adj(axins, ['left','bottom'])
 adj(ax, ['left','top'])
 
 axins.tick_params(axis='x', which='minor', top=False)
+axins.tick_params(axis='x', which='minor', bottom=False)
 axins.tick_params(axis='y', which='minor', bottom=False)
 
 plt.savefig("./fig/timeseries.png", dpi=300, bbox_inches='tight')
@@ -6159,27 +6359,27 @@ vareas basins@${MAPSET}
 
 #+NAME: fig:GEM_map_Zackenberg
 #+ATTR_LATEX: :width 0.9\textwidth :placement [!h]
-#+CAPTION: Zackenberg basin for GEM outlet. Note two small glaciers without correstponding MAR or RACMO ice cells. See Fig. \ref{fig:GEM_ts} for comparisons between GEM and MAR discharge at this location. Also visible is basin artifact at southern-most portion of basin. Because basins < 1 km^{2} are absorbed into their largest neighbor, here small basins clearly outside the basin (south of the coastal mountain range) are absorbed into the basin.
+#+CAPTION: Zackenberg basin for GEM outlet. Note two small glaciers without correstponding MAR or RACMO ice cells. See Fig. \ref{fig:GEM_ts} for comparisons between GEM and MAR discharge at this location. Also visible is basin artifact at southern-most portion of basin. Because basins < 1 km^{2} are absorbed into their largest neighbor, here small basins clearly outside the basin (south of the coastal mountain range) are absorbed into the basin. Basemap from citet:howat_2014_greenland,NSIDC_0713.
 [[./fig/GEM_Zackenberg.png]]
 
 #+NAME: fig:GEM_map_Rode
 #+ATTR_LATEX: :width 0.8\textwidth :placement [!h]
-#+CAPTION: Röde Elve basin for GEM outlet. See figures \ref{fig:GEM_ts} and \ref{fig:GEM_scatter} for comparisons between GEM and MAR discharge at this location.
+#+CAPTION: Røde Elv basin for GEM outlet. See figures \ref{fig:GEM_ts} and \ref{fig:GEM_scatter} for comparisons between GEM and MAR discharge at this location. Basemap from citet:howat_2014_greenland,NSIDC_0713.
 [[./fig/GEM_RodeElv.png]]
 
 #+NAME: fig:GEM_map_others
 #+ATTR_LATEX: :width 0.8\textwidth :placement [!h]
-#+CAPTION: GEM basins for Kingigtorssuaq, Kobbefjord, Oriartorfik, and Teqinngalip outlets. Note that except for one RCM ice cell, no ice basins have RCM runoff estimates. Furthemore, at the eastern edge of the image RCM ice cells exist where no ice basin exists (that RCM runoff is discarded). See figures \ref{fig:GEM_ts} and \ref{fig:GEM_scatter} for comparisons between GEM and MAR discharge at these location.
+#+CAPTION: GEM basins for Kingigtorssuaq, Kobbefjord, Oriartorfik, and Teqinngalip outlets. Note that except for one RCM ice cell, no ice basins have RCM runoff estimates. Furthermore, at the eastern edge of the image RCM ice cells exist where no ice basin exists (that RCM runoff is discarded). See figures \ref{fig:GEM_ts} and \ref{fig:GEM_scatter} for comparisons between GEM and MAR discharge at these location. Basemap from citet:howat_2014_greenland,NSIDC_0713.
 [[./fig/GEM_OtherFour.png]]
 
 #+NAME: fig:GEM_ts
 #+ATTR_LATEX: :width 0.9\textwidth :placement [!h]
-#+CAPTION: Time series of GEM observed MAR ice and land runoff for basins shown in Figures \ref{fig:GEM_map_Zackenberg}, \ref{fig:GEM_map_Rode}, and \ref{fig:GEM_map_others}. Only 2017 shown because that is the only year  where data exists at Röde Elv.
+#+CAPTION: Time series of GEM observed MAR ice and land runoff for basins shown in Figures \ref{fig:GEM_map_Zackenberg}, \ref{fig:GEM_map_Rode}, and \ref{fig:GEM_map_others}. Only 2017 shown because that is the only year  where data exists at Røde Elv.
 [[./fig/GEM_ts_doy.pdf]]
 
 #+NAME: fig:GEM_scatter
 #+ATTR_LATEX: :width 0.9\textwidth :placement [!h]
-#+CAPTION: Scatter plot of 10-day averages of GEM and MAR runoff for basins shown in Figures \ref{fig:GEM_map_Zackenberg}, \ref{fig:GEM_map_Rode}, and \ref{fig:GEM_map_others}. Data for all availabel years at all stations are shown.
+#+CAPTION: Scatter plot of 10-day averages of GEM and MAR runoff for basins shown in Figures \ref{fig:GEM_map_Zackenberg}, \ref{fig:GEM_map_Rode}, and \ref{fig:GEM_map_others}. Data for all available years at all stations are shown.
 [[./fig/GEM_scatter.png]]
 
 *** Code for Figures                                    :noexport:
@@ -6190,7 +6390,7 @@ vareas basins@${MAPSET}
 # GEM_meta['Oriartorfik']    = 140660
 # GEM_meta['Teqinngalip']    = 140669
 # GEM_meta['Kingigtorssuaq'] = 140937
-# GEM_meta['Röde_Elv']       = 91818
+# GEM_meta['Røde_Elv']       = 91818
 # GEM_meta['Zackenberg']      = 49123
 
 
@@ -6236,7 +6436,7 @@ i.colors.enhance -p red=r green=g blue=b strength=93
 g.region region=Zackenberg -p
 #+END_SRC
 
-**** Röde Elv
+**** Røde Elv
 #+BEGIN_SRC bash :results verbatim :session *freshwater-shell*
 g.mapset -c GEM_figs_RodeElv
 
@@ -6446,16 +6646,19 @@ scalebar f
 #+RESULTS: GEM_basins_psmap
 
 ** Qaanaaq
+:PROPERTIES:
+:clearpage: t
+:END:
 
 
 #+NAME: fig:map_Qaanaaq
 #+ATTR_LATEX: :width 0.8\textwidth :placement [!h]
-#+CAPTION: Plan view of Qaanaaq basin. Note that MAR ice cells only cover ~1 % of ice basin, while RACMO ice cells cover ~90 % of ice basin. See Figure \ref{fig:ts_Qaanaaq} for runoff data from this basin.
+#+CAPTION: Plan view of Qaanaaq basin. Note that MAR ice cells only cover ~1 % of ice basin, while RACMO ice cells cover ~90 % of ice basin. See Figure \ref{fig:ts_Qaanaaq} for runoff data from this basin. Basemap from citet:howat_2014_greenland,NSIDC_0713.
 [[./fig/Qaanaaq.png]]
 
 #+NAME: fig:ts_Qaanaaq
 #+ATTR_LATEX: :width 0.5\textwidth :placement [!h]
-#+CAPTION: Time series of observed and modeled runoff at Qaanaaq basin outlet (see Figure \ref{fig:map_Qaanaaq}). Displayed uncertainty is 9 % for observations and 15 % for RCMs.
+#+CAPTION: Time series of observed and modeled runoff at Qaanaaq basin outlet (see Figure \ref{fig:map_Qaanaaq}). Displayed uncertainty is 9 % for observations and 15 % for RCMs. Uncertainty only shown for total MAR runoff, not ice or land components.
 [[./fig/Qaanaaq_ts.png]]
 
 *** Code for Figures                                    :noexport:
@@ -6688,32 +6891,42 @@ obs_RACMO = pd.DataFrame(obs)\
 # plt.savefig('./fig/Qaanaaq_scatter.png', transparent=False, bbox_inches='tight', dpi=96)
 
 obs_MAR_RACMO = obs_MAR.merge(obs_RACMO['RACMO'], left_index=True, right_index=True)
-ax = obs_MAR_RACMO[['Observed','ice','RACMO']].plot(drawstyle='steps', 
-                        color=[C_darkblue,C_darkgreen,C_orange])
-obs_MAR_RACMO[['land']].plot(ax=ax,
-                             drawstyle='steps', 
-                             linestyle='--',
-                             color=C_darkgreen)
+
+# https://github.com/pandas-dev/pandas/issues/31965
+obs_MAR_RACMO.loc[obs_MAR_RACMO.index[-1] + (obs_MAR_RACMO.index[-1]-obs_MAR_RACMO.index[-2])] = obs_MAR_RACMO.iloc[-1]
+
+obs_MAR_RACMO['MAR'] = obs_MAR_RACMO['ice'] + obs_MAR_RACMO['land']
+ax = obs_MAR_RACMO[['Observed','RACMO']]\
+    .plot(drawstyle='steps-post', 
+          color=[C_darkblue,C_orange])
+obs_MAR_RACMO[['ice']].plot(ax=ax,drawstyle='steps-post', linestyle='--', color=C_darkgreen)
+obs_MAR_RACMO[['land']].plot(ax=ax,drawstyle='steps-post', linestyle=':', color=C_darkgreen)
+obs_MAR_RACMO[['MAR']].plot(ax=ax, drawstyle='steps-post', linestyle='-', color=C_darkgreen)
 
 ax.fill_between(obs_MAR_RACMO.index, 
                 obs_MAR_RACMO['Observed']*0.955, # 9 % according to Ken Kondo email
                 obs_MAR_RACMO['Observed']*1.045,
-                color=C_darkblue, step='pre', alpha=0.25)
+                color=C_darkblue, step='post', alpha=0.25)
 ax.fill_between(obs_MAR_RACMO.index, 
-                obs_MAR_RACMO['ice']*0.925, # 15 % according to Xavier
-                obs_MAR_RACMO['ice']*1.075,
-                color=C_darkgreen, step='pre', alpha=0.25)
-ax.fill_between(obs_MAR_RACMO.index, 
-                obs_MAR_RACMO['land']*0.925, # 15 % according to Xavier
-                obs_MAR_RACMO['land']*1.075,
-                linestyle='--',
-                color=C_darkgreen, step='pre', alpha=0.25)
+                obs_MAR_RACMO['MAR']*0.925, # 15 % according to Xavier
+                obs_MAR_RACMO['MAR']*1.075,
+                color=C_darkgreen, step='post', alpha=0.25)
+# ax.fill_between(obs_MAR_RACMO.index, 
+#                 obs_MAR_RACMO['land']*0.925, # 15 % according to Xavier
+#                 obs_MAR_RACMO['land']*1.075,
+#                 linestyle=':',
+#                 color=C_darkgreen, step='post', alpha=0.25)
+# ax.fill_between(obs_MAR_RACMO.index, 
+#                 obs_MAR_RACMO['ice']*0.925, # 15 % according to Xavier
+#                 obs_MAR_RACMO['ice']*1.075,
+#                 linestyle='--',
+#                 color=C_darkgreen, step='post', alpha=0.25)
 ax.fill_between(obs_MAR_RACMO.index, 
                 obs_MAR_RACMO['RACMO']*0.925, # 15 % ?
                 obs_MAR_RACMO['RACMO']*1.075,
-                color=C_orange, step='pre', alpha=0.25)
+                color=C_orange, step='post', alpha=0.25)
 
-ax.legend(['Observed','MAR ice','RACMO','MAR land'])
+ax.legend(['Observed','RACMO','MAR ice','MAR land','MAR total'])
 
 ax.set_ylabel('Runoff [m$^{3}$ s$^{-1}$]')
 
@@ -6722,10 +6935,400 @@ adj(ax, ['left','bottom'])
 
 plt.savefig('./fig/Qaanaaq_ts.png', transparent=False, bbox_inches='tight', dpi=150)
 
+obs_MAR_RACMO['%'] = obs_MAR_RACMO['MAR']/obs_MAR_RACMO['Observed']*100
+obs_MAR_RACMO[['Observed','MAR','%']]
 #+END_SRC
 
 #+RESULTS: Qaanaaq_compare
+| Time(UTC)           | Observed |      MAR |       % |
+|---------------------+----------+----------+---------|
+| 2017-07-21 00:00:00 |     0.52 | 0.591269 | 113.706 |
+| 2017-07-22 00:00:00 |     0.69 | 0.782025 | 113.337 |
+| 2017-07-23 00:00:00 |     0.72 | 0.688788 | 95.6651 |
+| 2017-07-24 00:00:00 |     0.91 | 0.812862 | 89.3255 |
+| 2017-07-25 00:00:00 |     0.97 |  1.17526 |  121.16 |
+| 2017-07-26 00:00:00 |     1.43 |  1.73051 | 121.015 |
+| 2017-07-27 00:00:00 |     1.64 |  3.01645 |  183.93 |
+| 2017-07-28 00:00:00 |     1.77 |  4.24957 | 240.089 |
+| 2017-07-29 00:00:00 |     6.23 |  5.38837 | 86.4906 |
+| 2017-07-30 00:00:00 |     5.33 |  4.47044 | 83.8732 |
+| 2017-07-31 00:00:00 |      2.4 |  3.64338 | 151.807 |
+| 2017-08-01 00:00:00 |      2.6 |  2.43088 | 93.4953 |
+| 2017-08-02 00:00:00 |     1.34 |  1.61227 | 120.318 |
+| 2017-08-03 00:00:00 |     0.98 | 0.773698 | 78.9487 |
+| 2017-08-04 00:00:00 |     0.98 | 0.773698 | 78.9487 |
 
+** Leverett Glacier
+:PROPERTIES:
+:clearpage: t
+:END:
+
+#+NAME: fig:leverett_ts
+#+ATTR_LATEX: :width 0.5\textwidth :placement [!h]
+#+CAPTION: Time series of Leverett glacier observed discharge vs. this product.
+[[./fig/leverett_ts.png]]
+
+
+#+NAME: fig:leverett_scatter
+#+ATTR_LATEX: :width 0.8\textwidth :placement [!h]
+#+CAPTION: Scatter plot of Leverett glacier observed discharge vs. this product.
+[[./fig/leverett_scatter.png]]
+
+
+*** Code for Figures                                    :noexport:
+
+Location:
+#+BEGIN_SRC bash :results verbatim :eval no-export
+head -n2 ~/data/Tedstone_2017/leverett_Q_????_UTC.csv|cat
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+==> /home/kdm/data/Tedstone_2017/leverett_Q_2009_UTC.csv <==
+# River discharge, Leverett Glacier, Greenland, 2009
+# 67°03'53.8"N 50°13'01.2"W
+
+==> /home/kdm/data/Tedstone_2017/leverett_Q_2010_UTC.csv <==
+# River discharge, Leverett Glacier, Greenland, 2010
+# 67°03'53.8"N 50°13'01.2"W
+
+==> /home/kdm/data/Tedstone_2017/leverett_Q_2011_UTC.csv <==
+# River discharge, Leverett Glacier, Greenland, 2011
+# 67°03'53.8"N 50°13'01.2"W
+
+==> /home/kdm/data/Tedstone_2017/leverett_Q_2012_UTC.csv <==
+# River discharge, Leverett Glacier, Greenland, 2012
+# 67°03'53.8"N 50°13'01.2"W
+#+end_example
+
+Manual inspection shows the large basin nearby (not closest) has ID 58005.
+
+#+BEGIN_SRC jupyter-python :session leverett :exports results :results raw drawer :eval no-export
+import numpy as np
+import pandas as pd
+import datetime
+
+root="/home/kdm/data/Tedstone_2017"
+# for y in np.arange(2009,2012+1):
+csv = []
+for y in np.arange(2009,2012+1):
+    df = pd.read_csv(root + "/leverett_Q_" + str(y) + "_UTC.csv", 
+                     comment="#", index_col=0)\
+        .rename({"Discharge m3 s-1": "Observed"}, axis="columns")
+    df.index = datetime.datetime(y,1,1) + np.array([datetime.timedelta(_-1) for _ in df.index])
+    csv.append(df)
+
+obs = pd.concat(csv, axis='index')\
+    .resample('1D').mean()
+
+# ID: 58005
+
+import xarray as xr
+
+ds_ice = xr.open_mfdataset('./freshwater/runoff/margin/runoff_ice_MAR_*.nc', combine='by_coords')
+if 'MAR' not in locals():
+    MAR = ds_ice.sel(station=58005).to_dataframe()['runoff']
+    MAR.name = "MAR"
+
+ds_ice = xr.open_mfdataset('./freshwater/runoff/margin/runoff_ice_RACMO_*.nc', combine='by_coords')
+if 'RACMO' not in locals():
+    RACMO = ds_ice.sel(station=58005).to_dataframe()['runoff']
+    RACMO.name = "RACMO"
+
+from matplotlib import rc
+rc('font', size=12)
+rc('text', usetex=False)
+# matplotlib.pyplot.xkcd()
+
+C_darkblue="#1f78b4"
+C_lightgreen="#b2df8"
+C_darkgreen="#33a02c"
+C_red="#e31a1c"
+C_orange="#fdbf6f"
+
+import matplotlib.pyplot as plt
+# plt.close(1)
+fig = plt.figure(1, figsize=(5,8)) # w,h
+fig.clf()
+fig.set_tight_layout(True)
+# import matplotlib.gridspec as gridspec
+# gs = gridspec.GridSpec(3, 2) #w,h
+# ax = plt.subplot(gs[:,:])
+
+obs_MAR = pd.DataFrame(obs)\
+            .merge(MAR, left_index=True, right_index=True, how='inner')
+obs_RACMO = pd.DataFrame(obs)\
+              .merge(RACMO, left_index=True, right_index=True, how='inner')
+
+obs_MAR_RACMO = obs_MAR.merge(obs_RACMO['RACMO'], left_index=True, right_index=True)\
+    .dropna()
+
+# https://github.com/pandas-dev/pandas/issues/31965
+# obs_MAR_RACMO.loc[obs_MAR_RACMO.index[-1] + (obs_MAR_RACMO.index[-1]-obs_MAR_RACMO.index[-2])] = obs_MAR_RACMO.iloc[-1]
+
+axs = []
+for i,y in enumerate(np.arange(2009,2012+1)):
+    ax = fig.add_subplot(4,1,i+1)
+    axs.append(ax)
+
+    tmp = obs_MAR_RACMO[obs_MAR_RACMO.index.year == y]
+    tmp[['Observed','RACMO','MAR']]\
+        .plot(ax = ax,
+              drawstyle='steps-post', 
+              color=[C_darkblue,C_orange,C_darkgreen])
+
+    ax.fill_between(tmp.index, 
+                    tmp['MAR']*0.925, # 15 % according to Xavier
+                    tmp['MAR']*1.075,
+                    color=C_darkgreen, step='post', alpha=0.25)
+
+    ax.fill_between(tmp.index, 
+                    tmp['RACMO']*0.925, # 15 % ?
+                    tmp['RACMO']*1.075,
+                    color=C_orange, step='post', alpha=0.25)
+
+    ax.legend([], frameon=False)
+    ax.text(tmp.index[0], 150, str(y))
+
+axs[0].legend()
+axs[0].set_ylabel('Discharge [m$^{3}$ s$^{-1}$]')
+
+from adjust_spines import adjust_spines as adj
+for a in axs[0:3]:
+    adj(a, ['left'])
+    a.set_ylim([0,800])
+adj(axs[3],['left','bottom'])    
+
+plt.savefig('./fig/leverett_ts.png', transparent=False, bbox_inches='tight', dpi=150)
+#+END_SRC
+
+#+RESULTS:
+: /home/kdm/local/anaconda/envs/sci/lib/python3.6/site-packages/matplotlib/figure.py:2369: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+:   warnings.warn("This figure includes Axes that are not compatible "
+
+#+BEGIN_SRC jupyter-python :session leverett :exports results :results raw drawer :eval no-export
+fig = plt.figure(2, figsize=(7,6)) # w,h
+fig.clf()
+fig.set_tight_layout(True)
+# import matplotlib.gridspec as gridspec
+
+axs = []
+for i,y in enumerate(np.arange(2009,2012+1)):
+    ax = fig.add_subplot(2,2,i+1)
+    axs.append(ax)
+
+    tmp = obs_MAR_RACMO[obs_MAR_RACMO.index.year == y]
+
+    tmp = tmp.rolling('10 D').mean()
+    
+    kws = {'c': tmp.index.dayofyear,
+           'xlim':(0,600),
+           'ylim':(0,700)}
+    s0 = tmp.plot(kind='scatter', 
+                  x='Observed', y='MAR',
+                  marker = 'o',
+                  label='MAR',
+                  ax=ax, **kws)
+
+    s1 = tmp.plot(kind='scatter', 
+                  x='Observed', y='RACMO',
+                  marker = 's',
+                  label='RACMO',
+                  colorbar=True,
+                  ax=ax, **kws)
+
+    if i == 0:
+        s1.legend(loc=4, frameon=False, facecolor='k')
+        s1.legend
+    else:
+        ax.legend([], frameon=False)
+
+    ax.errorbar(tmp['Observed'], tmp['RACMO'], yerr=tmp['MAR']*0.15/2, 
+                linestyle='', errorevery=1, ecolor='black', alpha=0.1)
+
+    ax.errorbar(tmp['Observed'], tmp['MAR'],
+                linestyle='', errorevery=1, ecolor='black', alpha=0.1)
+    ax.plot([0,np.max([ax.get_xlim()[1],ax.get_ylim()[1]])],
+            [0,np.max([ax.get_xlim()[1],ax.get_ylim()[1]])],
+            'k--', alpha=0.5)
+
+    ax.set_ylabel('')
+    ax.set_xlabel('')
+    adj(ax, ['left','bottom'])
+    ax.text(0, 500, str(y))
+
+f = plt.gcf()
+(f.get_axes()[-1]).set_ylabel('Day of Year')
+
+axs[0].set_ylabel('MAR [m$^{3}$ s$^{-1}$]')
+axs[-1].set_xlabel('Observed [m$^{3}$ s$^{-1}$]')
+
+plt.savefig('./fig/leverett_scatter.png', transparent=False, bbox_inches='tight', dpi=150)
+#+END_SRC
+
+#+RESULTS:
+** Narsarsuaq                                           :noexport:
+:PROPERTIES:
+:clearpage: t
+:END:
+
+#+NAME: fig:leverett_ts
+#+ATTR_LATEX: :width 0.5\textwidth :placement [!h]
+#+CAPTION: Time series of Leverett glacier observed discharge vs. this product.
+[[./fig/narsarsuaq_ts.png]]
+
+
+#+NAME: fig:leverett_scatter
+#+ATTR_LATEX: :width 0.8\textwidth :placement [!h]
+#+CAPTION: Scatter plot of Leverett glacier observed discharge vs. this product.
+[[./fig/narsarsuaq_scatter.png]]
+
+
+*** Code for Figures                                    :noexport:
+
+ID: 163584?
+
+#+BEGIN_SRC jupyter-python :session leverett :exports results :results raw drawer :eval no-export
+import numpy as np
+import pandas as pd
+import datetime
+
+df = pd.read_excel("/home/kdm/Desktop/NarsarsuaqDischarge2013.xlsx", index_col=0)\
+       .rename({"Q (m3 sec-1)":"Observed"}, axis="columns")
+df.index = datetime.datetime(2013,1,1) + np.array([datetime.timedelta(_-1) for _ in df.index])
+obs = df.resample('1D').mean()
+
+import xarray as xr
+
+# ds_ice = xr.open_mfdataset('./freshwater/runoff/coast/runoff_land_MAR_*.nc', combine='by_coords')
+# if 'MAR' not in locals():
+#     MAR = ds_ice.sel(station=163584).to_dataframe()['runoff']
+#     MAR.name = "MAR"
+
+ds_ice = xr.open_mfdataset('./freshwater/runoff/margin/runoff_ice_MAR_*.nc', combine='by_coords')
+MAR = ds_ice.sel(station=[70043,70037,69972,69953,69940,69927,69920,69893,69856,69848,69789]).to_dataframe()['runoff'].groupby("time").sum()
+
+MAR.name = "MAR"
+
+
+from matplotlib import rc
+rc('font', size=12)
+rc('text', usetex=False)
+
+C_darkblue="#1f78b4"
+C_lightgreen="#b2df8"
+C_darkgreen="#33a02c"
+C_red="#e31a1c"
+C_orange="#fdbf6f"
+
+import matplotlib.pyplot as plt
+# plt.close(1)
+fig = plt.figure(1, figsize=(5,4)) # w,h
+fig.clf()
+fig.set_tight_layout(True)
+# import matplotlib.gridspec as gridspec
+# gs = gridspec.GridSpec(3, 2) #w,h
+# ax = plt.subplot(gs[:,:])
+
+obs_MAR = pd.DataFrame(obs)\
+            .merge(MAR, left_index=True, right_index=True, how='inner')\
+            .dropna()
+
+axs = []
+ax = fig.add_subplot(1,1,1)
+
+obs_MAR[['Observed','MAR']]\
+    .plot(ax = ax,
+          drawstyle='steps-post', 
+          color=[C_darkblue,C_darkgreen])
+
+ax.fill_between(obs_MAR.index, 
+                obs_MAR['MAR']*0.925, # 15 % according to Xavier
+                obs_MAR['MAR']*1.075,
+                color=C_darkgreen, step='post', alpha=0.25)
+
+    # ax.fill_between(tmp.index, 
+    #                 tmp['RACMO']*0.925, # 15 % ?
+    #                 tmp['RACMO']*1.075,
+    #                 color=C_orange, step='post', alpha=0.25)
+
+    # ax.legend([], frameon=False)
+    # ax.text(tmp.index[0], 150, str(y))
+
+# axs[0].legend()
+ax.set_ylabel('Discharge [m$^{3}$ s$^{-1}$]')
+
+from adjust_spines import adjust_spines as adj
+adj(ax, ['left','bottom'])
+
+plt.savefig('./fig/narsarsuaq_ts.png', transparent=False, bbox_inches='tight', dpi=150)
+#+END_SRC
+
+#+RESULTS:
+: /home/kdm/local/anaconda/envs/sci/lib/python3.6/site-packages/matplotlib/figure.py:2369: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+:   warnings.warn("This figure includes Axes that are not compatible "
+
+#+BEGIN_SRC jupyter-python :session leverett :exports results :results raw drawer :eval no-export
+fig = plt.figure(2, figsize=(7,6)) # w,h
+fig.clf()
+fig.set_tight_layout(True)
+# import matplotlib.gridspec as gridspec
+
+axs = []
+for i,y in enumerate(np.arange(2009,2012+1)):
+    ax = fig.add_subplot(2,2,i+1)
+    axs.append(ax)
+
+    tmp = obs_MAR_RACMO[obs_MAR_RACMO.index.year == y]
+
+    tmp = tmp.rolling('10 D').mean()
+    
+    kws = {'c': tmp.index.dayofyear,
+           'xlim':(0,600),
+           'ylim':(0,700)}
+    s0 = tmp.plot(kind='scatter', 
+                  x='Observed', y='MAR',
+                  marker = 'o',
+                  label='MAR',
+                  ax=ax, **kws)
+
+    s1 = tmp.plot(kind='scatter', 
+                  x='Observed', y='RACMO',
+                  marker = 's',
+                  label='RACMO',
+                  colorbar=True,
+                  ax=ax, **kws)
+
+    if i == 0:
+        s1.legend(loc=4, frameon=False, facecolor='k')
+        s1.legend
+    else:
+        ax.legend([], frameon=False)
+
+    ax.errorbar(tmp['Observed'], tmp['RACMO'], yerr=tmp['MAR']*0.15/2, 
+                linestyle='', errorevery=1, ecolor='black', alpha=0.1)
+
+    ax.errorbar(tmp['Observed'], tmp['MAR'],
+                linestyle='', errorevery=1, ecolor='black', alpha=0.1)
+    ax.plot([0,np.max([ax.get_xlim()[1],ax.get_ylim()[1]])],
+            [0,np.max([ax.get_xlim()[1],ax.get_ylim()[1]])],
+            'k--', alpha=0.5)
+
+    ax.set_ylabel('')
+    ax.set_xlabel('')
+    adj(ax, ['left','bottom'])
+    ax.text(0, 500, str(y))
+
+f = plt.gcf()
+(f.get_axes()[-1]).set_ylabel('Day of Year')
+
+axs[0].set_ylabel('MAR [m$^{3}$ s$^{-1}$]')
+axs[-1].set_xlabel('Observed [m$^{3}$ s$^{-1}$]')
+
+plt.savefig('./fig/leverett_scatter.png', transparent=False, bbox_inches='tight', dpi=150)
+#+END_SRC
+
+#+RESULTS:
 * Appendix                                                :ignore:
 #+LaTeX: \appendix
 #+LaTeX: \clearpage
