@@ -3,7 +3,7 @@
 
 This repository contains the source for "Greenland liquid water runoff from 1979 through 2017" and subsequent versions. 
 
-+ The original paper is located at TBD
++ The original paper is located at https://doi.org/10.5194/essd-2020-47.
 + The data sets are located at [[http://dx.doi.org/10.22008/promice/data/freshwater_runoff/v01][doi:10.22008/promice/data/freshwater_runoff/v01]]/.
 + Companion paper: Greenland Ice Sheet solid ice discharge from 1986 through 2019 at https://github.com/mankoff/ice_discharge/
 
@@ -16,16 +16,17 @@ The [[https://github.com/mankoff/freshwater/tree/submitted][submitted tag]] is t
 * Citation
 
 #+BEGIN_EXAMPLE
-@article{mankoff_YYYY_freshwater,
-  doi = {TBD},
-  url = {https://doi.org/TBD},
-  year = {yyyy},
-  volume = v,
-  issue = i,
-  pages = {p -- p},
-  publisher = {TBD},
-  author = {Kenneth D. Mankoff and others TBD},
-  title = {{G}reenland liquid water runoff from 1979 through 2017},
-  journal = {TBD}
+@article{Mankoff_2020_freshwater,
+  doi = {10.5194/essd-2020-47},
+  url = {https://doi.org/10.5194/essd-2020-47},
+  year = {2020},
+  month = 4,
+  publisher = {Copernicus {GmbH}},
+  author = {Kenneth D. Mankoff and Andreas P. Ahlstrøm and William Colgan and
+            Robert S. Fausto and Xavier Fettweis and Ken Kondo and Kirsty Langley and Brice Noël and
+            Shin Sugiyama and Dirk van As},
+  title = {Greenland liquid water runoff from 1979 through 2017},
+  journal = {Earth System Science Data Discussions},
+  note = {In Review}
 }
 #+END_EXAMPLE
