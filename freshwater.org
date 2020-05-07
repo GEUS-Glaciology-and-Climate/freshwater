@@ -56,9 +56,9 @@
 \affil[3]{Institute of Low Temperature Science, Hokkaido University, Japan}
 \affil[4]{Asiaq-Greenland Survey, Nuuk, Greenland}
 \affil[5]{Institute for Marine and Atmospheric Research, Utrecht University, The Netherlands}
+\correspondence{Ken Mankoff (kdm@geus.dk)}
 \runningtitle{Greenland liquid water runoff}
 \runningauthor{K. D. Mankoff \textit{et al.}}
-\correspondence{Ken Mankoff (kdm@geus.dk)}
 
 \received{}
 \pubdiscuss{}
@@ -178,7 +178,9 @@ To recreate this work
 
 This is captured programatically by [[workflow-update]]
 
-* Introduction
+* Introduction                                            :ignore:
+
+\introduction
 
 # The mass budget of the Greenland ice sheet has on average been negative since the beginning of the new millennium citep:mouginot_2019_forty. The mass budget of the ice sheet is primarily the net balance between mass gain by snow accumulation, mass loss from the surface from melting (runoff) and mass loss across the grounding line from iceberg production and submarine melt. The runoff mass losses originate from changes in the surface energy balance, e.g. temperature, incoming solar radiation, and precipitation, which in turn governs the liquid water runoff (REFS).
 
@@ -583,13 +585,27 @@ Finally, basal melt from 1) geothermal heating (e.g. citet:fahnestock_2001_high)
 
 Importantly, ice sheet runoff may not be the majority source of freshwater into some fjords, even though it is traditionally considered the majority, or even only, source of freshwater. The combination of land runoff, freshwater inputs (snow and rain) directly onto the near-land fjord surface, and basal runoff, suggests that GIS-wide ice sheet surface runoff may account for < 50 % of total freshwater input. The percent contribution of ice sheet surface runoff to total freshwater input is likely to vary widely depending on the area considered for the downstream fjord, the upstream basin, and the dates and time-span of the estimates.
 
-* Data and Code Availability
+* Conclusions                                             :ignore:
+\conclusions
+
+Our new outlet, basin, stream, and liquid water discharge data provide a high spatial (100 m) and temporal (1 day) resolution estimate of freshwater fluxes into Greenland fjords and coastal seas for the entire ice-sheet area from 1979 through 2017. We find an annual average Greenland runoff of 400 \pm 30 km^{3} ranging from 136 \pm 10 km^{3} in 1992 to 785 \pm 59 km^{3} in 2012, and displaying and overall increase in both magnitude and variability.
+
+Because of the high spatial and temporal resolution, quality issues exist at basin and daily scale that do not exist when working over larger areas or times. 
+
+This liquid freshwater volumetric flow rate product is complemented by a solid ice discharge product citep:mankoff_2019_ice. Combined, these provide an estimate of the majority of freshwater (total solid ice and liquid) flow rates from the Greenland ice sheet into fjords and coastal seas. 
+
+This estimate of freshwater flux into Greenland fjords aims to support further studies of the impact of freshwater on ocean physical, chemical, and biological properties; fjord nutrient, sediment, and ecosystems; and larger societal impacts of freshwater on the fjord and surrounding environments.
+
+* Data and Code Availability                              :ignore:
+#+LATEX: \codedataavailability{
 
 This work in its entirety is available at doi:10.22008/promice/data/freshwater_runoff/v01 citep:GEUS_freshwater_paper where it will be updated over time.
 
 A website for post-publication updates is available at https://github.com/mankoff/freshwater where we document ongoing changes to this work and use the GitHub Issues feature to collect suggested improvements, document those improvements as they are implemented, document problems that made it through review, and mention related works not cited here, perhaps due to temporal directionality citep:zeh_2007_physical. This version of the document is generated with git commit version \input{|"git describe --always --dirty='*'"}.
 
-Runoff can only change in the future - the true past runoff is fixed - yet different estimates exist of past runoff (e.g. citet:van-as_2018_reconstructing,bamber_2018_freshwater, and this work). These differences must be caused by different methods or different inputs to the methods. By fully documenting the inputs, methods, and results we use to estimate runoff, this work supports attribution of result differences between different estimates. Both data and code are needed to support reproducibility, which is needed to both quantify and attribute differences. That is, future estimates of past runoff can and should both quantify and attribute differences due to changes in input data and the same methods (RCM inputs or the surface or subglacial digital elevation models (DEMs) used for routing), differences due to changes in hydrological routing algorithms using the same data, or combinations of the two. Quantification and attribution of these differences in needed to move the community from broadly comparable process studies to operational products that better support downstream research goals.  
+Runoff can only change in the future - the true past runoff is fixed - yet different estimates exist of past runoff (e.g. citet:van-as_2018_reconstructing,bamber_2018_freshwater, and this work). These differences must be caused by different methods or different inputs to the methods. By fully documenting the inputs, methods, and results we use to estimate runoff, this work supports attribution of result differences between different estimates. Both data and code are needed to support reproducibility, which is needed to both quantify and attribute differences. That is, future estimates of past runoff can and should both quantify and attribute differences due to changes in input data and the same methods (RCM inputs or the surface or subglacial digital elevation models (DEMs) used for routing), differences due to changes in hydrological routing algorithms using the same data, or combinations of the two. Quantification and attribution of these differences in needed to move the community from broadly comparable process studies to operational products that better support downstream research goals.
+
+#+LATEX: }
 
 ** README                                               :noexport:
 
@@ -630,38 +646,6 @@ Complete documentation and example use cases with code are available at https://
 #+END_SRC
 
 
-
-* Conclusions
-
-Our new outlet, basin, stream, and liquid water discharge data provide a high spatial (100 m) and temporal (1 day) resolution estimate of freshwater fluxes into Greenland fjords and coastal seas for the entire ice-sheet area from 1979 through 2017. We find an annual average Greenland runoff of 400 \pm 30 km^{3} ranging from 136 \pm 10 km^{3} in 1992 to 785 \pm 59 km^{3} in 2012, and displaying and overall increase in both magnitude and variability.
-
-Because of the high spatial and temporal resolution, quality issues exist at basin and daily scale that do not exist when working over larger areas or times. 
-
-This liquid freshwater volumetric flow rate product is complemented by a solid ice discharge product citep:mankoff_2019_ice. Combined, these provide an estimate of the majority of freshwater (total solid ice and liquid) flow rates from the Greenland ice sheet into fjords and coastal seas. 
-
-This estimate of freshwater flux into Greenland fjords aims to support further studies of the impact of freshwater on ocean physical, chemical, and biological properties; fjord nutrient, sediment, and ecosystems; and larger societal impacts of freshwater on the fjord and surrounding environments.
-
-* Misc                                                    :ignore:
-
-#+BEGIN_authorcontribution
-\xspace KDM produced this work - wrote the code and the text. APA and DVA helped with discussions of methods and quality control. WC, RSF, and DVA helped with writing. KK and SS supplied Qaanaaq data. XF and BN supplied RCM inputs. KL provided GEM data. 
-#+END_authorcontribution
-
-
-#+BEGIN_competinginterests
-\xspace  The authors declare that they have no conflict of interest.
-#+END_competinginterests
-
-
-#+BEGIN_acknowledgements
-Funding was provided by the Programme for Monitoring of the Greenland Ice Sheet (PROMICE). Parts of this work were funded by the INTAROS project under the European Union's Horizon 2020 research and innovation program under grant agreement No. 727890. DEMs provided by the Polar Geospatial Center under NSF-OPP awards 1043681, 1559691, and 1542736. Data from the Greenland Ecosystem Monitoring Programme (GEM) were provided by Asiaq – Greenland Survey, Nuuk, Greenland. We thank Dorthe Petersen (ASIAQ) for help with basin quality control.
-#+END_acknowledgements
-
-* References                                              :ignore:
-
-#+LaTeX: \bibliographystyle{copernicus}
-# #+LaTeX: \bibliography{/home/kdm/Documents/Papers/library,freshwater}{}
-#+LaTeX: \bibliography{freshwater}{}
 
 * Algorithms                                            :noexport:
 :PROPERTIES:
@@ -7330,8 +7314,8 @@ plt.savefig('./fig/leverett_scatter.png', transparent=False, bbox_inches='tight'
 
 #+RESULTS:
 * Appendix                                                :ignore:
-#+LaTeX: \appendix
 #+LaTeX: \clearpage
+#+LaTeX: \appendix
 
 ** Software
 :PROPERTIES:
@@ -7390,6 +7374,25 @@ This work was performed using only open-source software, primarily =GRASS GIS= c
 [[./fig/diff_ice_surf_sub_BM3_80_class.png]]
 
 
+
+
+* Misc Journal Sections                                   :ignore:
+
+\authorcontribution{KDM produced this work - wrote the code and the text. APA and DVA helped with discussions of methods and quality control. WC, RSF, and DVA helped with writing. KK and SS supplied Qaanaaq data. XF and BN supplied RCM inputs. KL provided GEM data.}
+
+\competinginterests{The authors declare that they have no conflict of interest.}
+
+
+#+BEGIN_acknowledgements
+Funding was provided by the Programme for Monitoring of the Greenland Ice Sheet (PROMICE). Parts of this work were funded by the INTAROS project under the European Union's Horizon 2020 research and innovation program under grant agreement No. 727890. DEMs provided by the Polar Geospatial Center under NSF-OPP awards 1043681, 1559691, and 1542736. Data from the Greenland Ecosystem Monitoring Programme (GEM) were provided by Asiaq – Greenland Survey, Nuuk, Greenland. We thank Dorthe Petersen (ASIAQ) for help with basin quality control.
+#+END_acknowledgements
+
+
+* References                                              :ignore:
+
+#+LaTeX: \bibliographystyle{copernicus}
+# #+LaTeX: \bibliography{/home/kdm/Documents/Papers/library,freshwater}{}
+#+LaTeX: \bibliography{freshwater}{}
 
 * Meta                                                  :noexport:
 ** Set up git
