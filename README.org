@@ -30,3 +30,395 @@ The [[https://github.com/mankoff/freshwater/tree/submitted][submitted tag]] is t
   note = {In Review}
 }
 #+END_EXAMPLE
+
+* Accessing this data
+** Introduction
+
+After the data have been downloaded, the =runoff.py= script allows access to outlets, basins, and their runoff within a region of interest (ROI). The ROI can be a point, a list describing a polygon, or a file. Optionally, upstream outlets, basins, and runoff from any land outlet(s) can be included. The script can be called from the command line (CLI) or within Python.
+
+This script queries two database:
+ 
++ land :: The land coast outlets and land basins.
++ ice :: ice margin outlets and ice basins.
+
+For each of these two geospatial domains, there are two runoff databases: MAR and RACMO.
+
+The ROI coordinate units can be either EPSG:4326 (lon,lat) or EPSG:3413. The units for the coordinates are guessed using the range of values. If the ROI is a point, basins that contain that point are selected. Either 1 (if the point is on land) or two (ice and the downstream land, if the point is on the ice) basins are selected, and optionally, all ice basins upstream from the one land basin. If the ROI is a polygon, all outlets within the polygon are selected. The polygon does not have to be closed - a convex hull is wrapped around it. If the argument is a file (e.g. KML file) then the first polygon is selected and used.
+
+When the script is run from the command line, CSV data is written to =stdout= and can be redirected to a file. When the API is accessed from within Python, if the script is used to access outlets, a =GeoPandas= =GeoDataFrame= is returned and can be used for further analysis within Python, or written to any file format supported by =GeoPandas= or =Pandas=, for example =CSV=, or =GeoPackage= for =QGIS=. If the script is used to access runoff, an =xarray= =Dataset= is returned, and can be used for further analysis within Python, or written to any file format supported by =xarray=, for example =CSV= or =NetCDF=.
+
+*** Warnings
+
++ The script takes a few seconds to query the outlets and basins. The script takes ~10s of seconds to query each of the runoff time series datasets. Because there may be up to 6 runoff queries (2 RCMs for each of 1 land domain + ice domains + upstream ice domains), it can several minutes on a fast laptop to extract the data. To track progress, do not set the =quiet= flag to =True=.
+
++ If a polygon includes ice outlets, and the ~upstream~ flag is set, some ice outlets, basins, and runoff may be included twice, once as a "direct" selection within the polygon and once as an upstream outlet and basin from the land polygon. Further processing by the user can remove duplicates (see examples below).
+
++ The =id= column may not be unique for multiple reasons:
+  + As above, the same outlet may be included twice.
+  + =id='s are unique within a dataset (i.e. =land=, and =ice=), but note between datasets.
+
++ Due to Linux/UNIX command-line issues, the syntax =--roi -60,60= does not work. Use ~--roi=-60,06~.
+
++ Longitude is expected in degrees East, and should therefore probably be negative.
+
+*** Requirements
+:PROPERTIES:
+:header-args:jupyter-python: :kernel freshwater :session using :eval no-export
+:END:
+
++ numpy
++ pandas
++ geopandas
++ xarray
++ shapely
++ fiona
+
+** Examples
+:PROPERTIES:
+:header-args:jupyter-python: :kernel freshwater :session using :eval no-export :exports both
+:header-args:bash: :eval no-export :session "*freshwater-shell*" :results verbatim :exports both
+:END:
+
+*** Command line interface
+**** Usage Instructions
+
+# (setq org-babel-min-lines-for-block-output 100)
+
+#+BEGIN_SRC bash :exports both
+python ./runoff.py -h
+#+END_SRC
+
+#+RESULTS:
+: usage: runoff.py [-h] --base BASE --roi ROI [-u] (-o | -r) [-q]
+: 
+: Runoff data access
+: 
+: optional arguments:
+:   -h, --help      show this help message and exit
+:   --base BASE     Folder containing freshwater data
+:   --roi ROI       x,y OR lon,lat OR x0,y0 x1,y1 ... xn,yn OR lon0,lat0 lon1,lat1 ... lon_n,lat_n. [lon: degrees E]
+:   -u, --upstream  Include upstream ice outlets draining into land basins
+:   -o, --outlets   Return outlet IDs (same as basin IDs)
+:   -r, --runoff    Return runoff for each domain (outlets merged)
+:   -q, --quiet     Be quiet
+
+**** Outlets and basins
+***** One point
+
+The simplest example is a point, in this case near the Watson River outlet. Because we select one point over land and do not request upstream outlets and basins, only one row should be returned.
+
+#+BEGIN_SRC bash :exports both :results table
+python ./runoff.py --base ./freshwater --roi=-50.5,67.2 -o -q
+#+END_SRC
+
+#+RESULTS:
+| index |     id |     lon |    lat |       x |        y | elev | domain | upstream | coast_id | coast_lon | coast_lat | coast_x | coast_y |
+|-------+--------+---------+--------+---------+----------+------+--------+----------+----------+-----------+-----------+---------+---------|
+|     0 | 112448 | -51.233 | 67.156 | -272150 | -2491850 |   42 | land   | False    |          |           |           |         |         |
+
+If we move 10° east to somewhere over the ice, there should be four rows: one for the land outlet and basin, and three more for the three ice scenario:
+
+#+BEGIN_SRC bash :exports both :results table
+python ./runoff.py --base ./freshwater --roi=-40.5,67.2 -o -q
+#+END_SRC
+
+#+RESULTS:
+| index |     id |     lon |    lat |      x |        y | elev | domain | upstream | coast_id | coast_lon | coast_lat | coast_x |  coast_y |
+|     0 | 118180 | -38.071 |  66.33 | 313650 | -2580750 |  -78 | land   | False    |       -1 |           |           |      -1 |       -1 |
+|     1 |  67133 |  -38.11 | 66.333 | 311850 | -2580650 |  -58 | ice    | False    |   118180 |   -38.071 |     66.33 |  313650 | -2580750 |
+
+***** Polygon covering multiple land and ice outlets
+
+Here a polygon covers several land outlets near the end of a fjord, and several ice outlets of the nearby ice margin. In addition, we request all ice outlets upstream of all selected land basins.
+
+We use the following simple KML file for our ROI (this can be copied-and-pasted into the Google Earth side-bar to see it). Rather than use this file with ~--roi=/path/to/file.kml~, we use the coordinates directly, and demonstrate dropping the last coordinate because the code will wrap any polygon in a convex hull.
+
+#+BEGIN_SRC xml
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document>
+  <name>Ice and Land Sample</name>
+  <Placemark>
+    <name>ice and land</name>
+    <LineString>
+      <tessellate>1</tessellate>
+      <coordinates>-51.50,66.93 -51.21,66.74 -49.44,66.91 -49.84,67.18 -51.50,66.93</coordinates>
+    </LineString>
+  </Placemark>
+</Document>
+</kml>
+#+END_SRC
+
+In this example, we query for upstream outlets, and for brevity show just the first three and last three lines.
+
+#+BEGIN_SRC bash :results table :exports both
+python ./runoff.py --base ./freshwater --roi="-51.50,66.93 -51.21,66.74 -49.44,66.91 -49.84,67.18" -q -u -o | (head -n3 ;tail -n4)
+#+END_SRC
+
+#+RESULTS:
+| index |     id |     lon |    lat |       x |        y | elev | domain | upstream | coast_id | coast_lon | coast_lat | coast_x |  coast_y |
+|-------+--------+---------+--------+---------+----------+------+--------+----------+----------+-----------+-----------+---------+----------|
+|     0 | 113526 | -50.713 | 67.002 | -251250 | -2511450 |   20 | land   | False    |       -1 |           |           |      -1 |       -1 |
+|     1 | 113705 | -50.735 | 66.988 | -252350 | -2512850 |    7 | land   | False    |       -1 |           |           |      -1 |       -1 |
+|   205 |  67140 | -49.538 | 66.425 | -204850 | -2580850 |  794 | ice    | True     |   114920 |   -50.652 |    66.868 | -250050 | -2526750 |
+|   206 |  67163 | -49.544 | 66.419 | -205150 | -2581550 |  825 | ice    | True     |   114920 |   -50.652 |    66.868 | -250050 | -2526750 |
+|   207 |  67211 | -49.534 | 66.406 | -204850 | -2583050 |  866 | ice    | True     |   114920 |   -50.652 |    66.868 | -250050 | -2526750 |
+
+
+**** Runoff
+
+The runoff examples here use the same code as the "outlets and basins" examples above, except we use =--runoff= rather than =--outlet=.
+
+***** One point
+
+The simplest example is a point, in this case near the Watson River outlet. Because we select one point over land and do not request upstream outlets and basins, two time series should be returned: =MAR_land_100= and =RACMO_land_100=. Rather than showing results for every day from 1958 through 2019, we limit to the header and the first 10 days of June, 2012.
+
+#+BEGIN_SRC bash :exports both :results table
+python ./runoff.py --base ./freshwater --roi=-50.5,67.2 -q -r | (head -n1; grep -A9 "^2012-06-01")
+#+END_SRC
+
+#+RESULTS:
+|       time |  MAR_land | RACMO_land |
+|------------+-----------+------------|
+|            |  0.043025 |   0.382903 |
+| 2012-06-02 |   5.5e-05 |   0.095672 |
+| 2012-06-03 |     5e-05 |   0.009784 |
+| 2012-06-04 |     9e-06 |  -0.007501 |
+| 2012-06-05 |  0.008212 |   0.007498 |
+| 2012-06-06 | 28.601947 |   0.607345 |
+| 2012-06-07 |  0.333926 |    0.05691 |
+| 2012-06-08 |  0.489437 |   0.204384 |
+| 2012-06-09 |  0.038816 |   0.167325 |
+| 2012-06-10 |   5.1e-05 |   0.011415 |
+
++ If we move 10° east to somewhere over the ice we add two columns: One for each of the two RCMs over the ice domain.
++ If the =--upstream= flag is set, we add two columns: One for each of the RCMs over the *upstream* ice domains. Results are summed across outlets per domain.
++ Results are therefore one of the following
+  + Two columns: 2 RCM * 1 land domain
+  + Four columns: 2 RCM * (1 land + 1 ice domain)
+  + Four columns: 2 RCM * (1 land + 1 upstream ice domain)
+  + Six columns: 2 RCM * (1 land + 1 ice + 1 upstream ice domain)
+
+***** Polygon covering multiple land and ice outlets
+
+When querying using an ROI that covers multiple outlets, runoff is summed by domain. Therefore, even if 100s of outlets are within the ROI, either two columns, eight, eight, or fourteen columns are returned depending on the options.
+
+*** Python API
+
+The python API is similar to the command line interface, but rather than printing results to =stdout=, returns a =GeoPandas= =GeoDataFrame= of outlets, an =xarray= =Dataset= of runoff. The runoff is not summed by domain, but instead contains runoff for each outlet.
+
+**** Outlets and basins
+
+***** One point
+
+The simplest example is a point, in this case near the Watson River outlet. Because we select one point over land and do not request upstream outlets and basins, only one row should be returned.
+
+#+BEGIN_SRC jupyter-python :session using
+import runoff as ru
+df = ru.runoff(base="./freshwater", roi="-50.5,67.2", quiet=True).outlets()
+#+END_SRC
+
+The =df= variable is a =Pandas= =GeoDataFrame=. 
+
+It includes two geometry columns
++ =outlet= :: A point for the location of the outlet (also available as the =x= and =y= columns)
++ =basin= :: A polygon describing this basin
+
+Because the geometry columns do not display well in tabular form, we drop them. 
+
+#+BEGIN_SRC jupyter-python :session using
+df.drop(columns=["outlet","basin"])
+#+END_SRC
+
+#+RESULTS:
+| index |     id |      lon |     lat |       x |        y | elev | domain | upstream | coast_id | coast_lon | coast_lat | coast_x | coast_y |
+|-------+--------+----------+---------+---------+----------+------+--------+----------+----------+-----------+-----------+---------+---------|
+|     0 | 112448 | -51.2329 | 67.1555 | -272150 | -2491850 |   42 | land   | False    |       -1 |       nan |       nan |      -1 |      -1 |
+
+***** Polygon covering multiple land and ice outlets
+
+Here a polygon covers several land outlets near the end of a fjord, and several ice outlets of the nearby ice margin. In addition, we request all ice outlets upstream of all selected land basins. Results are shown in tabular form and written to geospatial file formats.
+
+#+BEGIN_SRC jupyter-python :session using
+import runoff as ru
+df = ru.runoff(base="./freshwater", roi="-51.50,66.93 -51.21,66.74 -49.44,66.91 -49.84,67.18", quiet=True, upstream=True).outlets()
+#+END_SRC
+
+View the first few rows, excluding the geometry columns
+
+#+BEGIN_SRC jupyter-python :session using
+df.drop(columns=["outlet","basin"]).head()
+#+END_SRC
+
+#+RESULTS:
+| index |     id |      lon |     lat |       x |        y | elev | domain | upstream | coast_id | coast_lon | coast_lat | coast_x | coast_y |
+|-------+--------+----------+---------+---------+----------+------+--------+----------+----------+-----------+-----------+---------+---------|
+|     0 | 113526 |  -50.713 | 67.0017 | -251250 | -2511450 |   20 | land   | False    |       -1 |       nan |       nan |      -1 |      -1 |
+|     1 | 113705 | -50.7346 | 66.9884 | -252350 | -2512850 |    7 | land   | False    |       -1 |       nan |       nan |      -1 |      -1 |
+|     2 | 113729 | -50.7771 | 66.9849 | -254250 | -2513050 |   -1 | land   | False    |       -1 |       nan |       nan |      -1 |      -1 |
+|     3 | 113767 | -50.8634 | 66.9752 | -258150 | -2513750 |   14 | land   | False    |       -1 |       nan |       nan |      -1 |      -1 |
+|     4 | 113787 | -50.9575 | 66.9688 | -262350 | -2514050 |   12 | land   | False    |       -1 |       nan |       nan |      -1 |      -1 |
+
+View the last few rows:
+
+Note that the =domain=, =k=, and =upstream= columns can be used to subset the table.
+
+#+BEGIN_SRC jupyter-python :session using
+df.drop(columns=["outlet","basin"]).tail()
+#+END_SRC
+
+#+RESULTS:
+| index |    id |      lon |     lat |       x |        y | elev | domain | upstream | coast_id | coast_lon | coast_lat | coast_x |  coast_y |
+|-------+-------+----------+---------+---------+----------+------+--------+----------+----------+-----------+-----------+---------+----------|
+|   203 | 67070 | -49.5278 | 66.4399 | -204250 | -2579250 |  761 | ice    | True     |   114920 |  -50.6517 |   66.8677 | -250050 | -2526750 |
+|   204 | 67076 | -49.5386 | 66.4387 | -204750 | -2579350 |  758 | ice    | True     |   114920 |  -50.6517 |   66.8677 | -250050 | -2526750 |
+|   205 | 67140 | -49.5382 | 66.4254 | -204850 | -2580850 |  794 | ice    | True     |   114920 |  -50.6517 |   66.8677 | -250050 | -2526750 |
+|   206 | 67163 | -49.5436 |  66.419 | -205150 | -2581550 |  825 | ice    | True     |   114920 |  -50.6517 |   66.8677 | -250050 | -2526750 |
+|   207 | 67211 | -49.5344 |  66.406 | -204850 | -2583050 |  866 | ice    | True     |   114920 |  -50.6517 |   66.8677 | -250050 | -2526750 |
+
+Finally, write data to various file formats. GeoPandas DataFrames can only have one geometry, so we must select one and drop the other before writing the file.
+
+#+BEGIN_SRC jupyter-python :session using
+df.drop(columns=["outlet","basin"]).to_csv("outlets.csv")
+df.set_geometry("outlet").drop(columns="basin").to_file("outlets.gpkg")
+df.set_geometry("basin").drop(columns="outlet").to_file("basins.gpkg")
+#+END_SRC
+
+
+**** Runoff
+
+The code here is the same as above from the "Outlets and basins" section, but we call =RCM()= rather than =outlets()=.
+
+***** One point
+
+The simplest example is a point, in this case near the Watson River outlet. Because we select one point over land and do not request upstream outlets and basins, only one row should be returned.
+
+#+BEGIN_SRC jupyter-python :session using
+import runoff as ru
+ds = ru.runoff(base="./freshwater", roi="-50.5,67.2").RCM()
+#+END_SRC
+
+Print the =xarray= =Dataset=:
+
+#+BEGIN_SRC jupyter-python :session using :exports both
+print(ds)
+#+END_SRC
+
+#+RESULTS:
+: <xarray.Dataset>
+: Dimensions:     (land: 1, time: 22645)
+: Coordinates:
+:   * time        (time) datetime64[ns] 1958-01-01 1958-01-02 ... 2019-12-31
+:   * land        (land) uint64 112448
+: Data variables:
+:     MAR_land    (time, land) float64 nan nan nan ... 7.186e-07 3.928e-07
+:     RACMO_land  (time, land) float64 2.132 2.125 2.069 2.064 ... nan nan nan nan
+
+Display the time series. Unlike the command line interface, here the outlets are not merged.
+
+#+BEGIN_SRC jupyter-python :session using
+ds.sel(time=slice('2012-06-01','2012-06-10')).to_dataframe()
+#+END_SRC
+
+#+RESULTS:
+|                                                      |    MAR_land |  RACMO_land |
+|------------------------------------------------------+-------------+-------------|
+| (112448, Timestamp('2012-06-01 00:00:00', freq='D')) |   0.0430252 |    0.382903 |
+| (112448, Timestamp('2012-06-02 00:00:00', freq='D')) | 5.47723e-05 |   0.0956719 |
+| (112448, Timestamp('2012-06-03 00:00:00', freq='D')) | 4.96042e-05 |  0.00978398 |
+| (112448, Timestamp('2012-06-04 00:00:00', freq='D')) | 9.40224e-06 | -0.00750081 |
+| (112448, Timestamp('2012-06-05 00:00:00', freq='D')) |  0.00821199 |    0.007498 |
+| (112448, Timestamp('2012-06-06 00:00:00', freq='D')) |     28.6019 |    0.607345 |
+| (112448, Timestamp('2012-06-07 00:00:00', freq='D')) |    0.333926 |   0.0569098 |
+| (112448, Timestamp('2012-06-08 00:00:00', freq='D')) |    0.489437 |    0.204384 |
+| (112448, Timestamp('2012-06-09 00:00:00', freq='D')) |   0.0388156 |    0.167325 |
+| (112448, Timestamp('2012-06-10 00:00:00', freq='D')) | 5.11108e-05 |   0.0114149 |
+
+
+
+In order to merge the outlets, select all coordinates that are *not time* and merge them. Also, apply a rolling mean:
+
+#+BEGIN_SRC jupyter-python :session using
+dims = [_ for _ in ds.dims.keys() if _ != 'time']  # get all dimensions except the time dimension
+ds.sum(dim=dims)\
+  .rolling(time=3)\
+  .mean()\
+  .sel(time=slice('2012-06-01','2012-06-10'))\
+  .to_dataframe()
+#+END_SRC
+
+#+RESULTS:
+| time                |    MAR_land | RACMO_land |
+|---------------------+-------------+------------|
+| 2012-06-01 00:00:00 |   0.0319629 |   0.620721 |
+| 2012-06-02 00:00:00 |   0.0244863 |   0.301766 |
+| 2012-06-03 00:00:00 |   0.0143765 |   0.162786 |
+| 2012-06-04 00:00:00 | 3.79263e-05 |  0.0326517 |
+| 2012-06-05 00:00:00 |    0.002757 | 0.00326039 |
+| 2012-06-06 00:00:00 |     9.53672 |   0.202447 |
+| 2012-06-07 00:00:00 |     9.64803 |   0.223917 |
+| 2012-06-08 00:00:00 |     9.80844 |   0.289546 |
+| 2012-06-09 00:00:00 |    0.287393 |   0.142873 |
+| 2012-06-10 00:00:00 |    0.176101 |   0.127708 |
+
+***** Polygon covering multiple land and ice outlets
+
+Here a polygon covers several land outlets near the end of a fjord, and several ice outlets of the nearby ice margin. In addition, we request all ice outlets upstream of all selected land basins.
+
+#+BEGIN_SRC jupyter-python :session using
+import runoff as ru
+ds = ru.runoff(base="./freshwater", roi="-51.50,66.93 -51.21,66.74 -49.44,66.91 -49.84,67.18", quiet=True, upstream=True).RCM()
+#+END_SRC
+
+#+RESULTS:
+
+What are the dimensions (i.e. how many outlets in each domain?)
+
+#+BEGIN_SRC jupyter-python :session using :exports both
+# print(ds.dims)
+print(ds)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+<xarray.Dataset>
+Dimensions:             (ice: 36, ice_upstream: 88, land: 84, time: 22645)
+Coordinates:
+  ,* time                (time) datetime64[ns] 1958-01-01 ... 2019-12-31
+  ,* land                (land) uint64 113526 113705 113729 ... 115309 115334
+  ,* ice                 (ice) uint64 65558 65563 65579 ... 65741 65742 65786
+  ,* ice_upstream        (ice_upstream) uint64 65540 65546 65548 ... 67163 67211
+Data variables:
+    MAR_land            (time, land) float64 nan nan nan ... 5.894e-09 3.539e-08
+    MAR_ice             (time, ice) float64 nan nan nan ... 6.78e-07 0.0
+    RACMO_land          (time, land) float64 1.726 0.3477 0.004691 ... nan nan
+    RACMO_ice           (time, ice) float64 0.0 0.0 0.0 0.0 ... nan nan nan nan
+    MAR_ice_upstream    (time, ice_upstream) float64 nan nan nan ... 0.0 0.0 0.0
+    RACMO_ice_upstream  (time, ice_upstream) float64 0.0 0.0 0.0 ... nan nan nan
+#+end_example
+
+With these results:
++ Sum all outlets within each domain
++ Drop the land runoff and the upstream domains (keep only ice runoff explicitly within our ROI)
++ Apply a 5-day rolling mean
++ Plot 2012 runoff season
+
+#+BEGIN_SRC jupyter-python :session using
+d = [_ for _ in ds.dims.keys() if _ != 'time'] # dims for summing (don't sum time dimension)
+v = [_ for _ in ds.data_vars if ('land' in _) | ('_u' in _)] # vars containing '_u'
+
+r = ds.sum(dim=d)\
+      .drop_vars(v)\
+      .rolling(time=5).mean()
+
+import matplotlib.pyplot as plt
+plt.style.use('seaborn')
+
+for d in r.data_vars: r[d].sel(time=slice('2012-04-01','2012-11-15')).plot(drawstyle='steps', label=d)
+_ = legend()
+plt.savefig("./fig/api_example.png", bbox_inches='tight')
+#+END_SRC
+
+#+RESULTS:
+
+[[./fig/api_example.png]]
