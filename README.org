@@ -1,17 +1,32 @@
 
-* Greenland liquid water runoff from 1979 through 2017
+* Table of contents                               :toc_3:noexport:
+- [[#greenland-liquid-water-runoff-from-1958-through-2019][Greenland liquid water runoff from 1958 through 2019]]
+- [[#citation][Citation]]
+- [[#accessing-this-data][Accessing this data]]
+  - [[#introduction][Introduction]]
+    - [[#database-format][Database Format]]
+    - [[#warnings][Warnings]]
+    - [[#requirements][Requirements]]
+  - [[#examples][Examples]]
+    - [[#command-line-interface][Command line interface]]
+    - [[#python-api][Python API]]
 
-This repository contains the source for "Greenland liquid water runoff from 1979 through 2017" and subsequent versions. 
+* Greenland liquid water runoff from 1958 through 2019
 
-+ The original paper is located at https://doi.org/10.5194/essd-2020-47.
-+ The data sets are located at [[http://dx.doi.org/10.22008/promice/data/freshwater_runoff/v01][doi:10.22008/promice/data/freshwater_runoff/v01]]/.
-+ Companion paper: Greenland Ice Sheet solid ice discharge from 1986 through 2019 at https://github.com/mankoff/ice_discharge/
+This is the source for "Greenland liquid water runoff from 1958 through 2019" and subsequent versions. 
 
-The source file for the project is [[https://github.com/mankoff/freshwater/blob/master/freshwater.org][freshwater.org]].
++ The paper is located at https://doi.org/10.5194/essd-2020-47.
++ The data sets are located at [[https://doi.org/10.22008/promice/freshwater][doi:10.22008/promice/freshwater]
++ Companion paper: "Greenland Ice Sheet solid ice discharge from 1986 through 2019"
+  + Publication: [[https://doi.org/10.5194/essd-12-1367-2020][doi:10.5194/essd-12-1367-2020]]
+  + Source: https://github.com/mankoff/ice_discharge/
+  + Data: [[https://doi.org/10.22008/promice/data/ice_discharge][doi:10.22008/promice/data/ice_discharge]]
 
-GitHub [[https://github.com/mankoff/freshwater/issues?utf8=%E2%9C%93&q=is%3Aissue][issues]] are used to collect suggestions, issues, and mention of similar papers that have been published after this one.
 
-The [[https://github.com/mankoff/freshwater/tree/submitted][submitted tag]] is the submitted paper. The [[https://github.com/mankoff/freshwater/tree/master][master branch]] contains any updates since then publication. Differences between the two can be seen in this [[https://github.com/mankoff/freshwater/compare/submitted...master][diff]].
+The source for this work is hosted on GitHub at https://github.com/mankoff/freshwater. GitHub [[https://github.com/mankoff/freshwater/issues?utf8=%E2%9C%93&q=is%3Aissue][issues]] are used to collect suggested improvements to the paper, problems that made it through review, and mention of similar papers that have been published since this was accepted. The work may be under be under active development, including updating data (and therefore tables) within the source document.
++ This [[https://github.com/mankoff/freshwater/compare/TAG...master][diff]] shows changes between the published version of the paper and the current (active) development version.
++ The source for the active development version can be viewed at https://github.com/mankoff/freshwater/tree/master
++ The source for the published paper can be viewed at https://github.com/mankoff/freshwater/tree/TAG
 
 * Citation
 
@@ -36,26 +51,56 @@ The [[https://github.com/mankoff/freshwater/tree/submitted][submitted tag]] is t
 
 After the data have been downloaded, the =runoff.py= script allows access to outlets, basins, and their runoff within a region of interest (ROI). The ROI can be a point, a list describing a polygon, or a file. Optionally, upstream outlets, basins, and runoff from any land outlet(s) can be included. The script can be called from the command line (CLI) or within Python.
 
+The ROI coordinate units can be either EPSG:4326 (lon,lat) or EPSG:3413. The units for the coordinates are guessed using the range of values. If the ROI is a point, basins that contain that point are selected. Either 1 (if the point is on land) or two (ice and the downstream land, if the point is on the ice) basins are selected, and optionally, all ice basins upstream from the one land basin. If the ROI is a polygon, all outlets within the polygon are selected. The polygon does not have to be closed - a convex hull is wrapped around it. If the argument is a file (e.g. KML file) then the first polygon is selected and used.
+
+When the script is run from the command line, CSV data is written to =stdout= and can be redirected to a file. When the API is accessed from within Python, if the script is used to access outlets, a =GeoPandas= =GeoDataFrame= is returned and can be used for further analysis within Python, or written to any file format supported by =GeoPandas= or =Pandas=, for example =CSV=, or =GeoPackage= for =QGIS=. If the script is used to access runoff, an =xarray= =Dataset= is returned, and can be used for further analysis within Python, or written to any file format supported by =xarray=, for example =CSV= or =NetCDF=.
+
+*** Database Format
+
 This script queries two database:
  
 + land :: The land coast outlets and land basins.
 + ice :: ice margin outlets and ice basins.
 
-For each of these two geospatial domains, there are two runoff databases: MAR and RACMO.
+The folder structure required is a =root= folder (named =freshwater= in the examples below, but can be anything) and then a =land= and =ice= sub-folder. The geospatial files for =land= and =ice= must be in these folders (i.e. the k=1.0 Streams, Outlets, and Basins dataset from https://dataverse01.geus.dk/dataverse/freshwater). Then, each of the =land= and =ice= folders must contain a =runoff= folder with the appropriate (MAR & RACMO) yearly runoff NetCDF files
 
-The ROI coordinate units can be either EPSG:4326 (lon,lat) or EPSG:3413. The units for the coordinates are guessed using the range of values. If the ROI is a point, basins that contain that point are selected. Either 1 (if the point is on land) or two (ice and the downstream land, if the point is on the ice) basins are selected, and optionally, all ice basins upstream from the one land basin. If the ROI is a polygon, all outlets within the polygon are selected. The polygon does not have to be closed - a convex hull is wrapped around it. If the argument is a file (e.g. KML file) then the first polygon is selected and used.
+Example:
 
-When the script is run from the command line, CSV data is written to =stdout= and can be redirected to a file. When the API is accessed from within Python, if the script is used to access outlets, a =GeoPandas= =GeoDataFrame= is returned and can be used for further analysis within Python, or written to any file format supported by =GeoPandas= or =Pandas=, for example =CSV=, or =GeoPackage= for =QGIS=. If the script is used to access runoff, an =xarray= =Dataset= is returned, and can be used for further analysis within Python, or written to any file format supported by =xarray=, for example =CSV= or =NetCDF=.
+#+begin_example
+./freshwater
+./freshwater/land
+./freshwater/land/outlets.csv
+./freshwater/land/basins.csv
+./freshwater/land/streams.csv
+./freshwater/land/streams.gpkg
+./freshwater/land/outlets.gpkg
+./freshwater/land/basins.gpkg
+./freshwater/land/basins_filled.gpkg
+./freshwater/land/runoff
+./freshwater/land/runoff/MAR_<yyyy>.nc
+./freshwater/land/runoff/RACMO_<yyyy>.nc
+./freshwater/ice
+./freshwater/ice/outlets.csv
+./freshwater/ice/basins.csv
+./freshwater/ice/streams.csv
+./freshwater/ice/streams.gpkg
+./freshwater/ice/outlets.gpkg
+./freshwater/ice/basins.gpkg
+./freshwater/ice/basins_filled.gpkg
+./freshwater/ice/runoff
+./freshwater/ice/runoff/MAR_<yyyy>.nc
+./freshwater/ice/runoff/RACMO_<yyyy>.nc
+#+end_example
 
 *** Warnings
 
-+ The script takes a few seconds to query the outlets and basins. The script takes ~10s of seconds to query each of the runoff time series datasets. Because there may be up to 6 runoff queries (2 RCMs for each of 1 land domain + ice domains + upstream ice domains), it can several minutes on a fast laptop to extract the data. To track progress, do not set the =quiet= flag to =True=.
++ The script takes a few seconds to query the outlets and basins. The script takes ~10s of seconds to query each of the runoff time series datasets. Because there may be up to 6 runoff queries (2 RCMs for each of 1 land domain + ice domain + upstream ice), it can several minutes on a fast laptop to extract the data. To track progress, do not set the =quiet= flag to =True=.
 
 + If a polygon includes ice outlets, and the ~upstream~ flag is set, some ice outlets, basins, and runoff may be included twice, once as a "direct" selection within the polygon and once as an upstream outlet and basin from the land polygon. Further processing by the user can remove duplicates (see examples below).
 
 + The =id= column may not be unique for multiple reasons:
   + As above, the same outlet may be included twice.
-  + =id='s are unique within a dataset (i.e. =land=, and =ice=), but note between datasets.
+  + =id='s are unique within a dataset (i.e. =land=, and =ice=), but not between datasets.
 
 + Due to Linux/UNIX command-line issues, the syntax =--roi -60,60= does not work. Use ~--roi=-60,06~.
 
@@ -66,12 +111,12 @@ When the script is run from the command line, CSV data is written to =stdout= an
 :header-args:jupyter-python: :kernel freshwater :session using :eval no-export
 :END:
 
-+ numpy
-+ pandas
-+ geopandas
-+ xarray
-+ shapely
-+ fiona
+See =environment.yml= file in Git repository, or
+
+#+BEGIN_SRC bash
+conda create -n freshwater_user python=3.7 xarray=0.15.1 fiona=1.8.13 shapely=1.7.0 geopandas=0.7.0 netcdf4=1.5.3 dask=2.15.0
+conda activate freshwater_user
+#+END_SRC
 
 ** Examples
 :PROPERTIES:
@@ -113,8 +158,7 @@ python ./runoff.py --base ./freshwater --roi=-50.5,67.2 -o -q
 
 #+RESULTS:
 | index |     id |     lon |    lat |       x |        y | elev | domain | upstream | coast_id | coast_lon | coast_lat | coast_x | coast_y |
-|-------+--------+---------+--------+---------+----------+------+--------+----------+----------+-----------+-----------+---------+---------|
-|     0 | 112448 | -51.233 | 67.156 | -272150 | -2491850 |   42 | land   | False    |          |           |           |         |         |
+|     0 | 112448 | -51.233 | 67.156 | -272150 | -2491850 |   42 | land   | False    |       -1 |           |           |      -1 |      -1 |
 
 If we move 10° east to somewhere over the ice, there should be four rows: one for the land outlet and basin, and three more for the three ice scenario:
 
@@ -261,7 +305,7 @@ df.drop(columns=["outlet","basin"]).head()
 
 View the last few rows:
 
-Note that the =domain=, =k=, and =upstream= columns can be used to subset the table.
+Note that the =domain= and =upstream= columns can be used to subset the table.
 
 #+BEGIN_SRC jupyter-python :session using
 df.drop(columns=["outlet","basin"]).tail()

@@ -104,7 +104,8 @@ class runoff(object):
 
         o = o.reset_index().drop(columns="index").rename(columns={"cat":"id"})
         o.index.name = "index"
-        o = gp.GeoDataFrame(o, crs="EPSG:3413")
+        o = gp.GeoDataFrame(o, crs="EPSG:3413").set_geometry("basin") # GeoPandas 0.7
+        # o = gp.GeoDataFrame(o).to_crs("EPSG:3413").set_geometry("basin") # GeoPandas 0.8
         return o
 
 
@@ -264,12 +265,19 @@ class runoff(object):
         for key in self._runoff.keys():
             self.msg("    Selecting from: %s" % key)
             out_key = '_'.join(key.split("_")[1:])
+
+            # import pdb
+            # if key == "MAR_ice":  pdb.set_trace()
+            # At CLI: =gdb -ex r --args python ./freshwater.py -b ./freshwater --roi=-50.5,67.0 --upstream =
+
             self._runoff[key] \
                 = self._runoff[key]\
                       .sel({'station': self._outlets[out_key].index.values}, drop=True)[key]\
-                      .to_dataframe()\
-                      .reset_index()\
-                      .pivot_table(index="time", columns="station", values=key)
+                      .to_dataframe()
+            if self._runoff[key].index.size != 0:
+                self._runoff[key] = self._runoff[key]\
+                                        .reset_index()\
+                                        .pivot_table(index="time", columns="station", values=key)
 
             
 def parse_arguments():
