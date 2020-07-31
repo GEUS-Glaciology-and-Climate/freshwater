@@ -12,9 +12,9 @@ import fiona
 
 fiona.drvsupport.supported_drivers["LIBKML"] = "rw" # https://gis.stackexchange.com/a/258370/609
 
-class runoff(object):
+class discharge(object):
     """
-    Access the freshwater runoff database
+    Access the freshwater discharge database
 
     Parameters
     ----------
@@ -27,7 +27,7 @@ class runoff(object):
     Outputs
     --------
     Returns GeoPandas GeoDataFrame if outlets() called
-    Returns xarray Dataset if runoff() called
+    Returns xarray Dataset if discharge() called
     """
 
     def __init__(self, base=None, roi=None, upstream=False, quiet=True):
@@ -47,17 +47,17 @@ class runoff(object):
         # These will hold results
         self._outlets = {}     # pandas geodataframes of outlets and basins
         self._outlets_u = {}   # upsteam
-        self._runoff = {}      # pandas table of runoff per outlet
-        self._runoff_u = {}    # upstream
+        self._discharge = {}      # pandas table of discharge per outlet
+        self._discharge_u = {}    # upstream
         
         # populate with keys
         for key in ["land", "ice"]: self._outlets[key] = None
         for key in [_ for _ in self._outlets.keys() if 'ice' in _]: self._outlets_u[key] = None
         for rcm in ["MAR", "RACMO"]: 
             for key in self._outlets.keys(): 
-                self._runoff[rcm + '_' + key] = None
+                self._discharge[rcm + '_' + key] = None
             for key in [_ for _ in self._outlets.keys() if 'ice' in _]: 
-                self._runoff_u[rcm + "_" + key] = None
+                self._discharge_u[rcm + "_" + key] = None
 
 
     def msg(self, *args, **kwargs):
@@ -109,38 +109,38 @@ class runoff(object):
         return o
 
 
-    def RCM(self):
-        """Load runoff within ROI. Return this object to the end-user."""
-        self.msg("Loading runoff data...")
-        for key in self._runoff.keys():
+    def discharge(self):
+        """Load discharge within ROI. Return this object to the end-user."""
+        self.msg("Loading discharge data...")
+        for key in self._discharge.keys():
             # r,d,k = key.split("_")
             r,d = key.split("_")
             self.msg("    Loading %s" % key)
-            # file_list = self._base + "/" + d+"_"+k + "/runoff/" + r + "_*.nc"
+            # file_list = self._base + "/" + d+"_"+k + "/discharge/" + r + "_*.nc"
             file_list = self._base + "/" + d + "/runoff/" + r + "_*.nc"
-            # load all runoff at all outlets
-            self._runoff[key] = xr.open_mfdataset(file_list, combine="by_coords").rename({"runoff": key})
+            # load all discharge at all outlets
+            self._discharge[key] = xr.open_mfdataset(file_list, combine="by_coords").rename({"runoff": key})
 
         self.outlets()           # load outlets, and subset them to ROI
-        self.runoff_at_outlets() # subset runoff to these outlets (also populate _runoff_u)
+        self.discharge_at_outlets() # subset discharge to these outlets (also populate _discharge_u)
 
         # Return datastructure: Initialize with land and MAR
         key="MAR_land"; geo_key='_'.join(key.split("_")[1:])
-        rtmp = self._runoff[key]; rtmp.columns.name = geo_key
+        rtmp = self._discharge[key]; rtmp.columns.name = geo_key
         r = xr.DataArray(rtmp.values, dims=('time',geo_key), 
                          coords={'time':rtmp.index, geo_key:rtmp.columns}).to_dataset(name=key)
-        for key in self._runoff.keys():
-            if np.size(self._runoff[key]) == 0: continue
+        for key in self._discharge.keys():
+            if np.size(self._discharge[key]) == 0: continue
             geo_key='_'.join(key.split("_")[1:])
-            rtmp = self._runoff[key]; rtmp.columns.name = geo_key
+            rtmp = self._discharge[key]; rtmp.columns.name = geo_key
             rtmp = xr.DataArray(rtmp.values, dims=('time',geo_key), 
                                 coords={'time':rtmp.index, geo_key:rtmp.columns})\
                      .to_dataset(name=key)
             r = r.merge(rtmp)
         if self._upstream:
-            for key in self._runoff_u.keys():
-                if np.size(self._runoff_u[key]) == 0: continue
-                rtmp = self._runoff_u[key]
+            for key in self._discharge_u.keys():
+                if np.size(self._discharge_u[key]) == 0: continue
+                rtmp = self._discharge_u[key]
                 key = key + "_upstream"
                 geo_key='_'.join(key.split("_")[1:])
                 rtmp.columns.name = geo_key
@@ -248,21 +248,21 @@ class runoff(object):
         return gs
 
         
-    def runoff_at_outlets(self):
+    def discharge_at_outlets(self):
         if self._upstream:
-             self.msg("Selecting upstream runoff at outlets...")
-             for key in self._runoff_u.keys():
+             self.msg("Selecting upstream discharge at outlets...")
+             for key in self._discharge_u.keys():
                  self.msg("    Selecting from: %s" % key)
                  out_key = '_'.join(key.split("_")[1:])
-                 self._runoff_u[key] \
-                     = self._runoff[key]\
+                 self._discharge_u[key] \
+                     = self._discharge[key]\
                            .sel({'station': self._outlets_u[out_key].index.values}, drop=True)[key]\
                            .to_dataframe()\
                            .reset_index()\
                            .pivot_table(index="time", columns="station", values=key)
                  
-        self.msg("Selecting runoff at outlets...")
-        for key in self._runoff.keys():
+        self.msg("Selecting discharge at outlets...")
+        for key in self._discharge.keys():
             self.msg("    Selecting from: %s" % key)
             out_key = '_'.join(key.split("_")[1:])
 
@@ -270,18 +270,18 @@ class runoff(object):
             # if key == "MAR_ice":  pdb.set_trace()
             # At CLI: =gdb -ex r --args python ./freshwater.py -b ./freshwater --roi=-50.5,67.0 --upstream =
 
-            self._runoff[key] \
-                = self._runoff[key]\
+            self._discharge[key] \
+                = self._discharge[key]\
                       .sel({'station': self._outlets[out_key].index.values}, drop=True)[key]\
                       .to_dataframe()
-            if self._runoff[key].index.size != 0:
-                self._runoff[key] = self._runoff[key]\
+            if self._discharge[key].index.size != 0:
+                self._discharge[key] = self._discharge[key]\
                                         .reset_index()\
                                         .pivot_table(index="time", columns="station", values=key)
 
             
 def parse_arguments():
-    parser = ArgumentParser(description="Runoff data access")
+    parser = ArgumentParser(description="Discharge data access")
 
     parser.add_argument("--base", type=str, default="./freshwater", required=True,
                         help="Folder containing freshwater data")
@@ -293,8 +293,8 @@ def parse_arguments():
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-o", "--outlets", action='store_true', default=False,
                        help="Return outlet IDs (same as basin IDs)")
-    group.add_argument("-r", "--RCM", action='store_true', default=False,
-                       help="Return RCM runoff for each domain (outlets merged)")
+    group.add_argument("-d", "--discharge", action='store_true', default=False,
+                       help="Return RCM discharge for each domain (outlets merged)")
     parser.add_argument("-q", "--quiet", action='store_true', help="Be quiet")
     args = parser.parse_args()
     return args
@@ -303,12 +303,12 @@ def parse_arguments():
 if __name__ == '__main__':
     """Executed from the command line"""
     args = parse_arguments()
-    r = runoff(base=args.base, roi=args.roi, upstream=args.upstream, quiet=args.quiet)
+    r = discharge(base=args.base, roi=args.roi, upstream=args.upstream, quiet=args.quiet)
     if args.outlets:
         df = r.outlets()
         print(df.drop(columns=["outlet","basin"]).to_csv(float_format='%.3f'))
-    elif args.RCM:
-        ds = r.RCM()
+    elif args.discharge:
+        ds = r.discharge()
         d = [_ for _ in ds.dims.keys() if _ != 'time'] # merge outlets by domain
         print(ds.sum(dim=d).to_dataframe().to_csv(float_format='%.6f'))
 

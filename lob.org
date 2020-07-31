@@ -10,9 +10,13 @@
 import numpy as np
 import pandas as pd
 import xarray as xr
+
+import statsmodels.api as sm
+from statsmodels.sandbox.regression.predstd import wls_prediction_std
+from statsmodels.iolib.table import (SimpleTable, default_txt_fmt)
 #+END_SRC
 
-#+RESULTS: init
+#+RESULTS: py_init
 
 *** Graphics
 #+NAME: py_init_graphics
@@ -32,10 +36,15 @@ C_darkblue = np.array((31, 120, 180))/255
 C_lightgreen = np.array((127, 223, 138))/255
 C_darkgreen = np.array((51, 160, 44))/255
 
+C_darkblue = "#1f7ab7"
 
 from adjust_spines import adjust_spines
+import matplotlib.patheffects as pe
 
+import seaborn as sns
 #+END_SRC
+
+#+RESULTS: py_init_graphics
 
 #+RESULTS: init_graphics
 
@@ -201,7 +210,7 @@ obs.index.name = "time"
 obs.drop('DecDay', inplace=True, axis='columns')
 obs = obs.resample('1D').mean().dropna()
 
-obs.to_csv("./dat/runoff/obs_N.csv")
+obs.to_csv("./dat/runoff/obs_Ks.csv")
 #+END_SRC
 
 #+RESULTS: load_narsarsuaq
@@ -217,7 +226,7 @@ obs = pd.read_csv("/home/kdm/data/GEM/GEM.csv", parse_dates=True, index_col=0)
 obs.index.name = 'time'
 
 # name, abbreviation
-nloc = [['Kobbefjord', "b"],
+nloc = [['Kobbefjord', "Kb"],
         ['Oriartorfik', "O"],
         ['Teqinngalip', "T"],
         ['Kingigtorssuaq', "K"],
@@ -231,88 +240,66 @@ for nl in nloc:
 #+RESULTS: load_GEM
 
 
-** RCM at each obs
-*** Check locations
+** Load all observations
 
-See file:freshwater.org::#20200723T082939.595752
+#+NAME: load_all_obs
+#+BEGIN_SRC jupyter-python
+names = ['Kb Kobbefjord','K Kingigtorssuaq','L Leverett','Ks Kiattuut Sermiat','O Oriartorfik','Q Qaanaaq','R Røde Elv','T Teqinngalip','W Watson', 'Z Zackenberg']
+name = [' '.join(_.split(" ")[1:]) for _ in names]
+loc = [_.split(" ")[0] for _ in names]
 
-#+NAME: tbl_obs_xy
-| b | -316602 | -2831048 |
-| K | -326372 | -2829354 |
-| R | -335678 | -2246371 |
-| L | -226848 | -2507183 |
-| Q | -560538 | -1241281 |
-| N |  -18335 | -3183360 |
-| T | -324548 | -2827284 |
-| W | -249713 | -2510668 |
-| O | -317396 | -2826710 |
-| Z |  699990 | -1540459 |
+obs = {} # store all in dict of dataarrays
+for i,l in enumerate(loc):
+    df_obs = pd.read_csv("./dat/runoff/obs_" + l + ".csv", index_col=0, parse_dates=True)
+    df_obs.columns = ['obs'] if l != 'W' else ['obs','err']
+    df_RCM = pd.read_csv("./dat/runoff/" + l + ".csv", index_col=0, parse_dates=True)
+    df = df_obs.merge(df_RCM, left_index=True, right_index=True)
 
-#+BEGIN_SRC jupyter-python :var tbl=tbl_obs_xy
-import geopandas as gpd
-from shapely.geometry import Point
+    # add upstream ice to all basins where it exists (not O or K)
+    df['MAR'] = df['MAR_land'] + df['MAR_ice_upstream'] if 'MAR_ice_upstream' in df.columns else df['MAR_land']
+    # Leverett should be just upstream ice, no land runoff
+    if l == 'L': df['MAR'] = df['MAR_ice']
+    # Same for RACMO
+    df['RACMO'] = df['RACMO_land'] + df['RACMO_ice_upstream'] if 'RACMO_ice_upstream' in df.columns else df['RACMO_land']
+    if l == 'L': df['RACMO'] = df['RACMO_ice']
 
-gdf = gpd.GeoDataFrame(tbl, columns=['abbrev','x','y'], crs="EPSG:3413").set_index("abbrev")
-gdf['geometry'] = [Point(x,y) for x,y in zip(gdf['x'],gdf['y'])]
-gdf.to_file("./tmp/obs.gpkg", driver="GPKG")
-pd.DataFrame(gdf).drop(columns=["geometry"]).to_csv("./tmp/obs.csv", header=False)
-gdf
+    df['MAR'] = df['MAR'].rolling('7D', min_periods=5).mean()
+    df['RACMO'] = df['RACMO'].rolling('7D', min_periods=5).mean()
+
+    df.attrs['name'] = name[i]
+    obs[l] = df
+
+# one entry with everything, no time index, just all observation and model points
+o,MAR,RACMO = [],[],[]
+for k in loc:
+    o = np.append(o, obs[k]['obs'])
+    MAR = np.append(MAR, obs[k]['MAR'])
+    RACMO = np.append(RACMO, obs[k]['RACMO'])
+df = pd.DataFrame((o,MAR,RACMO), index=['obs','MAR','RACMO']).T
+df.attrs['name'] = "all"
+obs_all = df
+
+# same as above but without GEM basins
+o,MAR,RACMO = [],[],[]
+for k in loc:
+    if k in ['Kb','K','O','T']: continue
+    o = np.append(o, obs[k]['obs'])
+    MAR = np.append(MAR, obs[k]['MAR'])
+    RACMO = np.append(RACMO, obs[k]['RACMO'])
+df = pd.DataFrame((o,MAR,RACMO), index=['obs','MAR','RACMO']).T
+df.attrs['name'] = "noGEM"
+obs_noGEM = df
+
+
 #+END_SRC
 
-#+RESULTS:
-| abbrev |       x |        y | geometry                 |
-|--------+---------+----------+--------------------------|
-| b      | -316602 | -2831048 | POINT (-316602 -2831048) |
-| K      | -326372 | -2829354 | POINT (-326372 -2829354) |
-| R      | -335678 | -2246371 | POINT (-335678 -2246371) |
-| L      | -226848 | -2507183 | POINT (-226848 -2507183) |
-| Q      | -560538 | -1241281 | POINT (-560538 -1241281) |
-| N      |  -18335 | -3183360 | POINT (-18335 -3183360)  |
-| T      | -324548 | -2827284 | POINT (-324548 -2827284) |
-| W      | -249713 | -2510668 | POINT (-249713 -2510668) |
-| O      | -317396 | -2826710 | POINT (-317396 -2826710) |
-| Z      |  699990 | -1540459 | POINT (699990 -1540459)  |
+#+RESULTS: load_all_obs
 
-View
-
-#+BEGIN_SRC bash :results verbatim
-qgis ./tmp/obs.gpkg &
-#+END_SRC
-
-*** Comments
-
-Issues
-+ Leverett always in micro-basin at ice sheet edge. Suggest manually moving *or* using =upstream= to collect other nearby micro-catchments.
-+ Narsarsuaq in micro-basin at glacier snout. Seems likely that =upstream= fixes this. It appears that upstream glaciers drain to land and then under this glacier.
-
-*** Runoff at each obs
-
-#+BEGIN_SRC screen
-conda activate freshwater
-for line in $(cat ./tmp/obs.csv); do
-  # echo $line
-  IFS="," read abb x y <<< ${line[@]}
-  echo $abb $x $y
-  python ./runoff.py --base ./freshwater --roi=${x},${y} -u -r > ./tmp/${abb}.csv
-done
-#+END_SRC
-
-This takes an hour to run...
-
-** TODO Bamber 2018 at each obs
-
-** Scatter - Daily
+** Scatter - Daily w/ PI
 
 #+BEGIN_SRC jupyter-python
-import pandas as pd
-import matplotlib.pyplot as plt
-from adjust_spines import adjust_spines as adjust_spines
-
-import matplotlib
-from matplotlib import rc
-rc('font', size=12)
-rc('text', usetex=False)
-# matplotlib.pyplot.xkcd()
+<<py_init>>
+<<py_init_graphics>>
 
 # plt.close(1)
 fig = plt.figure(1, figsize=(8,3.5)) # w,h
@@ -322,57 +309,115 @@ fig.set_tight_layout(True)
 ax1 = fig.add_subplot(121)
 ax2 = fig.add_subplot(122)
 
-name = ['Watson','Leverett','Zackenberg','Narsarsuaq','Røde Elv','Kobbefjord','Teqinngalip','Oriartorfik','Kingigtorssuaq','Qaanaaq']
-loc = [_[0] for _ in name]
-loc[np.where(np.array(name) == 'Kobbefjord')[0][0]] = 'b'
+<<load_all_obs>>
 
-for i,l in enumerate(loc):
-    df_obs = pd.read_csv("./dat/runoff/obs_" + l + ".csv", index_col=0, parse_dates=True)
-    df_obs.columns = ['obs'] if l != 'W' else ['obs','err']
-    df_RCM = pd.read_csv("./dat/runoff/" + l + ".csv", index_col=0, parse_dates=True)
-    df = df_obs.merge(df_RCM, left_index=True, right_index=True)
+# Plot all basins alone
+for k in obs.keys():
 
-    # add upstream ice to all basins where it exists (not O or K)
-    df['MAR_100'] = df['MAR_land_100'] + df['MAR_ice_100_u'] if 'MAR_ice_100_u' in df.columns else df['MAR_land_100']
-    # Leverett should be just upstream ice, no land runoff
-    if l == 'L': df['MAR_100'] = df['MAR_ice_100']
-
-    # Same for RACMO
-    df['RACMO_100'] = df['RACMO_land_100'] + df['RACMO_ice_100_u'] if 'RACMO_ice_100_u' in df.columns else df['RACMO_land_100']
-    # Leverett should be just upstream ice, no land runoff
-    if l == 'L': df['RACMO_100'] = df['RACMO_ice_100']
-    
-    # df = df[['obs','MAR_100','RACMO_100']]
-    # df = df.fillna(0)
-    df['MAR_100'] = df['MAR_100'].rolling('5D', min_periods=5).mean()#.resample('5D').mean()
-    df['RACMO_100'] = df['RACMO_100'].rolling('5D', min_periods=5).mean()#.resample('5D').mean()
-    
+    df = obs[k]
     df = df.replace(0, np.nan).dropna()
-    ax1.scatter(df['obs'], df['MAR_100'], marker='.', alpha=0.1, label=name[i], edgecolor='none', clip_on=False)
-    ax2.scatter(df['obs'], df['RACMO_100'], marker='.', alpha=0.1, label=l, edgecolor='none', clip_on=False)
-    # if l == 'W':
-    #     ax1.plot([df['obs']-df['err'], df['obs']+df['err']], 
-    #             [df['MAR_100'], df['MAR_100']], color='gray', alpha=0.1, linestyle='-')
-    #     ax2.plot([df['obs']-df['err'], df['obs']+df['err']], 
-    #             [df['RACMO_100'], df['RACMO_100']], color='gray', alpha=0.1, linestyle='-')
+    df = np.log10(df)
+    ax1.scatter(df['obs'], df['MAR'], marker='.', alpha=0.1, 
+                label=df.attrs['name'], edgecolor='none', clip_on=False)
+    ax2.scatter(df['obs'], df['RACMO'], marker='.', alpha=0.1, 
+                label=df.attrs['name'], edgecolor='none', clip_on=False)
 
-coords = np.array((ax1.get_xlim(),ax1.get_ylim(),ax2.get_xlim(),ax2.get_ylim())).flatten()
+
+
+# fit to all basins together
+df = obs_all
+df = np.log10(df)
+df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]
+
+# # drop 5/95 outliers
+# q = df['obs'].quantile([0.05, 0.95])
+# df = df[(df['obs'] > q[0.05]) & (df['obs'] < q[0.95])]
+
+
+df.sort_values(by='obs', inplace=True)
+x = df['obs']
+y_MAR = df['MAR']
+y_RACMO = df['RACMO']
+
+X = sm.add_constant(x)
+# X = x
+model = sm.OLS(y_MAR, X)
+results = model.fit()
+prstd, iv_l, iv_u = wls_prediction_std(results)
+ax1.fill_between(x, iv_u, iv_l, color="grey", alpha=0.25)
+ax1.text(0.6, 0.05, 'r$^{2}$:' + str(round(results.rsquared,2)), transform=ax1.transAxes, horizontalalignment='left')
+
+model = sm.OLS(y_RACMO, X)
+results = model.fit()
+prstd, iv_l, iv_u = wls_prediction_std(results)
+ax2.fill_between(x, iv_u, iv_l, color="grey", alpha=0.25)
+ax2.text(0.6, 0.05, 'r$^{2}$:' + str(round(results.rsquared,2)), transform=ax2.transAxes, horizontalalignment='left')
+
+
+
+
+
+# repeat but without GEM basins
+df = obs_noGEM
+
+df = np.log10(df)
+df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]
+
+# # # drop 5/95 outliers
+# df['diff'] = df['obs'] - df['MAR']
+# q = df['obs'].quantile([0.05, 0.95])
+# df = df[(df['obs'] > q[0.05])]
+
+
+df.sort_values(by='obs', inplace=True)
+x = df['obs']
+y_MAR = df['MAR']
+y_RACMO = df['RACMO']
+
+X = sm.add_constant(x)
+# X = x
+model = sm.OLS(y_MAR, X)
+results = model.fit()
+prstd, iv_l, iv_u = wls_prediction_std(results)
+ax1.fill_between(x, iv_u, iv_l, color="red", alpha=0.1)
+ax1.text(0.6, 0.13, 'r$^{2}$:' + str(round(results.rsquared,2)), transform=ax1.transAxes, horizontalalignment='left', color='red')
+
+model = sm.OLS(y_RACMO, X)
+results = model.fit()
+prstd, iv_l, iv_u = wls_prediction_std(results)
+ax2.fill_between(x, iv_u, iv_l, color="red", alpha=0.1)
+ax2.text(0.6, 0.13, 'r$^{2}$:' + str(round(results.rsquared,2)), transform=ax2.transAxes, horizontalalignment='left', color='red')
+
+
+
+
+
+
+# coords = np.array((ax1.get_xlim(),ax1.get_ylim(),ax2.get_xlim(),ax2.get_ylim())).flatten()
+coords = np.log10([1E-3, 1E4])
 
 for ax in [ax1,ax2]:
-    ax.set_yscale('log')
-    ax.set_xscale('log')
-    ax.set_xlim(2E-4,1E3)
-    ax.set_ylim(ax.get_xlim())
+    # ax.set_yscale('log')
+    # ax.set_xscale('log')
+    # ax.set_xlim(2E-4,1E3)
+    # ax.set_ylim(ax.get_xlim())
     ax.set_xlabel('Observed [m$^{3}$ s$^{-1}$]')
     
-    kw = {'alpha':0.5, 'linewidth':1}
-    ax.plot([0,np.max(coords)],[0,np.max(coords)], 'k-', **kw)
-    ax.plot([0,np.max(coords)],[0,np.max(coords)*2], 'k--', **kw)
-    ax.plot([0,np.max(coords)],[0,np.max(coords)*0.5], 'k--', **kw)
+    kw = {'alpha':0.5, 'linewidth':1, 'color':'k', 'linestyle':'-'}
+    ax.plot(np.log10([1E-3,1E4]), np.log10([1E-3,1E4]), **kw)
+    ax.plot(np.log10([1E-3,1E4]), np.log10([1E-3/5,1E4/5]), **kw)
+    ax.plot(np.log10([1E-3,1E4]), np.log10([1E-3*5,1E4*5]), **kw)
 
-    locmaj = matplotlib.ticker.LogLocator(base=10,numticks=12) 
+    ax.set_ylim([-3,4])
+    ax.set_xlim(ax.get_ylim())
+    ax.set_yticks([-3,-2,-1, 0, 1,2,3,4])
+    ax.set_yticklabels(['10$^{-3}$','10$^{-2}$','10$^{-1}$','10$^{0}$','10$^{1}$','10$^{2}$','10$^{3}$','10$^{4}$'])
+    ax.set_xticks(ax.get_yticks())
+    ax.set_xticklabels(ax.get_yticklabels())
+
+    # locmaj = matplotlib.ticker.LogLocator(base=10,numticks=12) 
     # ax.xaxis.set_major_locator(locmaj)
-    ax.yaxis.set_major_locator(locmaj)
+    # ax.yaxis.set_major_locator(locmaj)
 
     # kwargs = {'rotation':40, 'horizontalalignment':'center', 'fontsize':8, 'verticalalignment':'center'}
     # if ax == ax1:
@@ -389,10 +434,18 @@ adjust_spines(ax2, ['right','bottom'])
 ax1.set_ylabel('MAR [m$^{^3}$ s$^{-1}$]')
 ax2.set_ylabel('RACMO [m$^{^3}$ s$^{-1}$]')
 
-leg = ax1.legend(fontsize=8, frameon=False, bbox_to_anchor=(0.8,0), loc='lower left', mode="expand")
+leg = ax1.legend(fontsize=8, frameon=False, bbox_to_anchor=(0.9,0.18), loc='lower left', mode="expand")
 ax2.set_zorder(-1)
 for lh in leg.legendHandles: 
     lh.set_alpha(1)
+
+plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45)
+plt.setp(ax2.xaxis.get_majorticklabels(), rotation=45)
+
+mticks = np.array([np.log10(np.linspace(2*_, 9*_, num=8)) for _ in [0.001, 0.01, 0.1,1,10,100,1000]]).ravel()
+for ax in [ax1,ax2]:
+    ax.set_xticks(mticks, minor=True)
+    ax.set_yticks(mticks, minor=True)
 
 plt.savefig("./fig/scatter_daily.png", bbox_inches='tight', dpi=300)
 plt.savefig("./fig/scatter_daily.pdf", bbox_inches='tight', dpi=300)
@@ -400,20 +453,19 @@ plt.savefig("./fig/scatter_daily.svg", bbox_inches='tight', dpi=300)
 #+END_SRC
 
 #+RESULTS:
+: <ipython-input-96-bfb4386988f7>:91: RuntimeWarning: invalid value encountered in log10
+:   df = np.log10(df)
+: <ipython-input-96-bfb4386988f7>:101: RuntimeWarning: divide by zero encountered in log10
+:   df = np.log10(df)
+: <ipython-input-96-bfb4386988f7>:135: RuntimeWarning: divide by zero encountered in log10
+:   df = np.log10(df)
 
 
-** NOTDONE Hexbin - Daily
+** Tukey - all daily data
 
 #+BEGIN_SRC jupyter-python
-import pandas as pd
-import matplotlib.pyplot as plt
-from adjust_spines import adjust_spines as adjust_spines
-
-import matplotlib
-from matplotlib import rc
-rc('font', size=12)
-rc('text', usetex=False)
-# matplotlib.pyplot.xkcd()
+<<py_init>>
+<<py_init_graphics>>
 
 # plt.close(1)
 fig = plt.figure(1, figsize=(8,3.5)) # w,h
@@ -423,73 +475,321 @@ fig.set_tight_layout(True)
 ax1 = fig.add_subplot(121)
 ax2 = fig.add_subplot(122)
 
-loc = ['b', 'K', 'R', 'L', 'Q', 'N', 'T', 'W', 'O', 'Z']
-name = ['Kobbefjord', 'Kingigtorssuaq', 'Røde Elv', 'Leverett', 'Qaanaaq', 'Narsarsuaq', 'Teqinngalip', 'Watson', 'Oriartorfik', 'Zackenberg']
+<<load_all_obs>>
+df = obs_noGEM
+df = np.log10(df)
+df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]
 
-cols=[cm.Blues,cm.Reds,cm.Greens,cm.Greys,cm.Oranges,cm.Purples,cm.Blues,cm.Reds,cm.Greens,cm.Greys]
+# q = df['obs'].quantile([0.05, 0.95])
+# df = df[(df['obs'] > q[0.05]) & (df['obs'] < q[0.95])]
 
-for i,l in enumerate(loc):
-    df_obs = pd.read_csv("./dat/runoff/obs_" + l + ".csv", index_col=0, parse_dates=True)
-    df_obs.columns = ['obs'] if l != 'W' else ['obs','err']
-    df_RCM = pd.read_csv("./dat/runoff/" + l + ".csv", index_col=0, parse_dates=True)
-    df = df_obs.merge(df_RCM, left_index=True, right_index=True)
+# kw = {'alpha': 0.2, 'marker':'.', 'edgecolor':'none', 'clip_on':False, 'color':'orange'}
+# sm.graphics.mean_diff_plot(x, y_MAR, ax=ax1, scatter_kwds=kw)
+# sm.graphics.mean_diff_plot(x, y_RACMO, ax=ax2, scatter_kwds=kw)
 
-    # add upstream ice to all basins where it exists (not O or K)
-    df['MAR_100'] = df['MAR_land_100'] + df['MAR_ice_100_u'] if 'MAR_ice_100_u' in df.columns else df['MAR_land_100']
-    # Leverett should be just upstream ice, no land runoff
-    if l == 'L': df['MAR_100'] = df['MAR_ice_100_u']
-
-    # Same for RACMO
-    df['RACMO_100'] = df['RACMO_land_100'] + df['RACMO_ice_100_u'] if 'RACMO_ice_100_u' in df.columns else df['RACMO_land_100']
-    # Leverett should be just upstream ice, no land runoff
-    if l == 'L': df['RACMO_100'] = df['RACMO_ice_100_u']
+# Tukey parameters
+tx_MAR = (df['obs']+df['MAR'])/2;     ty_MAR = df['obs']-df['MAR']
+tx_RACMO = (df['obs']+df['RACMO'])/2; ty_RACMO = df['obs']-df['RACMO']
     
-    # df = df[['obs','MAR_100','RACMO_100']]
-    # df = df.fillna(0)
-    df['MAR_100'] = df['MAR_100'].rolling('5D', min_periods=5).mean()
-    df['RACMO_100'] = df['RACMO_100'].rolling('5D', min_periods=5).mean()
+kw = {'mincnt':1, 'bins':'log', 'clip_on':True, 'gridsize':20, 'extent':[-3,3,-3,3], 'cmap':cm.cividis}
+# plot all to get max of both for colorbar range
+h_MAR = ax1.hexbin(tx_MAR, ty_MAR, alpha=0, **kw)
+h_RACMO = ax2.hexbin(tx_RACMO, ty_RACMO, alpha=0, **kw)
+hmax = max([h_MAR.get_array().max(),h_RACMO.get_array().max()])
     
-    df = df.replace(0, np.nan).dropna()
-    sc = ax1.scatter(df['obs'], df['MAR_100'], marker='.', alpha=0, edgecolor='none') # label=name[i], 
-    col = sc.get_facecolors()[0]
-    ax1.hexbin(df['obs'], df['MAR_100'], 
-               xscale='log', yscale='log', bins='log', 
-               gridsize=40,
-               mincnt=1, extent=(-4,4,-4,4), 
-               alpha=0.7, 
-               cmap=cols[i],
-               label=name[i],
-               edgecolor='face')
-    ax2.hexbin(df['obs'], df['RACMO_100'], 
-               xscale='log', yscale='log', bins='log', 
-               gridsize=40,
-               mincnt=1, extent=(-4,4,-4,4), 
-               alpha=0.7, 
-               cmap=cols[i],
-               edgecolor='face')
+h_MAR = ax1.hexbin(tx_MAR, ty_MAR, vmax=hmax, **kw)
+h_RACMO = ax2.hexbin(tx_RACMO, ty_RACMO, vmax=hmax, **kw)
 
+
+kwtext = {'path_effects':[pe.withStroke(linewidth=4, foreground="white")], 'color':'k'}
+kwtext['horizontalalignment'] = 'left'
+kwline = {'color':'k'}
+xpos = -3
+
+for ty,ax in [[ty_MAR,ax1],[ty_RACMO,ax2]]:
+    y = ty.mean()
+    _ = ax.axhline(y=y, **kwline)
+    _ = ax.text(xpos, y, str(round(10**y,2)), verticalalignment='center', **kwtext)
+
+    y = ty.mean() + 1.96 * ty.std()
+    _ = ax.axhline(y=y, linestyle='--', **kwline)
+    _ = ax.text(xpos, y, str(round(10**y,2)), verticalalignment='bottom', **kwtext)
+
+    y = ty.mean() - 1.96 * ty.std()
+    _ = ax.axhline(y=y, linestyle='--', **kwline)
+    _ = ax.text(xpos, y-0.15, str(round(10**y,2)), verticalalignment='top', **kwtext)
+
+
+ax1.set_xlabel(r'$\frac{\mathrm{Observed} + \mathrm{MAR}}{2}$ [m$^{3}$ s$^{-1}$]')
+ax1.set_ylabel(r'$\mathrm{Observed} - \mathrm{MAR}$ [m$^{3}$ s$^{-1}$]')
+ax2.set_xlabel(r'$\frac{\mathrm{Observed} + \mathrm{RACMO}}{2}$ [m$^{3}$ s$^{-1}$]')
+ax2.set_ylabel(r'$\mathrm{Observed} - \mathrm{RACMO}$ [m$^{3}$ s$^{-1}$]')
+
+lims = [np.min([ax1.get_xlim()[0], ax1.get_ylim()[0], ax2.get_xlim()[0], ax2.get_ylim()[0]]),
+        np.max([ax1.get_xlim()[1], ax1.get_ylim()[1], ax2.get_xlim()[1], ax2.get_ylim()[1]])]
+ticks = np.arange(round(lims[0]), round(lims[1])+1)
+# ax.set_ylim(lims[0], lims[1])
+# ax.set_xlim(lims[0], lims[1])
 for ax in [ax1,ax2]:
-    ax.set_yscale('log')
-    ax.set_xscale('log')
-    ax.set_xlim(1E-4,1E4)
-    ax.set_ylim(ax.get_xlim())
-    ax.set_xlabel('Observed [m$^{3}$ s$^{-1}$]')
-
-    ax.plot([0,np.max(coords)],[0,np.max(coords)], 'k-', linewidth=0.33)
-    ax.plot([0,np.max(coords)],[0,np.max(coords)*2], 'k-', linewidth=0.33)
-    ax.plot([0,np.max(coords)],[0,np.max(coords)*0.5], 'k-', linewidth=0.33)
-    kwargs = {'rotation':40, 'horizontalalignment':'center', 'fontsize':8, 'verticalalignment':'center'}
+    ax.set_xticks(ticks)
+    ax.set_yticks(ticks)
+    labels = ['10$^{' + str(int(_)) + '}$' for _ in ticks]
+    ax.set_yticklabels(labels)
+    ax.set_xticks(ax.get_yticks())
+    ax.set_xticklabels(ax.get_yticklabels())
     
-    locmaj = matplotlib.ticker.LogLocator(base=10,numticks=12) 
-    # ax.xaxis.set_major_locator(locmaj)
-    ax.yaxis.set_major_locator(locmaj)
+cax = fig.add_axes([0.40, 0.39, 0.2, 0.04])
+cb = fig.colorbar(h_MAR, cax=cax, orientation='horizontal')
+# cb.set_label('N')
 
-    if ax == ax1:
-        loc=4E-3
-        ax.text(loc, (loc/2)*0.4, "RCM = 1/2 * Obs", **kwargs)
-        # ax.text(loc, loc*1.3, "RCM = Obs", **kwargs)
-        loc=1.5E-3
-        ax.text(loc, (loc*2)*1.6, "RCM = 2 * Obs", **kwargs)
+# _ = adjust_spines(ax1, ['left','bottom'])
+# _ = adjust_spines(ax2, ['right','bottom'])
+_ = adjust_spines(ax1, ['left','bottom'])
+_ = adjust_spines(ax2, ['right','bottom'])
+
+_ = plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45)
+_ = plt.setp(ax2.xaxis.get_majorticklabels(), rotation=45)
+
+plt.savefig("./fig/tukey_daily.png", bbox_inches='tight', dpi=300)
+# # plt.savefig("./fig/scatter_daily.pdf", bbox_inches='tight', dpi=300)
+# # plt.savefig("./fig/scatter_daily.svg", bbox_inches='tight', dpi=300)
+#+END_SRC
+
+#+RESULTS:
+: <ipython-input-23-03bb5dd2acf1>:86: RuntimeWarning: divide by zero encountered in log10
+:   df = np.log10(df)
+: <ipython-input-23-03bb5dd2acf1>:167: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+:   plt.savefig("./fig/tukey_daily.png", bbox_inches='tight', dpi=300)
+
+
+** Modified Tukey & all daily data by discharge thirds
+
+#+BEGIN_SRC jupyter-python
+<<py_init>>
+<<py_init_graphics>>
+
+# plt.close(1)
+fig = plt.figure(1, figsize=(8,3.5)) # w,h
+# get_current_fig_manager().window.move(0,0)
+fig.clf()
+fig.set_tight_layout(True)
+ax1 = fig.add_subplot(121)
+ax2 = fig.add_subplot(122)
+
+
+<<load_all_obs>>
+df = obs_noGEM
+
+df = np.log10(df)
+df[df < -5] = np.nan # < 1 m^3/day runoff
+df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]
+
+# # drop 5/95 outliers
+# q = df['obs'].quantile([0.05, 0.95])
+# df = df[(df['obs'] > q[0.05]) & (df['obs'] < q[0.95])]
+
+df.sort_values(by='obs', inplace=True)
+x = df['obs']
+y_MAR = df['MAR']
+y_RACMO = df['RACMO']
+
+
+# df['x'] = (df['obs']+df['MAR'])/2
+df['x'] = df['obs']
+df['y_MAR'] = df['MAR'] - df['obs']
+df['y_RACMO'] = df['RACMO'] - df['obs']
+    
+kw = {'mincnt':1, 'bins':'log', 'clip_on':True, 'gridsize':20, 'extent':[-3,3,-3,3], 'cmap':cm.cividis}
+# plot all to get max of both for colorbar range
+h_MAR = ax1.hexbin(df['x'], df['y_MAR'], alpha=0, **kw)
+h_RACMO = ax2.hexbin(df['x'], df['y_RACMO'], alpha=0, **kw)
+hmax = max([h_MAR.get_array().max(),h_RACMO.get_array().max()])
+    
+h_MAR = ax1.hexbin(df['x'], df['y_MAR'], vmax=hmax, **kw)
+h_RACMO = ax2.hexbin(df['x'], df['y_RACMO'], vmax=hmax, **kw)
+
+df_top = df[df['obs'] > df['obs'].quantile(0.33)]
+# df_mid = df[(df['obs'] < df['obs'].quantile(0.66)) & (df['obs'] > df['obs'].quantile(0.33))]
+df_bot = df[df['obs'] < df['obs'].quantile(0.33)]
+
+kwline = {'color':'k'}
+kwtext = {'path_effects':[pe.withStroke(linewidth=2, foreground="white")], 
+          'color':'k',
+          'fontsize':10,
+          'verticalalignment':'center'}
+for d in [df_top, df_bot]:
+    
+    for ax in [ax2,ax1]:
+        if d is df_top:
+            xpos = 3.2
+            kwtext['horizontalalignment'] = 'left'
+        elif d is df_bot:
+            xpos = -2
+            kwtext['horizontalalignment'] = 'right'
+
+        if ax is ax1: yy = d['y_MAR']
+        if ax is ax2: yy = d['y_RACMO']
+        y = yy.mean()
+        ax.plot([d['x'].min(),d['x'].max()], [y,y], **kwline)
+        ax.text(xpos, y, str(round(10**y,2)), **kwtext)
+
+        # y = yy.mean() + 1.96 * yy.std()
+        y = yy.quantile(0.95)
+        ax.plot([d['x'].min(),d['x'].max()], [y,y], linestyle='--', **kwline)
+        ax.text(xpos, y, str(round(10**y,2)), **kwtext)
+
+        # y = yy.mean() - 1.96 * yy.std()
+        y = yy.quantile(0.05)
+        ax.plot([d['x'].min(),d['x'].max()], [y,y], linestyle='--', **kwline)
+        ax.text(xpos, y, str(round(10**y,2)), **kwtext)
+
+ax1.set_xlabel('Observed [m$^{3}$ s$^{-1}$]')
+ax1.set_ylabel('MAR - Observed [m$^{3}$ s$^{-1}$]')
+ax2.set_xlabel('Observed [m$^{3}$ s$^{-1}$]')
+ax2.set_ylabel('RACMO - Observed [m$^{3}$ s$^{-1}$]')
+
+# lims = [np.min([ax1.get_xlim()[0], ax1.get_ylim()[0], ax2.get_xlim()[0], ax2.get_ylim()[0]]),
+#         np.max([ax1.get_xlim()[1], ax1.get_ylim()[1], ax2.get_xlim()[1], ax2.get_ylim()[1]])]
+lims = [-3.5,3.5]
+# ticks = np.arange(round(lims[0]), round(lims[1])+1)
+ticks = np.arange(-3,3+1)
+for ax in [ax1,ax2]:
+    ax.set_ylim(lims[0], lims[1])
+    ax.set_xlim(lims[0], lims[1])
+    ax.set_xticks(ticks)
+    ax.set_yticks(ticks)
+    labels = ['10$^{' + str(int(_)) + '}$' for _ in ticks]
+    ax.set_yticklabels(labels)
+    ax.set_xticks(ax.get_yticks())
+    ax.set_xticklabels(ax.get_yticklabels())
+    
+cax = fig.add_axes([0.37, 0.85, 0.2, 0.04])
+cb = fig.colorbar(h_MAR, cax=cax, orientation='horizontal')
+# # cb.set_label('N')
+
+adjust_spines(ax1, ['left','bottom'])
+adjust_spines(ax2, ['right','bottom'])
+
+_ = plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45)
+_ = plt.setp(ax2.xaxis.get_majorticklabels(), rotation=45)
+
+mticks = np.array([np.log10(np.linspace(2*_, 9*_, num=8)) for _ in [0.001, 0.01, 0.1,1,10,100]]).ravel()
+for ax in [ax1,ax2]:
+    ax.set_xticks(mticks, minor=True)
+    ax.set_yticks(mticks, minor=True)
+
+plt.savefig("./fig/tukey_daily3.png", bbox_inches='tight', dpi=300)
+# # plt.savefig("./fig/scatter_daily.pdf", bbox_inches='tight', dpi=300)
+# # plt.savefig("./fig/scatter_daily.svg", bbox_inches='tight', dpi=300)
+#+END_SRC
+
+#+RESULTS:
+: <ipython-input-331-4f8629f1554b>:88: RuntimeWarning: divide by zero encountered in log10
+:   df = np.log10(df)
+: <ipython-input-331-4f8629f1554b>:186: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+:   plt.savefig("./fig/tukey_daily3.png", bbox_inches='tight', dpi=300)
+
+
+** Merge Tukey
+#+BEGIN_SRC bash :results verbatim
+convert ./fig/tukey_daily.png ./fig/tukey_daily3.png -gravity center -append fig/tukey.png
+o ./fig/tukey.png
+#+END_SRC
+
+#+RESULTS:
+: 
+: direnv: loading ~/projects/freshwater/.envrc
+
+** NOTDONE Scatter - Daily w/ weighted PI
+
+#+BEGIN_QUOTE
+=> instead of giving a range +500%/-80%, I suggest you to rather ompute the mean error in % for each measurement you have in Fig4 by removing 5% of highest model-obs differences (by keep only percentile 95) and by weighting the mean by the measurement values to not give the same weight to the very low runoff value which are not representative for me when the errors is given in %. 
+#+END_QUOTE
+
+#+BEGIN_SRC jupyter-python
+<<py_init>>
+<<py_init_graphics>>
+
+<<load_all_obs>>
+
+
+# plt.close(1)
+fig = plt.figure(1, figsize=(8,3.5)) # w,h
+# get_current_fig_manager().window.move(0,0)
+fig.clf()
+fig.set_tight_layout(True)
+ax1 = fig.add_subplot(121)
+ax2 = fig.add_subplot(122)
+
+for k in obs.keys():
+
+    df = obs[k]
+    name = df.attrs['name']
+    df = df.replace(0, np.nan).dropna()
+    df = np.log10(df)
+    ax1.scatter(df['obs'], df['MAR'], marker='.', alpha=0.1, 
+                label=name, edgecolor='none', clip_on=False)
+    ax2.scatter(df['obs'], df['RACMO'], marker='.', alpha=0.1, 
+                label=name, edgecolor='none', clip_on=False)
+
+
+
+df = obs_all
+
+df = np.log10(df)
+df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]
+df.sort_values(by='obs', inplace=True)
+
+df['diff'] = df['obs'] - df['MAR']
+df['diff %'] = df['obs'] / 10**df['diff'] * 100
+
+# drop 5/95 outliers
+q = df['diff %'].quantile([0.05, 0.5, 0.95])
+# df = df[(df['diff %'] > q[0.05]) & (df['diff %'] < q[0.95])]
+df = df[(df['diff %'] > q[0.5])]
+
+
+x = df['obs']
+y_MAR = df['MAR']
+y_RACMO = df['RACMO']
+
+weights = 10**x.values; weights = weights - np.min(weights)+1
+weights = x.values * 0 + 1
+# weights = x.values; weights = weights - np.min(weights)+1
+# weights = (weights - np.min(weights)) / (np.max(weights) - np.min(weights))+0.01
+
+X = sm.add_constant(x)
+
+model = sm.OLS(y_MAR, X)
+results = model.fit()
+print(results.summary())
+prstd, iv_l, iv_u = wls_prediction_std(results, weights=weights)
+ax1.fill_between(x, iv_u, iv_l, color="grey", alpha=0.25)
+
+model = sm.OLS(y_RACMO, X, weights=weights)
+results = model.fit()
+print(results.summary())
+prstd, iv_l, iv_u = wls_prediction_std(results, weights=weights)
+ax2.fill_between(x, iv_u, iv_l, color="grey", alpha=0.25)
+
+
+
+
+coords = np.log10([1E-3, 1E4])
+for ax in [ax1,ax2]:
+    ax.set_xlabel('Observed [m$^{3}$ s$^{-1}$]')
+    
+    # kw = {'alpha':0.5, 'linewidth':1, 'color':'k', 'linestyle':'-'}
+    # ax.plot(np.log10([1E-3,1E4]), np.log10([1E-3,1E4]), **kw)
+    # ax.plot(np.log10([1E-3,1E4]), np.log10([1E-3/5,1E4/5]), **kw)
+    # ax.plot(np.log10([1E-3,1E4]), np.log10([1E-3*5,1E4*5]), **kw)
+
+    ax.set_ylim([-3,4])
+    ax.set_xlim(ax.get_ylim())
+    ax.set_yticks([-3,-2,-1, 0, 1,2,3,4])
+    ax.set_yticklabels(['10$^{-3}$','10$^{-2}$','10$^{-1}$','10$^{0}$','10$^{1}$','10$^{2}$','10$^{3}$','10$^{4}$'])
+    ax.set_xticks(ax.get_yticks())
+    ax.set_xticklabels(ax.get_yticklabels())
 
 adjust_spines(ax1, ['left','bottom'])
 adjust_spines(ax2, ['right','bottom'])
@@ -503,25 +803,97 @@ ax2.set_zorder(-1)
 for lh in leg.legendHandles: 
     lh.set_alpha(1)
 
+plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45)
+plt.setp(ax2.xaxis.get_majorticklabels(), rotation=45)
+
+
+
 # plt.savefig("./fig/scatter_daily.png", bbox_inches='tight', dpi=300)
 # plt.savefig("./fig/scatter_daily.pdf", bbox_inches='tight', dpi=300)
 # plt.savefig("./fig/scatter_daily.svg", bbox_inches='tight', dpi=300)
 #+END_SRC
 
+#+RESULTS:
+:RESULTS:
+#+begin_example
+<ipython-input-61-3616c414ec5e>:63: RuntimeWarning: invalid value encountered in log10
+  df = np.log10(df)
+<ipython-input-61-3616c414ec5e>:73: RuntimeWarning: divide by zero encountered in log10
+  df = np.log10(df)
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                    MAR   R-squared:                       0.885
+Model:                            OLS   Adj. R-squared:                  0.885
+Method:                 Least Squares   F-statistic:                 6.051e+04
+Date:                Thu, 20 Aug 2020   Prob (F-statistic):               0.00
+Time:                        09:39:29   Log-Likelihood:                -2192.8
+No. Observations:                7889   AIC:                             4390.
+Df Residuals:                    7887   BIC:                             4403.
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+const         -0.0150      0.006     -2.573      0.010      -0.026      -0.004
+obs            0.9388      0.004    245.982      0.000       0.931       0.946
+==============================================================================
+Omnibus:                      232.626   Durbin-Watson:                   1.789
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              578.877
+Skew:                          -0.089   Prob(JB):                    1.99e-126
+Kurtosis:                       4.315   Cond. No.                         3.22
+==============================================================================
 
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                  RACMO   R-squared:                       0.871
+Model:                            OLS   Adj. R-squared:                  0.871
+Method:                 Least Squares   F-statistic:                 5.336e+04
+Date:                Thu, 20 Aug 2020   Prob (F-statistic):               0.00
+Time:                        09:39:29   Log-Likelihood:                -2641.9
+No. Observations:                7889   AIC:                             5288.
+Df Residuals:                    7887   BIC:                             5302.
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+const         -0.0220      0.006     -3.561      0.000      -0.034      -0.010
+obs            0.9332      0.004    230.994      0.000       0.925       0.941
+==============================================================================
+Omnibus:                      394.046   Durbin-Watson:                   1.857
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):             1383.416
+Skew:                          -0.119   Prob(JB):                    3.94e-301
+Kurtosis:                       5.038   Cond. No.                         3.22
+==============================================================================
 
-** Scatter - Yearly sum
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+#+end_example
+|   |
+|   |
+|   |
+|   |
+|   |
+|   |
+|   |
+|   |
+|   |
+|   |
+|   |
+|   |
+|   |
+|   |
+|   |
+|   |
+:END:
+
+** Scatter - Yearly sum w/ PI
 
 #+BEGIN_SRC jupyter-python
-import pandas as pd
-import matplotlib.pyplot as plt
-from adjust_spines import adjust_spines as adjust_spines
-
-import matplotlib
-from matplotlib import rc
-rc('font', size=12)
-rc('text', usetex=False)
-# matplotlib.pyplot.xkcd()
+<<py_init>>
+<<py_init_graphics>>
 
 # plt.close(1)
 fig = plt.figure(1, figsize=(8,3.5)) # w,h
@@ -531,55 +903,84 @@ fig.set_tight_layout(True)
 ax1 = fig.add_subplot(121)
 ax2 = fig.add_subplot(122)
 
-name = ['Watson','Leverett','Zackenberg','Narsarsuaq','Røde Elv','Kobbefjord','Teqinngalip','Oriartorfik','Kingigtorssuaq','Qaanaaq']
-loc = [_[0] for _ in name]
-loc[np.where(np.array(name) == 'Kobbefjord')[0][0]] = 'b'
+<<load_all_obs>>
+for k in obs.keys():
 
-for i,l in enumerate(loc):
-    df_obs = pd.read_csv("./dat/runoff/obs_" + l + ".csv", index_col=0, parse_dates=True)
-    df_obs.columns = ['obs'] if l != 'W' else ['obs','err']
-    df_RCM = pd.read_csv("./dat/runoff/" + l + ".csv", index_col=0, parse_dates=True)
-    df = df_obs.merge(df_RCM, left_index=True, right_index=True)
-
-    # add upstream ice to all basins where it exists (not O or K)
-    df['MAR_100'] = df['MAR_land_100'] + df['MAR_ice_100_u'] if 'MAR_ice_100_u' in df.columns else df['MAR_land_100']
-    # Leverett should be just upstream ice, no land runoff
-    if l == 'L': df['MAR_100'] = df['MAR_ice_100']
-
-    # Same for RACMO
-    df['RACMO_100'] = df['RACMO_land_100'] + df['RACMO_ice_100_u'] if 'RACMO_ice_100_u' in df.columns else df['RACMO_land_100']
-    # Leverett should be just upstream ice, no land runoff
-    if l == 'L': df['RACMO_100'] = df['RACMO_ice_100']
-    
-    # df = df[['obs','MAR_100','RACMO_100']]
-    
+    df = obs[k]
+    name = df.attrs['name']
     df = df.replace(0, np.nan).dropna()
-
     df = df.resample('A').sum()
-    ax1.scatter(df['obs'], df['MAR_100'], marker='$\mathrm{'+l+'}$', alpha=0.9, label=name[i], clip_on=False, zorder=99)
-    ax2.scatter(df['obs'], df['RACMO_100'], marker='$\mathrm{'+l+'}$', alpha=0.9, clip_on=False, zorder=99)
-    # if l == 'W':
-    #     ax1.plot([df['obs']-df['err'], df['obs']+df['err']], 
-    #             [df['MAR_100'], df['MAR_100']], color='k', alpha=0.9, linestyle='-')
-    #     ax2.plot([df['obs']-df['err'], df['obs']+df['err']], 
-    #             [df['RACMO_100'], df['RACMO_100']], color='k', alpha=0.9, linestyle='-')
+    df = np.log10(df)
+    ax1.scatter(df['obs'], df['MAR'], marker='$\mathrm{'+k+'}$', alpha=0.9, 
+                label=name, clip_on=False, zorder=99)
+    ax2.scatter(df['obs'], df['RACMO'], marker='$\mathrm{'+k+'}$', alpha=0.9, 
+                clip_on=False, zorder=99)
+
+
+# combine all into one for confidence intervals
+# one entry with everything, no time index, just all observation and model points
+o,MAR,RACMO = [],[],[]
+for k in obs.keys():
+    o = np.append(o, obs[k]['obs'].resample('A').sum())
+    MAR = np.append(MAR, obs[k]['MAR'].resample('A').sum())
+    RACMO = np.append(RACMO, obs[k]['RACMO'].resample('A').sum())
+df = pd.DataFrame((o,MAR,RACMO), index=['obs','MAR','RACMO']).T
+
+
+df = np.log10(df)
+df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]
+
+
+df.sort_values(by='obs', inplace=True)
+x = df['obs']
+y_MAR = df['MAR']
+y_RACMO = df['RACMO']
+
+X = sm.add_constant(x)
+# X = x
+model = sm.OLS(y_MAR, X)
+results = model.fit()
+prstd, iv_l, iv_u = wls_prediction_std(results)
+ax1.fill_between(x, iv_u, iv_l, color="grey", alpha=0.25)
+ax1.text(0.6, 0.05, 'r$^{2}$:' + str(round(results.rsquared,2)), transform=ax1.transAxes, horizontalalignment='left')
+
+model = sm.OLS(y_RACMO, X)
+results = model.fit()
+prstd, iv_l, iv_u = wls_prediction_std(results)
+ax2.fill_between(x, iv_u, iv_l, color="grey", alpha=0.25)
+ax2.text(0.6, 0.05, 'r$^{2}$:' + str(round(results.rsquared,2)), transform=ax2.transAxes, horizontalalignment='left')
+
+
+
 
 for ax in [ax1,ax2]:
-    ax.set_yscale('log')
-    ax.set_xscale('log')
-    ax.set_xlim(1E1,1E5)
-    ax.set_ylim(ax.get_xlim())
+    # ax.set_yscale('log')
+    # ax.set_xscale('log')
+    # ax.set_xlim(1E1,1E5)
+    # ax.set_ylim(ax.get_xlim())
     ax.set_xlabel('Observed [m$^{3}$]')
 
-    coords = ax.get_xlim()
-    kw = {'alpha':0.5, 'linewidth':1}
-    ax.plot([0,np.max(coords)],[0,np.max(coords)], 'k-', **kw)
-    ax.plot([0,np.max(coords)],[0,np.max(coords)*2], 'k--', **kw)
-    ax.plot([0,np.max(coords)],[0,np.max(coords)*0.5], 'k--', **kw)
+    kw = {'alpha':0.5, 'linewidth':1, 'color':'k', 'linestyle':'-'}
+    ax.plot(np.log10([1E1,1E5]), np.log10([1E1,1E5]), **kw)
+    ax.plot(np.log10([1E1,1E5]), np.log10([1E1/2,1E5/2]), **kw)
+    ax.plot(np.log10([1E1,1E5]), np.log10([1E1*2,1E5*2]), **kw)
 
-    locmaj = matplotlib.ticker.LogLocator(base=10,numticks=12) 
-    ax.xaxis.set_major_locator(locmaj)
-    ax.yaxis.set_major_locator(locmaj)
+    ax.set_ylim([1,5])
+    ax.set_xlim(ax.get_ylim())
+    ax.set_yticks([1,2,3,4,5])
+    ax.set_yticklabels(['10$^{1}$','10$^{2}$','10$^{3}$','10$^{4}$','10$^{5}$'])
+    ax.set_xticks(ax.get_yticks())
+    ax.set_xticklabels(ax.get_yticklabels())
+
+    # coords = ax.get_xlim()
+    # kw = {'alpha':0.5, 'linewidth':1}
+    # ax.plot([0,np.max(coords)],[0,np.max(coords)], 'k-', **kw)
+    # ax.plot([0,np.max(coords)],[0,np.max(coords)*2], 'k--', **kw)
+    # ax.plot([0,np.max(coords)],[0,np.max(coords)*0.5], 'k--', **kw)
+
+    # locmaj = matplotlib.ticker.LogLocator(base=10,numticks=12) 
+    # ax.xaxis.set_major_locator(locmaj)
+    # ax.yaxis.set_major_locator(locmaj)
 
     # kwargs = {'rotation':40, 'horizontalalignment':'center', 'fontsize':8, 'verticalalignment':'center'}
     # if ax == ax1:
@@ -607,354 +1008,16 @@ for i,l in enumerate(leg.texts):
 # for i,l in enumerate(leg.legendHandles):
 #     l.set_offsets([[-i*12.5+10+20,4],[-i*12.5+10+20,4]])
 
+# plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45)
+# plt.setp(ax2.xaxis.get_majorticklabels(), rotation=45)
+
 plt.savefig("./fig/scatter_yearsum.png", bbox_inches='tight', dpi=300)
 # plt.savefig("./fig/scatter_yearsum.pdf", bbox_inches='tight', dpi=300)
 # plt.savefig("./fig/scatter_yearsum.svg", bbox_inches='tight', dpi=300)
 #+END_SRC
 
 #+RESULTS:
-
-
-* NOTDONE Bamber 2018
-
-#+BEGIN_SRC bash :results verbatim
-grass -c ./G/Bamber_2018
-# r.external input=NetCDF:"${DATADIR}/Bamber_2018/FWF17.v3_a.nc:lon" output=lon
-# parallel --bar 'r.external -o source="netCDF:./tmp/MAR_runoff_ice_2000.nc:runoff" output=ice.{} band={}' ::: ${seq}
-
-g.region res=5000 -pa
-g.region w=-1777980 n=-67308 e=$(( -1777980 + 5000*752 )) s=$(( -67308 - 5000*785 )) -pa  # from ncdump global attributes
-
-r.external -o source="netCDF:${DATADIR}/Bamber_2018/FWF17.v3_a.nc:lon" output=lon
-r.external -o source="netCDF:${DATADIR}/Bamber_2018/FWF17.v3_a.nc:lat" output=lat
-# r.external -o source="netCDF:${DATADIR}/Bamber_2018/FWF17.v3_a.nc:runoff_tundra" output=runoff_tundra # band...
-r.external -o source="netCDF:${DATADIR}/Bamber_2018/FWF17.v3_a.nc:LSMGr" output=LSMGr
-
-
-#+END_SRC
-
-* Figures
-** DONE Scatter plot of RCM vs observed
-
-Broken axes plot https://github.com/bendichter/brokenaxes
-
-#+BEGIN_SRC jupyter-python
-<<load_RCM_obs>>
-
-<<py_init_graphics>>
-
-# plt.close(1)
-fig = plt.figure(1, figsize=(9,4)) # w,h
-fig.clf()
-fig.set_tight_layout(True)
-axL = fig.add_subplot(121)
-axR = fig.add_subplot(122)
-
-kwargs = {'fontsize' : 9,
-          'horizontalalignment' : 'center', 
-          'verticalalignment' : 'center'}
-
-for site in [#'Qaanaaq',
-        'Watson',
-        'Kingigtorssuaq','Kobbefjord',
-        'Oriartorfik','Røde Elv','Teqinngalip','Zackenberg','Leverett']:
-    label = site[0]
-    if site == "Kobbefjord": label='B'
-
-    df = RCM_obs.resample('A').sum()[site].replace(0, np.nan).dropna()
-    axL.scatter(df['Observed'], df['MAR'], alpha = 0) # don't display, just set axis range
-    axR.scatter(df['Observed'], df['MAR'], alpha = 0)
-    for x,y in zip(df['Observed'], df['MAR']):
-        axL.text(x,y, label, color = C_MAR, **kwargs)
-        axR.text(x,y, label, color = C_MAR, **kwargs)
-    for x,y in zip(df['Observed'], df['RACMO']):
-        axL.text(x,y, label, color = C_RACMO, **kwargs)
-        axR.text(x,y, label, color = C_RACMO, **kwargs)
-
-axR.set_yscale('log')
-axR.set_xscale('log')
-
-for a in [axL,axR]:
-    coords = np.array((a.get_xlim(),a.get_ylim())).flatten()
-    a.set_xlim(np.min(coords),np.max(coords))
-    a.set_ylim(a.get_xlim())
-    a.plot([0,np.max(coords)],[0,np.max(coords)], 'k-', linewidth=0.33)
-    a.plot([0,np.max(coords)],[0,np.max(coords)*2], 'k-', linewidth=0.33)
-    a.plot([0,np.max(coords)],[0,np.max(coords)*0.5], 'k-', linewidth=0.33)
-    
-    a.set_xlabel('Observed [m$^{3}$ yr$^{-1}$]')
-    a.set_ylabel('RCM [m$^{^3}$ yr$^{-1}$]')
-
-import matplotlib.patches as mpatches
-patch_MAR = mpatches.Patch(color=C_MAR, label='MAR')
-patch_RACMO = mpatches.Patch(color=C_RACMO, label='RACMO')
-plt.legend(handles=[patch_MAR,patch_RACMO])
-
-adjust_spines(axL, ['left','bottom'])
-adjust_spines(axR, ['right','bottom'])
-_ = plt.setp(axL.get_xticklabels(), rotation=15)
-
-# plt.savefig('.png', transparent=True, bbox_inches='tight', dpi=300)
-#+END_SRC
-
-#+RESULTS:
-:RESULTS:
-# [goto error]
-#+begin_example
-
-KeyErrorTraceback (most recent call last)
-~/local/anaconda/envs/sci/lib/python3.6/site-packages/pandas/core/indexes/base.py in get_loc(self, key, method, tolerance)
-   2896             try:
--> 2897                 return self._engine.get_loc(key)
-   2898             except KeyError:
-
-pandas/_libs/index.pyx in pandas._libs.index.IndexEngine.get_loc()
-
-pandas/_libs/index.pyx in pandas._libs.index.IndexEngine.get_loc()
-
-pandas/_libs/hashtable_class_helper.pxi in pandas._libs.hashtable.PyObjectHashTable.get_item()
-
-pandas/_libs/hashtable_class_helper.pxi in pandas._libs.hashtable.PyObjectHashTable.get_item()
-
-KeyError: 'RACMO'
-
-During handling of the above exception, another exception occurred:
-
-KeyErrorTraceback (most recent call last)
-<ipython-input-30-0271442be3fd> in <module>
-    301         axL.text(x,y, label, color = C_MAR, **kwargs)
-    302         axR.text(x,y, label, color = C_MAR, **kwargs)
---> 303     for x,y in zip(df['Observed'], df['RACMO']):
-    304         axL.text(x,y, label, color = C_RACMO, **kwargs)
-    305         axR.text(x,y, label, color = C_RACMO, **kwargs)
-
-~/local/anaconda/envs/sci/lib/python3.6/site-packages/pandas/core/frame.py in __getitem__(self, key)
-   2993             if self.columns.nlevels > 1:
-   2994                 return self._getitem_multilevel(key)
--> 2995             indexer = self.columns.get_loc(key)
-   2996             if is_integer(indexer):
-   2997                 indexer = [indexer]
-
-~/local/anaconda/envs/sci/lib/python3.6/site-packages/pandas/core/indexes/base.py in get_loc(self, key, method, tolerance)
-   2897                 return self._engine.get_loc(key)
-   2898             except KeyError:
--> 2899                 return self._engine.get_loc(self._maybe_cast_indexer(key))
-   2900         indexer = self.get_indexer([key], method=method, tolerance=tolerance)
-   2901         if indexer.ndim > 1 or indexer.size > 1:
-
-pandas/_libs/index.pyx in pandas._libs.index.IndexEngine.get_loc()
-
-pandas/_libs/index.pyx in pandas._libs.index.IndexEngine.get_loc()
-
-pandas/_libs/hashtable_class_helper.pxi in pandas._libs.hashtable.PyObjectHashTable.get_item()
-
-pandas/_libs/hashtable_class_helper.pxi in pandas._libs.hashtable.PyObjectHashTable.get_item()
-
-KeyError: 'RACMO'
-#+end_example
-:END:
-
-** DONE Scatter plot of RCM vs observed
-
-#+BEGIN_SRC jupyter-python
-<<load_RCM_obs>>
-
-<<py_init_graphics>>
-
-# plt.close(1)
-fig = plt.figure(1, figsize=(9,4)) # w,h
-fig.clf()
-fig.set_tight_layout(True)
-axL = fig.add_subplot(121)
-axR = fig.add_subplot(122)
-
-from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
-axins = zoomed_inset_axes(axL, 50, loc=2) # zoom-factor: 2.5, location: upper-left
-axins.set_xlim([0,1000]); axins.set_ylim(axins.get_xlim())
-
-kwargs = {'alpha' : 0.5}
-
-for site in [#'Qaanaaq',
-        'Watson','Kingigtorssuaq','Kobbefjord',
-        'Oriartorfik','Røde Elv','Teqinngalip','Zackenberg','Leverett']:
-    label = site[0]
-    if site == "Kobbefjord": label='B'
-
-    df = RCM_obs.resample('A').sum()[site].replace(0, np.nan).dropna()
-    axL.scatter(df['Observed'], df['MAR'], marker='$\mathrm{'+label+'}$', color=C_MAR, **kwargs)
-    axins.scatter(df['Observed'], df['MAR'], marker='$\mathrm{'+label+'}$', color=C_MAR, **kwargs)
-    axR.scatter(df['Observed'], df['MAR'], marker='$\mathrm{'+label+'}$', color=C_MAR, **kwargs)
-
-    # axL.scatter(df['Observed'], df['RACMO'], marker='$\mathrm{'+label+'}$', color=C_RACMO, **kwargs)
-    # axins.scatter(df['Observed'], df['RACMO'], marker='$\mathrm{'+label+'}$', color=C_RACMO, **kwargs)
-    # axR.scatter(df['Observed'], df['RACMO'], marker='$\mathrm{'+label+'}$', color=C_RACMO, **kwargs)
-
-axR.set_yscale('log')
-axR.set_xscale('log')
-
-for a in [axL,axR]:
-    coords = np.array((a.get_xlim(),a.get_ylim())).flatten()
-    a.set_xlim(np.min(coords)-150,np.max(coords))
-    a.set_ylim(a.get_xlim())
-    a.set_xlabel('Observed [m$^{3}$ yr$^{-1}$]')
-    a.set_ylabel('RCM [m$^{^3}$ yr$^{-1}$]')
-
-for a in [axL,axR, axins]:
-    a.plot([0,np.max(coords)],[0,np.max(coords)], 'k-', linewidth=0.33)
-    a.plot([0,np.max(coords)],[0,np.max(coords)*2], 'k-', linewidth=0.33)
-    a.plot([0,np.max(coords)],[0,np.max(coords)*0.5], 'k-', linewidth=0.33)
-   
-import matplotlib.patches as mpatches
-patch_MAR = mpatches.Patch(color=C_MAR, label='MAR')
-patch_RACMO = mpatches.Patch(color=C_RACMO, label='RACMO')
-#axR.legend(handles=[patch_MAR,patch_RACMO])
-# axR.legend(handles=[patch_MAR])
-
-adjust_spines(axL, ['left','bottom'])
-adjust_spines(axR, ['right','bottom'])
-plt.setp(axL.get_xticklabels(), rotation=15)
-
-# axins.set_xlim([0,1000]); axins.set_ylim(axins.get_xlim())
-plt.yticks(visible=False)
-plt.xticks(visible=False)
-
-"" # quiet output
-# from mpl_toolkits.axes_grid1.inset_locator import mark_inset
-# mark_inset(axL, axins, loc1=2, loc2=4, fc="none", ec="0.5")
-
-# plt.savefig('.png', transparent=True, bbox_inches='tight', dpi=300)
-#+END_SRC
-
-#+RESULTS:
-
-
-** DONE [#A] Scatter plot of RCM vs observed
-
-#+BEGIN_SRC jupyter-python
-<<load_RCM_obs>>
-
-<<py_init_graphics>>
-
-# plt.close(1)
-fig = plt.figure(1, figsize=(5,4)) # w,h
-fig.clf()
-fig.set_tight_layout(True)
-ax = fig.add_subplot(111)
-
-kwargs = {'alpha' : 0.5}
-
-for site in [# 'Qaanaaq',
-        'Watson',
-        'Kingigtorssuaq',
-        'Kobbefjord',
-        'Oriartorfik',
-        'Røde Elv',
-        'Teqinngalip',
-        'Zackenberg',
-        'Leverett']:
-    label = site[0]
-    if site == "Kobbefjord": label='B'
-
-    df = RCM_obs.resample('A').sum()[site][['Observed','MAR']].replace(0, np.nan).dropna()
-    ax.scatter(df['Observed'], df['MAR'], marker='$\mathrm{'+label+'}$', color=C_MAR, **kwargs)
-
-ax.set_yscale('log')
-ax.set_xscale('log')
-
-coords = np.array((ax.get_xlim(),ax.get_ylim())).flatten()
-ax.set_xlim(np.min(coords)-1,np.max(coords))
-ax.set_ylim(ax.get_xlim())
-ax.set_xlabel('Observed [m$^{3}$ yr$^{-1}$]')
-ax.set_ylabel('RCM [m$^{^3}$ yr$^{-1}$]')
-
-ax.plot([0,np.max(coords)],[0,np.max(coords)], 'k-', linewidth=0.33)
-ax.plot([0,np.max(coords)],[0,np.max(coords)*2], 'k-', linewidth=0.33)
-ax.plot([0,np.max(coords)],[0,np.max(coords)*0.5], 'k-', linewidth=0.33)
-kwargs = {'rotation':40, 'horizontalalignment':'center', 'fontsize':8, 'verticalalignment':'center'}
-
-loc=0.6E2
-ax.text(loc, (loc/2)*1.3, "y=0.5x", **kwargs)
-ax.text(loc, loc*1.3, "y=x", **kwargs)
-ax.text(loc, (loc*2)*1.3, "$y=2x$", **kwargs)
-
-# import matplotlib.patches as mpatches
-# patch_MAR = mpatches.Patch(color=C_MAR, label='MAR')
-# patch_RACMO = mpatches.Patch(color=C_RACMO, label='RACMO')
-# #axR.legend(handles=[patch_MAR,patch_RACMO])
-# # axR.legend(handles=[patch_MAR])
-
-adjust_spines(ax, ['left','bottom'])
-# adjust_spines(axR, ['right','bottom'])
-# plt.setp(axL.get_xticklabels(), rotation=15)
-
-# plt.savefig('.png', transparent=True, bbox_inches='tight', dpi=300)
-#+END_SRC
-
-#+RESULTS:
-
-
-** FAIL Scatter plot of RCM vs observed
-
-#+BEGIN_SRC jupyter-python
-<<load_RCM_obs>>
-
-<<py_init_graphics>>
-
-# plt.close(1)
-fig = plt.figure(1, figsize=(9,4)) # w,h
-fig.clf()
-fig.set_tight_layout(True)
-axL = fig.add_subplot(121)
-axR = fig.add_subplot(122)
-
-kwargs = {'fontsize' : 9,
-          'horizontalalignment' : 'center', 
-          'verticalalignment' : 'center'}
-
-for site in [#'Qaanaaq',
-             'Watson','Kingigtorssuaq','Kobbefjord',
-             'Oriartorfik','Røde Elv','Teqinngalip','Zackenberg','Leverett']:
-    label = site[0]
-    if site == "Kobbefjord": label='B'
-
-    df = RCM_obs.resample('A').sum()[site].replace(0, np.nan).dropna()
-    df = df.apply(lambda c:  c/df['Observed'].values)
-    axL.scatter(df['Observed'], df['MAR'], alpha = 0) # don't display, just set axis range
-    axR.scatter(df['Observed'], df['MAR'], alpha = 0)
-    for x,y in zip(df['Observed'], df['MAR']):
-        axL.text(x,y, label, color = C_MAR, **kwargs)
-        axR.text(x,y, label, color = C_MAR, **kwargs)
-    for x,y in zip(df['Observed'], df['RACMO']):
-        axL.text(x,y, label, color = C_RACMO, **kwargs)
-        axR.text(x,y, label, color = C_RACMO, **kwargs)
-
-axR.set_yscale('log')
-axR.set_xscale('log')
-
-for a in [axL,axR]:
-    coords = np.array((a.get_xlim(),a.get_ylim())).flatten()
-    a.set_xlim(np.min(coords),np.max(coords))
-    a.set_ylim(a.get_xlim())
-    a.plot([0,np.max(coords)],[0,np.max(coords)], 'k-', linewidth=0.33)
-    
-    a.set_xlabel('Observed [m$^{3}$ yr$^{-1}$]')
-    a.set_ylabel('RCM [m$^{^3}$ yr$^{-1}$]')
-
-# import matplotlib.patches as mpatches
-# patch_MAR = mpatches.Patch(color=C_MAR, label='MAR')
-# patch_RACMO = mpatches.Patch(color=C_RACMO, label='RACMO')
-# plt.legend(handles=[patch_MAR,patch_RACMO])
-
-# adjust_spines(axL, ['left','bottom'])
-# adjust_spines(axR, ['right','bottom'])
-
-# axL.set_xlim([0,2]); axL.set_ylim(axL.get_xlim())
-
-# rot = plt.xticks(rotation=15)
-
-# plt.savefig('.png', transparent=True, bbox_inches='tight', dpi=300)
-#+END_SRC
-
-#+RESULTS:
+: <ipython-input-5-c6851b185ea3>:99: RuntimeWarning: divide by zero encountered in log10
+:   df = np.log10(df)
 
 

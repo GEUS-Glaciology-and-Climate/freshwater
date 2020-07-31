@@ -1,6 +1,6 @@
 
 * Table of contents                               :toc_3:noexport:
-- [[#greenland-liquid-water-runoff-from-1958-through-2019][Greenland liquid water runoff from 1958 through 2019]]
+- [[#greenland-liquid-water-discharge-from-1958-through-2019][Greenland liquid water discharge from 1958 through 2019]]
 - [[#citation][Citation]]
 - [[#accessing-this-data][Accessing this data]]
   - [[#introduction][Introduction]]
@@ -11,9 +11,9 @@
     - [[#command-line-interface][Command line interface]]
     - [[#python-api][Python API]]
 
-* Greenland liquid water runoff from 1958 through 2019
+* Greenland liquid water discharge from 1958 through 2019
 
-This is the source for "Greenland liquid water runoff from 1958 through 2019" and subsequent versions. 
+This is the source for "Greenland liquid water discharge from 1958 through 2019" and subsequent versions. 
 
 + The paper is located at https://doi.org/10.5194/essd-2020-47.
 + The data sets are located at [[https://doi.org/10.22008/promice/freshwater][doi:10.22008/promice/freshwater]
@@ -31,16 +31,16 @@ The source for this work is hosted on GitHub at https://github.com/mankoff/fresh
 * Citation
 
 #+BEGIN_EXAMPLE
-@article{Mankoff_2020_freshwater,
+@article{Mankoff_2020_water,
   doi = {10.5194/essd-2020-47},
   url = {https://doi.org/10.5194/essd-2020-47},
   year = {2020},
   month = 4,
   publisher = {Copernicus {GmbH}},
-  author = {Kenneth D. Mankoff and Andreas P. Ahlstrøm and William Colgan and
-            Robert S. Fausto and Xavier Fettweis and Ken Kondo and Kirsty Langley and Brice Noël and
-            Shin Sugiyama and Dirk van As},
-  title = {Greenland liquid water runoff from 1979 through 2017},
+  author = {Kenneth D. Mankoff and Brice Noël and Xavier Fettweis and Andreas P. Ahlstrøm 
+            and William Colgan and Ken Kondo and Kirsty Langley and Shin Sugiyama 
+            and Dirk van As and Robert S. Fausto},
+  title = {Greenland liquid water discharge from 1958 through 2019},
   journal = {Earth System Science Data Discussions},
   note = {In Review}
 }
@@ -49,11 +49,11 @@ The source for this work is hosted on GitHub at https://github.com/mankoff/fresh
 * Accessing this data
 ** Introduction
 
-After the data have been downloaded, the =runoff.py= script allows access to outlets, basins, and their runoff within a region of interest (ROI). The ROI can be a point, a list describing a polygon, or a file. Optionally, upstream outlets, basins, and runoff from any land outlet(s) can be included. The script can be called from the command line (CLI) or within Python.
+After the data have been downloaded, the =discharge.py= script allows access to outlets, basins, and their discharge within a region of interest (ROI). The ROI can be a point, a list describing a polygon, or a file. Optionally, upstream outlets, basins, and discharge from any land outlet(s) can be included. The script can be called from the command line (CLI) or within Python.
 
 The ROI coordinate units can be either EPSG:4326 (lon,lat) or EPSG:3413. The units for the coordinates are guessed using the range of values. If the ROI is a point, basins that contain that point are selected. Either 1 (if the point is on land) or two (ice and the downstream land, if the point is on the ice) basins are selected, and optionally, all ice basins upstream from the one land basin. If the ROI is a polygon, all outlets within the polygon are selected. The polygon does not have to be closed - a convex hull is wrapped around it. If the argument is a file (e.g. KML file) then the first polygon is selected and used.
 
-When the script is run from the command line, CSV data is written to =stdout= and can be redirected to a file. When the API is accessed from within Python, if the script is used to access outlets, a =GeoPandas= =GeoDataFrame= is returned and can be used for further analysis within Python, or written to any file format supported by =GeoPandas= or =Pandas=, for example =CSV=, or =GeoPackage= for =QGIS=. If the script is used to access runoff, an =xarray= =Dataset= is returned, and can be used for further analysis within Python, or written to any file format supported by =xarray=, for example =CSV= or =NetCDF=.
+When the script is run from the command line, CSV data is written to =stdout= and can be redirected to a file. When the API is accessed from within Python, if the script is used to access outlets, a =GeoPandas= =GeoDataFrame= is returned and can be used for further analysis within Python, or written to any file format supported by =GeoPandas= or =Pandas=, for example =CSV=, or =GeoPackage= for =QGIS=. If the script is used to access discharge, an =xarray= =Dataset= is returned, and can be used for further analysis within Python, or written to any file format supported by =xarray=, for example =CSV= or =NetCDF=.
 
 *** Database Format
 
@@ -62,13 +62,22 @@ This script queries two database:
 + land :: The land coast outlets and land basins.
 + ice :: ice margin outlets and ice basins.
 
-The folder structure required is a =root= folder (named =freshwater= in the examples below, but can be anything) and then a =land= and =ice= sub-folder. The geospatial files for =land= and =ice= must be in these folders (i.e. the k=1.0 Streams, Outlets, and Basins dataset from https://dataverse01.geus.dk/dataverse/freshwater). Then, each of the =land= and =ice= folders must contain a =runoff= folder with the appropriate (MAR & RACMO) yearly runoff NetCDF files
+The folder structure required is a =root= folder (named =freshwater= in the examples below, but can be anything) and then a =land= and =ice= sub-folder. The geospatial files for =land= and =ice= must be in these folders (i.e. the k=1.0 Streams, Outlets, and Basins dataset from https://dataverse01.geus.dk/dataverse/freshwater). Then, each of the =land= and =ice= folders must contain a =runoff= folder with the appropriate (MAR & RACMO) yearly discharge NetCDF files
 
 Example:
 
+#+BEGIN_SRC bash :results verbatim :exports results
+find ./freshwater/land/ -maxdepth 1
+echo "./freshwater/land/runoff/MAR_<yyyy>.nc"
+echo "./freshwater/land/runoff/RACMO_<yyyy>.nc"
+find ./freshwater/ice/ -maxdepth 1
+echo "./freshwater/ice/runoff/MAR_<yyyy>.nc"
+echo "./freshwater/ice/runoff/RACMO_<yyyy>.nc"
+#+END_SRC
+
+#+RESULTS:
 #+begin_example
-./freshwater
-./freshwater/land
+./freshwater/land/
 ./freshwater/land/outlets.csv
 ./freshwater/land/basins.csv
 ./freshwater/land/streams.csv
@@ -79,7 +88,7 @@ Example:
 ./freshwater/land/runoff
 ./freshwater/land/runoff/MAR_<yyyy>.nc
 ./freshwater/land/runoff/RACMO_<yyyy>.nc
-./freshwater/ice
+./freshwater/ice/
 ./freshwater/ice/outlets.csv
 ./freshwater/ice/basins.csv
 ./freshwater/ice/streams.csv
@@ -94,15 +103,15 @@ Example:
 
 *** Warnings
 
-+ The script takes a few seconds to query the outlets and basins. The script takes ~10s of seconds to query each of the runoff time series datasets. Because there may be up to 6 runoff queries (2 RCMs for each of 1 land domain + ice domain + upstream ice), it can several minutes on a fast laptop to extract the data. To track progress, do not set the =quiet= flag to =True=.
++ The script takes a few seconds to query the outlets and basins. The script takes ~10s of seconds to query each of the discharge time series datasets. Because there may be up to 6 discharge queries (2 RCMs for each of 1 land domain + ice domain + upstream ice), it can several minutes on a fast laptop to extract the data. To track progress, do not set the =quiet= flag to =True=.
 
-+ If a polygon includes ice outlets, and the ~upstream~ flag is set, some ice outlets, basins, and runoff may be included twice, once as a "direct" selection within the polygon and once as an upstream outlet and basin from the land polygon. Further processing by the user can remove duplicates (see examples below).
++ If a polygon includes ice outlets, and the ~upstream~ flag is set, some ice outlets, basins, and discharge may be included twice, once as a "direct" selection within the polygon and once as an upstream outlet and basin from the land polygon. Further processing by the user can remove duplicates (see examples below).
 
 + The =id= column may not be unique for multiple reasons:
   + As above, the same outlet may be included twice.
   + =id='s are unique within a dataset (i.e. =land=, and =ice=), but not between datasets.
 
-+ Due to Linux/UNIX command-line issues, the syntax =--roi -60,60= does not work. Use ~--roi=-60,06~.
++ Due to bash command-line parsing behavior, the syntax =--roi -60,60= does not work. Use ~--roi=-60,06~.
 
 + Longitude is expected in degrees East, and should therefore probably be negative.
 
@@ -130,22 +139,24 @@ conda activate freshwater_user
 # (setq org-babel-min-lines-for-block-output 100)
 
 #+BEGIN_SRC bash :exports both
-python ./runoff.py -h
+python ./discharge.py -h
 #+END_SRC
 
 #+RESULTS:
-: usage: runoff.py [-h] --base BASE --roi ROI [-u] (-o | -r) [-q]
-: 
-: Runoff data access
-: 
-: optional arguments:
-:   -h, --help      show this help message and exit
-:   --base BASE     Folder containing freshwater data
-:   --roi ROI       x,y OR lon,lat OR x0,y0 x1,y1 ... xn,yn OR lon0,lat0 lon1,lat1 ... lon_n,lat_n. [lon: degrees E]
-:   -u, --upstream  Include upstream ice outlets draining into land basins
-:   -o, --outlets   Return outlet IDs (same as basin IDs)
-:   -r, --runoff    Return runoff for each domain (outlets merged)
-:   -q, --quiet     Be quiet
+#+begin_example
+usage: discharge.py [-h] --base BASE --roi ROI [-u] (-o | -d) [-q]
+
+Discharge data access
+
+optional arguments:
+  -h, --help       show this help message and exit
+  --base BASE      Folder containing freshwater data
+  --roi ROI        x,y OR lon,lat OR x0,y0 x1,y1 ... xn,yn OR lon0,lat0 lon1,lat1 ... lon_n,lat_n. [lon: degrees E]
+  -u, --upstream   Include upstream ice outlets draining into land basins
+  -o, --outlets    Return outlet IDs (same as basin IDs)
+  -d, --discharge  Return RCM discharge for each domain (outlets merged)
+  -q, --quiet      Be quiet
+#+end_example
 
 **** Outlets and basins
 ***** One point
@@ -153,21 +164,23 @@ python ./runoff.py -h
 The simplest example is a point, in this case near the Watson River outlet. Because we select one point over land and do not request upstream outlets and basins, only one row should be returned.
 
 #+BEGIN_SRC bash :exports both :results table
-python ./runoff.py --base ./freshwater --roi=-50.5,67.2 -o -q
+python ./discharge.py --base ./freshwater --roi=-50.5,67.2 -o -q
 #+END_SRC
 
 #+RESULTS:
 | index |     id |     lon |    lat |       x |        y | elev | domain | upstream | coast_id | coast_lon | coast_lat | coast_x | coast_y |
+|-------+--------+---------+--------+---------+----------+------+--------+----------+----------+-----------+-----------+---------+---------|
 |     0 | 112448 | -51.233 | 67.156 | -272150 | -2491850 |   42 | land   | False    |       -1 |           |           |      -1 |      -1 |
 
 If we move 10° east to somewhere over the ice, there should be four rows: one for the land outlet and basin, and three more for the three ice scenario:
 
 #+BEGIN_SRC bash :exports both :results table
-python ./runoff.py --base ./freshwater --roi=-40.5,67.2 -o -q
+python ./discharge.py --base ./freshwater --roi=-40.5,67.2 -o -q
 #+END_SRC
 
 #+RESULTS:
 | index |     id |     lon |    lat |      x |        y | elev | domain | upstream | coast_id | coast_lon | coast_lat | coast_x |  coast_y |
+|-------+--------+---------+--------+--------+----------+------+--------+----------+----------+-----------+-----------+---------+----------|
 |     0 | 118180 | -38.071 |  66.33 | 313650 | -2580750 |  -78 | land   | False    |       -1 |           |           |      -1 |       -1 |
 |     1 |  67133 |  -38.11 | 66.333 | 311850 | -2580650 |  -58 | ice    | False    |   118180 |   -38.071 |     66.33 |  313650 | -2580750 |
 
@@ -196,7 +209,7 @@ We use the following simple KML file for our ROI (this can be copied-and-pasted 
 In this example, we query for upstream outlets, and for brevity show just the first three and last three lines.
 
 #+BEGIN_SRC bash :results table :exports both
-python ./runoff.py --base ./freshwater --roi="-51.50,66.93 -51.21,66.74 -49.44,66.91 -49.84,67.18" -q -u -o | (head -n3 ;tail -n4)
+python ./discharge.py --base ./freshwater --roi="-51.50,66.93 -51.21,66.74 -49.44,66.91 -49.84,67.18" -q -u -o | (head -n3 ;tail -n4)
 #+END_SRC
 
 #+RESULTS:
@@ -209,22 +222,22 @@ python ./runoff.py --base ./freshwater --roi="-51.50,66.93 -51.21,66.74 -49.44,6
 |   207 |  67211 | -49.534 | 66.406 | -204850 | -2583050 |  866 | ice    | True     |   114920 |   -50.652 |    66.868 | -250050 | -2526750 |
 
 
-**** Runoff
+**** Discharge
 
-The runoff examples here use the same code as the "outlets and basins" examples above, except we use =--runoff= rather than =--outlet=.
+The discharge examples here use the same code as the "outlets and basins" examples above, except we use =--discharge= rather than =--outlet=.
 
 ***** One point
 
 The simplest example is a point, in this case near the Watson River outlet. Because we select one point over land and do not request upstream outlets and basins, two time series should be returned: =MAR_land_100= and =RACMO_land_100=. Rather than showing results for every day from 1958 through 2019, we limit to the header and the first 10 days of June, 2012.
 
 #+BEGIN_SRC bash :exports both :results table
-python ./runoff.py --base ./freshwater --roi=-50.5,67.2 -q -r | (head -n1; grep -A9 "^2012-06-01")
+python ./discharge.py --base ./freshwater --roi=-50.5,67.2 -q -d | (head -n1; grep -A9 "^2012-06-01")
 #+END_SRC
 
 #+RESULTS:
 |       time |  MAR_land | RACMO_land |
 |------------+-----------+------------|
-|            |  0.043025 |   0.382903 |
+| 2012-06-01 |  0.043025 |   0.382903 |
 | 2012-06-02 |   5.5e-05 |   0.095672 |
 | 2012-06-03 |     5e-05 |   0.009784 |
 | 2012-06-04 |     9e-06 |  -0.007501 |
@@ -245,11 +258,11 @@ python ./runoff.py --base ./freshwater --roi=-50.5,67.2 -q -r | (head -n1; grep 
 
 ***** Polygon covering multiple land and ice outlets
 
-When querying using an ROI that covers multiple outlets, runoff is summed by domain. Therefore, even if 100s of outlets are within the ROI, either two columns, eight, eight, or fourteen columns are returned depending on the options.
+When querying using an ROI that covers multiple outlets, discharge is summed by domain. Therefore, even if 100s of outlets are within the ROI, either two columns, eight, eight, or fourteen columns are returned depending on the options.
 
 *** Python API
 
-The python API is similar to the command line interface, but rather than printing results to =stdout=, returns a =GeoPandas= =GeoDataFrame= of outlets, an =xarray= =Dataset= of runoff. The runoff is not summed by domain, but instead contains runoff for each outlet.
+The python API is similar to the command line interface, but rather than printing results to =stdout=, returns a =GeoPandas= =GeoDataFrame= of outlets, an =xarray= =Dataset= of discharge. The discharge is not summed by domain, but instead contains discharge for each outlet.
 
 **** Outlets and basins
 
@@ -258,9 +271,11 @@ The python API is similar to the command line interface, but rather than printin
 The simplest example is a point, in this case near the Watson River outlet. Because we select one point over land and do not request upstream outlets and basins, only one row should be returned.
 
 #+BEGIN_SRC jupyter-python :session using
-import runoff as ru
-df = ru.runoff(base="./freshwater", roi="-50.5,67.2", quiet=True).outlets()
+from discharge import discharge 
+df = discharge(base="./freshwater", roi="-50.5,67.2", quiet=True).outlets()
 #+END_SRC
+
+#+RESULTS:
 
 The =df= variable is a =Pandas= =GeoDataFrame=. 
 
@@ -279,14 +294,17 @@ df.drop(columns=["outlet","basin"])
 |-------+--------+----------+---------+---------+----------+------+--------+----------+----------+-----------+-----------+---------+---------|
 |     0 | 112448 | -51.2329 | 67.1555 | -272150 | -2491850 |   42 | land   | False    |       -1 |       nan |       nan |      -1 |      -1 |
 
+
 ***** Polygon covering multiple land and ice outlets
 
 Here a polygon covers several land outlets near the end of a fjord, and several ice outlets of the nearby ice margin. In addition, we request all ice outlets upstream of all selected land basins. Results are shown in tabular form and written to geospatial file formats.
 
 #+BEGIN_SRC jupyter-python :session using
-import runoff as ru
-df = ru.runoff(base="./freshwater", roi="-51.50,66.93 -51.21,66.74 -49.44,66.91 -49.84,67.18", quiet=True, upstream=True).outlets()
+from discharge import discharge
+df = discharge(base="./freshwater", roi="-51.50,66.93 -51.21,66.74 -49.44,66.91 -49.84,67.18", quiet=True, upstream=True).outlets()
 #+END_SRC
+
+#+RESULTS:
 
 View the first few rows, excluding the geometry columns
 
@@ -329,7 +347,7 @@ df.set_geometry("basin").drop(columns="outlet").to_file("basins.gpkg")
 #+END_SRC
 
 
-**** Runoff
+**** Discharge
 
 The code here is the same as above from the "Outlets and basins" section, but we call =RCM()= rather than =outlets()=.
 
@@ -338,9 +356,11 @@ The code here is the same as above from the "Outlets and basins" section, but we
 The simplest example is a point, in this case near the Watson River outlet. Because we select one point over land and do not request upstream outlets and basins, only one row should be returned.
 
 #+BEGIN_SRC jupyter-python :session using
-import runoff as ru
-ds = ru.runoff(base="./freshwater", roi="-50.5,67.2").RCM()
+from discharge import discharge
+ds = discharge(base="./freshwater", roi="-50.5,67.2").discharge()
 #+END_SRC
+
+#+RESULTS:
 
 Print the =xarray= =Dataset=:
 
@@ -379,39 +399,38 @@ ds.sel(time=slice('2012-06-01','2012-06-10')).to_dataframe()
 | (112448, Timestamp('2012-06-10 00:00:00', freq='D')) | 5.11108e-05 |   0.0114149 |
 
 
-
 In order to merge the outlets, select all coordinates that are *not time* and merge them. Also, apply a rolling mean:
 
 #+BEGIN_SRC jupyter-python :session using
 dims = [_ for _ in ds.dims.keys() if _ != 'time']  # get all dimensions except the time dimension
 ds.sum(dim=dims)\
-  .rolling(time=3)\
+  .rolling(time=7)\
   .mean()\
   .sel(time=slice('2012-06-01','2012-06-10'))\
   .to_dataframe()
 #+END_SRC
 
 #+RESULTS:
-| time                |    MAR_land | RACMO_land |
-|---------------------+-------------+------------|
-| 2012-06-01 00:00:00 |   0.0319629 |   0.620721 |
-| 2012-06-02 00:00:00 |   0.0244863 |   0.301766 |
-| 2012-06-03 00:00:00 |   0.0143765 |   0.162786 |
-| 2012-06-04 00:00:00 | 3.79263e-05 |  0.0326517 |
-| 2012-06-05 00:00:00 |    0.002757 | 0.00326039 |
-| 2012-06-06 00:00:00 |     9.53672 |   0.202447 |
-| 2012-06-07 00:00:00 |     9.64803 |   0.223917 |
-| 2012-06-08 00:00:00 |     9.80844 |   0.289546 |
-| 2012-06-09 00:00:00 |    0.287393 |   0.142873 |
-| 2012-06-10 00:00:00 |    0.176101 |   0.127708 |
+| time                |  MAR_land | RACMO_land |
+|---------------------+-----------+------------|
+| 2012-06-01 00:00:00 |   7.33495 |    3.46155 |
+| 2012-06-02 00:00:00 |   6.63191 |    3.25688 |
+| 2012-06-03 00:00:00 |    1.7918 |    1.09451 |
+| 2012-06-04 00:00:00 | 0.0179128 |   0.604358 |
+| 2012-06-05 00:00:00 | 0.0148878 |   0.281088 |
+| 2012-06-06 00:00:00 |   4.09767 |   0.217489 |
+| 2012-06-07 00:00:00 |   4.14103 |   0.164659 |
+| 2012-06-08 00:00:00 |   4.20481 |   0.139156 |
+| 2012-06-09 00:00:00 |   4.21034 |   0.149392 |
+| 2012-06-10 00:00:00 |   4.21034 |   0.149625 |
 
 ***** Polygon covering multiple land and ice outlets
 
 Here a polygon covers several land outlets near the end of a fjord, and several ice outlets of the nearby ice margin. In addition, we request all ice outlets upstream of all selected land basins.
 
 #+BEGIN_SRC jupyter-python :session using
-import runoff as ru
-ds = ru.runoff(base="./freshwater", roi="-51.50,66.93 -51.21,66.74 -49.44,66.91 -49.84,67.18", quiet=True, upstream=True).RCM()
+from discharge import discharge
+ds = discharge(base="./freshwater", roi="-51.50,66.93 -51.21,66.74 -49.44,66.91 -49.84,67.18", quiet=True, upstream=True).discharge()
 #+END_SRC
 
 #+RESULTS:
@@ -443,9 +462,9 @@ Data variables:
 
 With these results:
 + Sum all outlets within each domain
-+ Drop the land runoff and the upstream domains (keep only ice runoff explicitly within our ROI)
++ Drop the land discharge and the upstream domains (keep only ice discharge explicitly within our ROI)
 + Apply a 5-day rolling mean
-+ Plot 2012 runoff season
++ Plot 2012 discharge season
 
 #+BEGIN_SRC jupyter-python :session using
 d = [_ for _ in ds.dims.keys() if _ != 'time'] # dims for summing (don't sum time dimension)
