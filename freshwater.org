@@ -5489,11 +5489,8 @@ fi
 
 ### Basemap
 g.region res=15 -a
-r.mapcalc "r = rgb.1@NSIDC_0713"
-r.mapcalc "g = rgb.2@NSIDC_0713"
-r.mapcalc "b = rgb.3@NSIDC_0713"
-# i.colors.enhance -p red=r green=g blue=b strength=95
-i.colors.enhance -p red=r green=g blue=b strength=93
+parallel --verbose --bar "r.mapcalc \"{} = (rgb.{#}@NSIDC_0713)^0.33\"" ::: r g b
+r.colors map=rr,gg,bb color=grey
 
 # RCM cells here
 r.to.vect input=mask_ice_MAR@MAR output=MAR_ice type=area
