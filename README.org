@@ -342,8 +342,8 @@ Finally, write data to various file formats. GeoPandas DataFrames can only have 
 
 #+BEGIN_SRC jupyter-python :session using
 df.drop(columns=["outlet","basin"]).to_csv("outlets.csv")
-df.set_geometry("outlet").drop(columns="basin").to_file("outlets.gpkg")
-df.set_geometry("basin").drop(columns="outlet").to_file("basins.gpkg")
+df.set_geometry("outlet").drop(columns="basin").to_file("outlets.gpkg", driver="GPKG")
+df.set_geometry("basin").drop(columns="outlet").to_file("basins.gpkg", driver="GPKG")
 #+END_SRC
 
 
