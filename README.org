@@ -1,6 +1,7 @@
 
 * Table of contents                               :toc_3:noexport:
 - [[#greenland-liquid-water-discharge-from-1958-through-2019][Greenland liquid water discharge from 1958 through 2019]]
+- [[#warning][WARNING]]
 - [[#citation][Citation]]
 - [[#accessing-this-data][Accessing this data]]
   - [[#introduction][Introduction]]
@@ -27,6 +28,10 @@ The source for this work is hosted on GitHub at https://github.com/mankoff/fresh
 + This [[https://github.com/mankoff/freshwater/compare/TAG...master][diff]] shows changes between the published version of the paper and the current (active) development version.
 + The source for the active development version can be viewed at https://github.com/mankoff/freshwater/tree/master
 + The source for the published paper can be viewed at https://github.com/mankoff/freshwater/tree/TAG
+
+* WARNING
+
+Bugs may exist in this data or the [[./discharge.py]] access script. All known bugs will be documented at [[https://github.com/mankoff/freshwater/issue]]. Before using this software or submitting final revisions, you should check if any [[https://github.com/mankoff/freshwater/issues][open issues]] impact your results, or if any issue have been [[https://github.com/mankoff/freshwater/issues?q=is%3Aissue+is%3Aclosed][closed]] since you  downloaded the data or script.
 
 * Citation
 
