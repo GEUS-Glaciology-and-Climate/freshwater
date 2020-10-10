@@ -187,15 +187,15 @@ class discharge(object):
                     = self._outlets[key]\
                           .iloc[[_.within(geom[0]) for _ in self._outlets[key]["outlet"]]]
 
-        # clean up duplicates. Code works w/ multi-index
-        for key in self._outlets: 
-            if self._outlets[key] is not None: 
-                self._outlets[key] \
-                    = self._outlets[key].groupby(level=self._outlets[key].index.names).first()
-        for key in self._outlets_u: 
-            if self._outlets_u[key] is not None: 
-                self._outlets_u[key] \
-                    = self._outlets_u[key].groupby(level=self._outlets_u[key].index.names).first()
+        # # clean up duplicates. Code works w/ multi-index
+        # for key in self._outlets: 
+        #     if self._outlets[key] is not None: 
+        #         self._outlets[key] \
+        #             = self._outlets[key].groupby(level=self._outlets[key].index.names).first()
+        # for key in self._outlets_u: 
+        #     if self._outlets_u[key] is not None: 
+        #         self._outlets_u[key] \
+        #             = self._outlets_u[key].groupby(level=self._outlets_u[key].index.names).first()
                 
             
     def parse_ROI(self):
