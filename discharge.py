@@ -270,9 +270,10 @@ class discharge(object):
             # if key == "MAR_ice":  pdb.set_trace()
             # At CLI: =gdb -ex r --args python ./freshwater.py -b ./freshwater --roi=-50.5,67.0 --upstream =
 
+            intersect = self._outlets[out_key].index.intersection(self._discharge[key].station)
             self._discharge[key] \
                 = self._discharge[key]\
-                      .sel({'station': self._outlets[out_key].index.values}, drop=True)[key]\
+                      .sel({'station': intersect}, drop=True)[key]\
                       .to_dataframe()
             if self._discharge[key].index.size != 0:
                 self._discharge[key] = self._discharge[key]\
