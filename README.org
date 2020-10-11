@@ -31,7 +31,7 @@ The source for this work is hosted on GitHub at https://github.com/mankoff/fresh
 
 * WARNING
 
-Bugs may exist in this data or the [[./discharge.py]] access script. All known bugs will be documented at [[https://github.com/mankoff/freshwater/issue]]. Before using this software or submitting final revisions, you should check if any [[https://github.com/mankoff/freshwater/issues][open issues]] impact your results, or if any issue have been [[https://github.com/mankoff/freshwater/issues?q=is%3Aissue+is%3Aclosed][closed]] since you  downloaded the data or script.
+Bugs may exist in this data or the [[./discharge.py]] access script. All known bugs will be documented at [[https://github.com/mankoff/freshwater/issue]]. Before using this software or finalizing results, you should check if any [[https://github.com/mankoff/freshwater/issues][open issues]] impact your results, or if any issue have been [[https://github.com/mankoff/freshwater/issues?q=is%3Aissue+is%3Aclosed][closed]] since you  downloaded the data or script.
 
 * Citation
 
