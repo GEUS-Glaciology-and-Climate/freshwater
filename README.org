@@ -1,5 +1,5 @@
 
-* Table of contents                               :toc_3:noexport:
+* Table of contents                               :toc_5:noexport:
 - [[#greenland-liquid-water-discharge-from-1958-through-2019][Greenland liquid water discharge from 1958 through 2019]]
 - [[#warning][WARNING]]
 - [[#citation][Citation]]
@@ -10,7 +10,20 @@
     - [[#requirements][Requirements]]
   - [[#examples][Examples]]
     - [[#command-line-interface][Command line interface]]
+      - [[#usage-instructions][Usage Instructions]]
+      - [[#outlets-and-basins][Outlets and basins]]
+        - [[#one-point][One point]]
+        - [[#polygon-covering-multiple-land-and-ice-outlets][Polygon covering multiple land and ice outlets]]
+      - [[#discharge][Discharge]]
+        - [[#one-point-1][One point]]
+        - [[#polygon-covering-multiple-land-and-ice-outlets-1][Polygon covering multiple land and ice outlets]]
     - [[#python-api][Python API]]
+      - [[#outlets-and-basins-1][Outlets and basins]]
+        - [[#one-point-2][One point]]
+        - [[#polygon-covering-multiple-land-and-ice-outlets-2][Polygon covering multiple land and ice outlets]]
+      - [[#discharge-1][Discharge]]
+        - [[#one-point-3][One point]]
+        - [[#polygon-covering-multiple-land-and-ice-outlets-3][Polygon covering multiple land and ice outlets]]
 
 * Greenland liquid water discharge from 1958 through 2019
 
