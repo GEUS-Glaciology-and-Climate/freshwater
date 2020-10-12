@@ -70,13 +70,34 @@ class discharge(object):
         Optional end-point: Return this object to end-user."""
         self.msg("Loading outlets and basins...")
         for key in self._outlets.keys():
-                self.msg("    Loading %s" % key)
-                self._outlets[key] \
-                    = (gp.read_file(self._base + "/" + key + "/outlets.gpkg").set_index("cat"))\
-                    .merge(gp.read_file(self._base + "/" + key + "/basins_filled.gpkg")\
-                           .set_index("cat"), left_index=True, right_index=True)\
-                    .rename(columns={"geometry_x":"outlet", "geometry_y":"basin"})
+            self.msg("    Loading %s" % key)
+            self._outlets[key] \
+                = (gp.read_file(self._base + "/" + key + "/outlets.gpkg").set_index("cat"))\
+                .merge(gp.read_file(self._base + "/" + key + "/basins_filled.gpkg")\
+                       .set_index("cat"), left_index=True, right_index=True)\
+                .rename(columns={"geometry_x":"outlet", "geometry_y":"basin"})
+                
         self.subset_to_ROI()
+
+        # the same outlet may be represented multiple times because of flow across corners.
+        # eg: [aa]
+        #        [aaaa] represents one basins with two parts, so it gets 2 table rows. We want 1.
+        # df.groupby('id').first() solves this, except for the basin column that needs a custom aggregate fuction.
+        # except we need to aggregate the 'basin' column to convert to multipolygon
+        def p2mp(da): # polygon to multipolygon
+            from shapely.ops import cascaded_union
+            return cascaded_union(da)  # https://stackoverflow.com/questions/36774049/
+            
+        for key in self._outlets.keys():
+            if self._outlets[key] is not None:
+                aggdict = dict(zip(self._outlets[key].columns,['first']*self._outlets[key].columns.size))
+                aggdict['basin'] = p2mp
+                self._outlets[key] = self._outlets[key].groupby('cat').agg(aggdict)
+        for key in self._outlets_u.keys():
+            if self._outlets_u[key] is not None:
+                aggdict = dict(zip(self._outlets_u[key].columns,['first']*self._outlets_u[key].columns.size))
+                aggdict['basin'] = p2mp
+                self._outlets_u[key] = self._outlets_u[key].groupby('cat').agg(aggdict)
 
         # Return datastructure
         # Merge all dataframes with new columns (domain, k, upstream) to distinguish them
