@@ -38,8 +38,8 @@ This is the source for "Greenland liquid water discharge from 1958 through 2019"
 
 
 The source for this work is hosted on GitHub at https://github.com/mankoff/freshwater. GitHub [[https://github.com/mankoff/freshwater/issues?utf8=%E2%9C%93&q=is%3Aissue][issues]] are used to collect suggested improvements to the paper, problems that made it through review, and mention of similar papers that have been published since this was accepted. The work may be under be under active development, including updating data (and therefore tables) within the source document.
-+ This [[https://github.com/mankoff/freshwater/compare/TAG...master][diff]] shows changes between the published version of the paper and the current (active) development version.
-+ The source for the active development version can be viewed at https://github.com/mankoff/freshwater/tree/master
++ This [[https://github.com/mankoff/freshwater/compare/TAG...main][diff]] shows changes between the published version of the paper and the current (active) development version.
++ The source for the active development version can be viewed at https://github.com/mankoff/freshwater/tree/main
 + The source for the published paper can be viewed at https://github.com/mankoff/freshwater/tree/TAG
 
 * WARNING

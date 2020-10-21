@@ -461,7 +461,7 @@ plt.savefig("./fig/scatter_daily.svg", bbox_inches='tight', dpi=300)
 :   df = np.log10(df)
 
 
-** Tukey - all daily data
+** NOTDONE Tukey - all daily data
 
 #+BEGIN_SRC jupyter-python
 <<py_init>>
@@ -580,26 +580,24 @@ ax2 = fig.add_subplot(122)
 <<load_all_obs>>
 df = obs_noGEM
 
+df['x'] = df['obs']
+df['y_MAR'] = df['MAR'] / df['obs']
+df['y_RACMO'] = df['RACMO'] / df['obs']
+df = df.replace(0,np.nan).dropna()
 df = np.log10(df)
-df[df < -5] = np.nan # < 1 m^3/day runoff
 df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]
 
-# # drop 5/95 outliers
-# q = df['obs'].quantile([0.05, 0.95])
-# df = df[(df['obs'] > q[0.05]) & (df['obs'] < q[0.95])]
+THRESH=3
+df['y_MAR'] = df['y_MAR'].apply(lambda x: x if abs(x) < THRESH else sign(x)*THRESH)
+df['y_RACMO'] = df['y_RACMO'].apply(lambda x: x if abs(x) < THRESH else sign(x)*THRESH)
 
-df.sort_values(by='obs', inplace=True)
-x = df['obs']
-y_MAR = df['MAR']
-y_RACMO = df['RACMO']
+kw = {'mincnt':1,
+      'bins':'log',
+      'clip_on':True,
+      'gridsize':20,
+      'extent':[-THRESH,THRESH,-THRESH,THRESH],
+      'cmap':cm.cividis}
 
-
-# df['x'] = (df['obs']+df['MAR'])/2
-df['x'] = df['obs']
-df['y_MAR'] = df['MAR'] - df['obs']
-df['y_RACMO'] = df['RACMO'] - df['obs']
-    
-kw = {'mincnt':1, 'bins':'log', 'clip_on':True, 'gridsize':20, 'extent':[-3,3,-3,3], 'cmap':cm.cividis}
 # plot all to get max of both for colorbar range
 h_MAR = ax1.hexbin(df['x'], df['y_MAR'], alpha=0, **kw)
 h_RACMO = ax2.hexbin(df['x'], df['y_RACMO'], alpha=0, **kw)
@@ -609,7 +607,6 @@ h_MAR = ax1.hexbin(df['x'], df['y_MAR'], vmax=hmax, **kw)
 h_RACMO = ax2.hexbin(df['x'], df['y_RACMO'], vmax=hmax, **kw)
 
 df_top = df[df['obs'] > df['obs'].quantile(0.33)]
-# df_mid = df[(df['obs'] < df['obs'].quantile(0.66)) & (df['obs'] > df['obs'].quantile(0.33))]
 df_bot = df[df['obs'] < df['obs'].quantile(0.33)]
 
 kwline = {'color':'k'}
@@ -644,28 +641,25 @@ for d in [df_top, df_bot]:
         ax.text(xpos, y, str(round(10**y,2)), **kwtext)
 
 ax1.set_xlabel('Observed [m$^{3}$ s$^{-1}$]')
-ax1.set_ylabel('MAR - Observed [m$^{3}$ s$^{-1}$]')
 ax2.set_xlabel('Observed [m$^{3}$ s$^{-1}$]')
-ax2.set_ylabel('RACMO - Observed [m$^{3}$ s$^{-1}$]')
+ax1.set_ylabel('MAR / Observed')
+ax2.set_ylabel('RACMO / Observed')
 
-# lims = [np.min([ax1.get_xlim()[0], ax1.get_ylim()[0], ax2.get_xlim()[0], ax2.get_ylim()[0]]),
-#         np.max([ax1.get_xlim()[1], ax1.get_ylim()[1], ax2.get_xlim()[1], ax2.get_ylim()[1]])]
 lims = [-3.5,3.5]
-# ticks = np.arange(round(lims[0]), round(lims[1])+1)
 ticks = np.arange(-3,3+1)
 for ax in [ax1,ax2]:
-    ax.set_ylim(lims[0], lims[1])
     ax.set_xlim(lims[0], lims[1])
     ax.set_xticks(ticks)
-    ax.set_yticks(ticks)
     labels = ['10$^{' + str(int(_)) + '}$' for _ in ticks]
+    ax.set_xticks(ticks)
+    ax.set_xticklabels(labels)
+
+    ax.set_ylim(lims[0], lims[1])
+    ax.set_yticks(ticks)
     ax.set_yticklabels(labels)
-    ax.set_xticks(ax.get_yticks())
-    ax.set_xticklabels(ax.get_yticklabels())
-    
+
 cax = fig.add_axes([0.37, 0.85, 0.2, 0.04])
 cb = fig.colorbar(h_MAR, cax=cax, orientation='horizontal')
-# # cb.set_label('N')
 
 adjust_spines(ax1, ['left','bottom'])
 adjust_spines(ax2, ['right','bottom'])
@@ -679,14 +673,12 @@ for ax in [ax1,ax2]:
     ax.set_yticks(mticks, minor=True)
 
 plt.savefig("./fig/tukey_daily3.png", bbox_inches='tight', dpi=300)
-# # plt.savefig("./fig/scatter_daily.pdf", bbox_inches='tight', dpi=300)
-# # plt.savefig("./fig/scatter_daily.svg", bbox_inches='tight', dpi=300)
+# plt.savefig("./fig/scatter_daily.pdf", bbox_inches='tight', dpi=300)
+# plt.savefig("./fig/scatter_daily.svg", bbox_inches='tight', dpi=300)
 #+END_SRC
 
 #+RESULTS:
-: <ipython-input-331-4f8629f1554b>:88: RuntimeWarning: divide by zero encountered in log10
-:   df = np.log10(df)
-: <ipython-input-331-4f8629f1554b>:186: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+: <ipython-input-315-e807cb86f54a>:180: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
 :   plt.savefig("./fig/tukey_daily3.png", bbox_inches='tight', dpi=300)
 
 
