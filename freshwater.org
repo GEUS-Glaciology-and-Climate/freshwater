@@ -2880,9 +2880,9 @@ Band 1 Block=16620x1 Type=Int16, ColorInterp=Gray
 
 #+NAME: BM3_md5sum_ncdump
 #+BEGIN_SRC bash :results verbatim :exports both
-md5sum ${DATADIR}/Morlighem_2017/*.nc
+md5sum ${DATADIR}/Morlighem_2017/BedMachineGreenland-2017-09-20.nc
 echo ""
-ncdump -chs ${DATADIR}/Morlighem_2017/BedMachine*nc
+ncdump -chs ${DATADIR}/Morlighem_2017/BedMachineGreenland-2017-09-20.nc
 #+END_SRC
 
 #+RESULTS: BM3_md5sum_ncdump
@@ -2902,7 +2902,6 @@ variables:
 		mapping:latitude_of_projection_origin = 90. ;
 		mapping:standard_parallel = 70. ;
 		mapping:straight_vertical_longitude_from_pole = -45. ;
-		mapping:_Storage = "contiguous" ;
 	int x(x) ;
 		x:long_name = "Cartesian x-coordinate" ;
 		x:standard_name = "projection_x_coordinate" ;
@@ -2998,19 +2997,19 @@ variables:
 		:license = "No restrictions on access or use" ;
 		:Data_citation = "Morlighem M. et al., (2017), BedMachine v3: Complete bed topography and ocean bathymetry mapping of Greenland from multi-beam echo sounding combined with mass conservation, Geophys. Res. Lett., 44, doi:10.1002/2017GL074954. (http://onlinelibrary.wiley.com/doi/10.1002/2017GL074954/full)" ;
 		:_SuperblockVersion = 2 ;
-		:_IsNetcdf4 = 0 ;
+		:_IsNetcdf4 = 1 ;
 		:_Format = "netCDF-4 classic model" ;
 }
 #+end_example
 
-*** TODO MAR
+*** MAR
 **** File list and md5sums
 
 + WARNING :: May be stale. Using pre-computed md5sum because it takes so long to calculate.
 
 #+BEGIN_SRC bash :results verbatim :exports both :session
 ROOT=${DATADIR}/MAR/3.11
-LIST=$(cd ${ROOT}; ls | { tee >(head -n4 >&3; cat >/dev/null) | tail -n4; } 3>&1  ) # first and last four files
+LIST=$(cd ${ROOT}; ls *.nc | { tee >(head -n4 >&3; cat >/dev/null) | tail -n4; } 3>&1  ) # first and last four files
 parallel --keep-order md5sum ${ROOT}/{} ::: ${LIST}
 #+END_SRC
 
@@ -3219,7 +3218,7 @@ variables:
 }
 #+end_example
 
-*** TODO RACMO
+*** RACMO
 **** File list and md5sums
 
 + WARN :: Only check some to save compute time.
@@ -3691,7 +3690,6 @@ variables:
 		polar_stereographic:false_easting = 0. ;
 		polar_stereographic:false_northing = 0. ;
 		polar_stereographic:latitude_of_projection_origin = 90. ;
-		polar_stereographic:_Storage = "contiguous" ;
 	byte LSMGr(Y, X) ;
 		LSMGr:_FillValue = -99b ;
 		LSMGr:long_name = "Hole-filled Greenland land mass mask" ;
@@ -3831,8 +3829,8 @@ head ${root}/discharge2018.txt
 #+RESULTS: Provenance_Qaanaaq
 #+begin_example
 
-8f76120d03ddd9b435db797b3ceb95d4  /home/kdm/data.me/qaanaaq/discharge2018.txt
-Time(UTC),Discharge
+779a8d8c1296df98d41dcb990bf1f19b  /home/kdm/data.me/qaanaaq/discharge2018.txt
+Time(UTC),Discharge(m^3/s)
 2018/07/05 16:45:00,0.81
 2018/07/05 16:50:00,0.8
 2018/07/05 16:55:00,0.81
@@ -3919,7 +3917,14 @@ Date_Time,Kingigtorssuaq,Kobbefjord,Oriartorfik,Røde_Elv,Teqinngalip,Zackenberg
 2018-09-26,0.233,,0.088,,,
 #+end_example
 
-*** TODO Narsarsuaq
+*** Narsarsuaq
+
+#+BEGIN_SRC bash
+md5sum ${DATADIR}/Hawkings_2016/NarsarsuaqDischarge2013.xlsx
+#+END_SRC
+
+#+RESULTS:
+: b7d649e6afdc7804353592df37e3a3d8  /home/kdm/data/Hawkings_2016/NarsarsuaqDischarge2013.xlsx
 
 ** Import Data
 :PROPERTIES:
@@ -4216,16 +4221,18 @@ df
 *** Check CF compliance
 #+NAME: cf_check
 #+BEGIN_SRC bash :results verbatim :eval no-export :exports both
+conda activate freshwater
 cfchecks ./freshwater/land/runoff/MAR_2000.nc
 #+END_SRC
 
 #+RESULTS: cf_check
 #+begin_example
+
 CHECKING NetCDF FILE: ./freshwater/land/runoff/MAR_2000.nc
 =====================
 Using CF Checker Version 4.0.0
 Checking against CF Version CF-1.7
-Using Standard Name Table Version 74 (2020-08-04T14:43:55Z)
+Using Standard Name Table Version 76 (2020-10-13T12:38:27Z)
 Using Area Type Table Version 10 (23 June 2020)
 Using Standardized Region Name Table Version 4 (18 December 2018)
 
@@ -4344,7 +4351,7 @@ variables:
 }
 #+end_example
 
-*** TODO Annual sums agree?
+*** Annual sums agree?
 
 Yes, within ~0.3 %.
 
@@ -6461,10 +6468,9 @@ plt.savefig('./fig/watson_adjusted_south.png', transparent=True, bbox_inches='ti
 * README                                                :noexport:
 
 #+BEGIN_SRC org :tangle ./freshwater/README.txt :mkdirp ./freshwater :eval no
-README for "Greenland liquid water runoff from 1979 through 2017"
+README for "Greenland liquid water runoff from 1958 through 2019"
 
-DOI: doi:10.22008/promice/freshwater
-PROMICE page: https://www.promice.org/PromiceDataPortal/#FreshwaterRunoff
+Data DOI: doi:10.22008/promice/freshwater
 Source: https://github.com/mankoff/freshwater
 
 ,* Data Description
@@ -6510,7 +6516,7 @@ In the runoff sub-folders, files are named <RCM>_<YYYY>.nc, where =RCM= is one o
 
 ,* Database access software
 
-The =runoff.py= script provides high-level access to the database. See =README.org= for usage examples.
+The =discharge.py= script provides high-level access to the database. See =README.org= for usage examples.
 
 Complete documentation and example use cases with code are available at https://github.com/mankoff/freshwater, or by contacting Ken Mankoff <kdm@geus.dk>
 #+END_SRC
@@ -6556,21 +6562,21 @@ This project uses software - bash, GRASS, Python, etc. The python environment is
 
 *** Os installed
 #+BEGIN_SRC bash :results table
-for tool in gdal-bin parallel sed gawk netcdf-bin proj-bin nco cdo bash grass datamash; do dpkg -l | grep "ii  ${tool} " | cut -c5-90; done| sort
+for tool in gdal-bin parallel sed gawk netcdf-bin proj-bin nco cdo bash grass-gui datamash; do dpkg -l | grep "ii  ${tool} " | cut -c5-90; done| sort
 #+END_SRC
 
 #+RESULTS:
-| bash       | 5.0-6ubuntu1.1     |
-| cdo        | 1.9.9~rc1-1        |
-| datamash   | 1.4-1              |
-| gawk       | 1:5.0.1+dfsg-1     |
-| gdal-bin   | 3.0.4+dfsg-1build3 |
-| grass      | 7.8.3-1~focal1     |
-| nco        | 4.9.1-1build2      |
-| netcdf-bin | 1:4.7.3-1          |
-| parallel   | 20161222-1.1       |
-| proj-bin   | 6.3.1-1            |
-| sed        | 4.7-1              |
+| bash       | 5.0-6ubuntu1.1      |
+| cdo        | 1.9.9~rc1-1         |
+| datamash   | 1.4-1               |
+| gawk       | 1:5.0.1+dfsg-1      |
+| gdal-bin   | 3.1.3+dfsg-1~focal0 |
+| grass-gui  | 7.8.4-1~focal1      |
+| nco        | 4.9.1-1build2       |
+| netcdf-bin | 1:4.7.3-1           |
+| parallel   | 20161222-1.1        |
+| proj-bin   | 7.1.1-1~focal0      |
+| sed        | 4.7-1               |
 
 
 *** Org Mode
@@ -6579,7 +6585,7 @@ for tool in gdal-bin parallel sed gawk netcdf-bin proj-bin nco cdo bash grass da
 #+END_SRC
 
 #+RESULTS:
-: Org mode version 9.3.7 (9.3.7-21-g47f26b-elpaplus @ /home/kdm/.emacs.d/elpa/org-plus-contrib-20200817/)
+: Org mode version 9.4 (9.4-19-gb1de0c-elpaplus @ /home/kdm/.emacs.d/elpa/org-plus-contrib-20201019/)
 
 *** Python
 
@@ -6607,7 +6613,7 @@ dependencies:
   - bzip2=1.0.8=h516909a_2
   - ca-certificates=2020.6.20=hecda079_0
   - cairo=1.16.0=hcf35c78_1003
-  - certifi=2020.6.20=py38h32f6830_0
+  - certifi=2020.6.20=py38h924ce5b_2
   - cfchecker=4.0.0=py_0
   - cfitsio=3.470=hce51eda_6
   - cftime=1.2.1=py38h8790de6_0
@@ -6651,6 +6657,7 @@ dependencies:
   - icu=64.2=he1b5a44_1
   - importlib-metadata=1.7.0=py38h32f6830_0
   - importlib_metadata=1.7.0=0
+  - ipdb=0.13.3=pyh9f0ad1d_0
   - ipykernel=5.3.4=py38h23f93f0_0
   - ipython=7.16.1=py38h23f93f0_0
   - ipython_genutils=0.2.0=py_1
@@ -6717,7 +6724,7 @@ dependencies:
   - numpy=1.18.5=py38h8854b6b_0
   - olefile=0.46=py_0
   - openjpeg=2.3.1=h981e76c_3
-  - openssl=1.1.1g=h516909a_1
+  - openssl=1.1.1h=h516909a_0
   - packaging=20.4=pyh9f0ad1d_0
   - pandas=1.0.4=py38hcb8c335_0
   - pandoc=2.10=h14c3975_0
@@ -6811,6 +6818,7 @@ dependencies:
     - grass-session==0.5
     - isort==4.3.21
     - lazy-object-proxy==1.4.3
+    - matplotlib-scalebar==0.6.2
     - mccabe==0.6.1
     - pylint==2.5.3
     - pyqt5-sip==4.19.18
