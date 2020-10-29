@@ -197,7 +197,7 @@ Freshwater discharge from Greenland primarily takes three forms: solid ice from 
 * Input and validation data
 ** Static data
 
-The static products (streams, outlets, and basins (Fig. [[fig:overview]])) are derived from an ice-sheet surface digital elevation model (DEM), an ice sheet bed DEM, an ice-sheet mask, the land surface DEM, and an ocean mask. For the surface DEM, we use ArcticDEM v7 100 m citep:ArcticDEM. Subglacial routing uses ArcticDEM and ice thickness from BedMachine v3 citep:NSIDC_BedMachine_GL,morlighem_2017. For the ice mask we use the Programme for Monitoring of the Greenland Ice Sheet (PROMICE) Ice Extent citep:citterio_2013. For the ocean mask we use the Making Earth System Data Records for Use in Research Environments (MEaSUREs) Greenland Ice Mapping Project (GIMP) Land Ice and Ocean Classification Mask, Version 1 citep:NSIDC_0714,howat_2014.
+The static products (streams, outlets, and basins (Fig. [[fig:overview]])) are derived from an ice-sheet surface digital elevation model (DEM), an ice sheet bed DEM, an ice-sheet mask, the land surface DEM, and an ocean mask. For the surface DEM, we use ArcticDEM v7 100 m citep:ArcticDEM. Subglacial routing uses ArcticDEM and ice thickness from BedMachine v3 citep:NSIDC_BedMachine_GL,morlighem_2017. Both DEMs are referenced to the WGS84 ellipsoid. For the ice mask we use the Programme for Monitoring of the Greenland Ice Sheet (PROMICE) Ice Extent citep:citterio_2013. For the ocean mask we use the Making Earth System Data Records for Use in Research Environments (MEaSUREs) Greenland Ice Mapping Project (GIMP) Land Ice and Ocean Classification Mask, Version 1 citep:NSIDC_0714,howat_2014.
 
 ** RCM time series
 
@@ -208,7 +208,7 @@ The time series product (daily discharge) is derived from daily runoff estimates
 R = ME + RA - RT - RF.
 \end{equation}
 
-In Eq. \ref{eq:runoff}, \(ME\) is melt, \(RA\) is rainfall, \(RT\) is retention, and \(RF\) is refreezing. In RACMO, retention occurs only when firn is present (not with bare ice). MAR does have a delay for bare ice runoff. Neither have a delay for land runoff. Both RCM outputs were provided regridded to the same 1 km grid using an offline statistical down-scaling technique based on local vertical runoff gradient applied to the sub-grid topography citep:noel_2016,fettweis_2020. MAR (v 3.11; citet:delhasse_2019) ran with 7.5 km resolution and ERA5 6-hour forcing. RACMO (v 2.3p2; citet:noel_2018,noel_2019) ran with 5.5 km resolution and ERA-Interim 6-hour forcing. Runoff is assigned an uncertainty of \pm15 %.
+In Eq. \ref{eq:runoff}, \(ME\) is melt, \(RA\) is rainfall, \(RT\) is retention, and \(RF\) is refreezing. In RACMO, retention occurs only when firn is present (not with bare ice). MAR does have a delay for bare ice runoff. Neither have a delay for land runoff. Both RCM outputs were provided regridded to the same 1 km grid using an offline statistical down-scaling technique based on local vertical runoff gradient applied to the sub-grid topography citep:noel_2016,fettweis_2020. MAR (v 3.11; citet:delhasse_2019) ran with 7.5 km resolution and ERA5 6-hour forcing. RACMO (v 2.3p2; citet:noel_2018,noel_2019) ran with 5.5 km resolution and ERA-Interim 6-hour forcing. Runoff is assigned an uncertainty of \pm15 % (Sect. \ref{sec:uncertain:RCM}).
 
 ** River discharge observations
 
@@ -218,18 +218,18 @@ We use 10 river discharge daily time series to validate the results of this work
 
 #+NAME: tbl_obs
 #+CAPTION: Table of observation locations, time spans, and associated references. Coordinates are decimal degree W and N.
-| Location              |     Lon |     Lat |      Time | Data                     | Publication         | Fig(s).                                   |
-|-----------------------+---------+---------+-----------+--------------------------+---------------------+-------------------------------------------|
-| Kiattuut Sermiat      |   45.33 |   61.21 |      2013 | citet:hawkings_2016_data | citet:hawkings_2016 | 1 4 5 6 \ref{fig:Ks}                      |
-| Kingigtorssuaq (Nuuk) | 51.5801 | 64.1387 | 2008-2018 | citet:GEM_data           |                     | 1 4 5 \ref{fig:K}                         |
-| Kobbefjord (Nuuk)     | 51.3810 | 64.1336 | 2006-2017 | citet:GEM_data           |                     | 1 4 5 \ref{fig:Kb}                        |
-| Leverett Glacier      |   50.17 |   67.06 | 2009-2012 | citet:tedstone_2017      | citet:hawkings_2015 | 1 4 5 6 \ref{fig:L}                       |
-| Oriartorfik (Nuuk)    | 51.4066 | 64.1707 | 2007-2018 | citet:GEM_data           |                     | 1 4 5 \ref{fig:O}                         |
-| Qaanaaq               | 69.3030 | 77.4753 | 2017-2018 | citet:qaanaaq_data       | citet:sugiyama_2014 | 1 4 5 6 \ref{fig:Q}                       |
-| Røde Elv (Disko)      | 53.4989 | 69.2534 |      2017 | citet:GEM_data           |                     | 1 \ref{fig:bamber_2018} 4 5 6 \ref{fig:R} |
-| Teqinngalip (Nuuk)    | 51.5484 | 64.1586 | 2007-2018 | citet:GEM_data           |                     | 1 4 5 \ref{fig:T}                         |
-| Watson River          |   50.68 |   67.01 | 2006-2019 | citet:van-as_2018        | citet:van-as_2018   | 1 4 5 6 \ref{fig:W} \ref{fig:W_adjust}    |
-| Zackenberg            | 20.5628 | 74.4722 | 1996-2018 | citet:GEM_data           |                     | 1 4 5 6 \ref{fig:Z}                       |
+| Location              |     Lon |     Lat |      Time | Data                     | Publication         | Fig(s).                                |
+|-----------------------+---------+---------+-----------+--------------------------+---------------------+----------------------------------------|
+| Kiattuut Sermiat      |   45.33 |   61.21 |      2013 | citet:hawkings_2016_data | citet:hawkings_2016 | 1 3 4 5 \ref{fig:Ks}                   |
+| Kingigtorssuaq (Nuuk) | 51.5801 | 64.1387 | 2008-2018 | citet:GEM_data           |                     | 1 3 4 \ref{fig:K}                      |
+| Kobbefjord (Nuuk)     | 51.3810 | 64.1336 | 2006-2017 | citet:GEM_data           |                     | 1 3 4 \ref{fig:Kb}                     |
+| Leverett Glacier      |   50.17 |   67.06 | 2009-2012 | citet:tedstone_2017      | citet:hawkings_2015 | 1 3 4 5 \ref{fig:L}                    |
+| Oriartorfik (Nuuk)    | 51.4066 | 64.1707 | 2007-2018 | citet:GEM_data           |                     | 1 3 4 \ref{fig:O}                      |
+| Qaanaaq               | 69.3030 | 77.4753 | 2017-2018 | citet:qaanaaq_data       | citet:sugiyama_2014 | 1 3 4 5 \ref{fig:Q}                    |
+| Røde Elv (Disko)      | 53.4989 | 69.2534 |      2017 | citet:GEM_data           |                     | 1 3 4 5 6 \ref{fig:R}                  |
+| Teqinngalip (Nuuk)    | 51.5484 | 64.1586 | 2007-2018 | citet:GEM_data           |                     | 1 3 4 \ref{fig:T}                      |
+| Watson River          |   50.68 |   67.01 | 2006-2019 | citet:van-as_2018        | citet:van-as_2018   | 1 3 4 5 \ref{fig:W} \ref{fig:W_adjust} |
+| Zackenberg            | 20.5628 | 74.4722 | 1996-2018 | citet:GEM_data           |                     | 1 3 4 5 \ref{fig:Z}                    |
 
 *** Discharge observations table internal use              :noexport:
 :PROPERTIES:
@@ -294,8 +294,8 @@ Note - to solve =jupyter-python= issue with =:cache= results,
 We use the following terminology throughout the document:
 + Runoff refers to the unmodified RCM data products - melted ice, rain, condensation, and evaporation that comprise the RCM runoff output variable.
 + Discharge refers to the runoff after it has been processed by this work - routed to and aggregated at the outlets. Depending on context, discharge may also refer to the observed stream discharge (Table \ref{tbl_obs}).
-+ Basins refer to the 100 m x 100 m resolution basins derived from a combination of the ArcticDEM product and the mask.
-+ Mask refers to the surface classification at that 100 m x 100 m resolution and is one of ice, land, or ocean (also called fjord or water). When referring to the surface classification in the RCM, we explicitly state "RCM mask".
++ Basins refer to the 100 m x 100 m gridded basins derived from a combination of the ArcticDEM product and the mask.
++ Mask refers to the surface classification on that 100 m x 100 m grid and is one of ice, land, or ocean (also called fjord or water). When referring to the surface classification in the RCM, we explicitly state "RCM mask".
 + MAR and RACMO refer to the RCMs, but when comparing discharge estimates between them or to observations, we use MAR and RACMO to refer to our discharge product derived from the MAR and RACMO RCM runoff variables, rather than repeatedly explicitly stating "discharged derived from [MAR|RACMO] runoff". The use should be clear from context.
 
 ** Streams, outlets, and basins
@@ -324,7 +324,7 @@ The three choices of \(k\) generate three scenarios of basins and outlets, and w
 
 RCM runoff is summed over each basin for each day of RCM data, and assigned to each outlet for that day. This assumes routing between the runoff and the outlet is instantaneous, so all analyses done here include a seven-day smooth applied to the RCM discharge product (cf. citet:van-as_2017). The released data do not include any smoothing.
 
-The alignment of the RCM and the basins do not always agree. Each 100 m x 100 m ArcticDEM pixel is classified as ice citep:citterio_2013, ocean citep:NSIDC_0714, or land (defined as neither ice nor ocean). However, the classification of the mask cells and the 1 km^{2} RCM domains do not always agree - for example, when a mask cell is classified as ice but the matching RCM cell is land. This disagreement occurs almost everywhere along the ice margin because the 1 km resolution RCM boundary and the 100 m mask boundary rarely perfectly align. The ice margin is where most runoff occurs per unit area due to the highest temperatures at the lowest ice elevations, so small changes in masks in these locations can introduce large changes in RCM outputs.
+The alignment of the RCM and the basins do not always agree. Each 100 m x 100 m ArcticDEM pixel is classified as ice citep:citterio_2013, ocean citep:NSIDC_0714, or land (defined as neither ice nor ocean). However, the classification of the mask cells and the 1 km^{2} RCM domains do not always agree - for example, when a mask cell is classified as ice but the matching RCM cell is land. This disagreement occurs almost everywhere along the ice margin because the 1 km RCM boundary and the 100 m mask boundary rarely perfectly align. The ice margin is where most runoff occurs per unit area due to the highest temperatures at the lowest ice elevations, so small changes in masks in these locations can introduce large changes in RCM outputs.
 
 We adjust for this imprecise overlap and scale the RCM results to the basin area. Where the mask reports ice and a RCM reports land, the RCM land runoff fraction is discarded, and the RCM ice runoff fraction over this basin is adjusted for the uncovered basin cells (and vice versa for basin land and RCM ice). Small basins with no RCM coverage of the same type have no runoff.
 
@@ -343,7 +343,7 @@ We validate the modeled outlet discharge against the observations first in bulk 
 
 We introduce the graphics here as part of the methods to reduce replication in figure captions - we show 10 nearly identical graphics (Figs. \ref{fig:W} and \ref{fig:L} through \ref{fig:Q}) for 10 different observation locations, and each graphic uses the same template of six panels.
 
-For each figure (Figs. \ref{fig:W}, \ref{fig:L} to \ref{fig:Q}), the top panel (a) shows a satellite basemap with the land portion of the basin of interest (if it exists) outlined in dark green, the streams within that basin in light green, the basin outlet as an orange filled diamond, and the stream gauge location as an orange unfilled diamond. Ice basin(s) that drain to the outlet are outlined in thick dark blue if they exist, and all other ice basins in thin dark blue. Both MAR and RACMO use the same domains. The RCM ice domain is in light blue, and the RCM land domain is not shown, but is outside the light blue ice domain (not including the water). The scale of each map varies, but the basins lines (green and dark blue) are discretised at 100 m resolution, and the RCM grid cells (light blue) are at 1 km resolution.
+For each figure (Figs. \ref{fig:W}, \ref{fig:L} to \ref{fig:Q}), the top panel (a) shows a satellite basemap with the land portion of the basin of interest (if it exists) outlined in dark green, the streams within that basin in light green, the basin outlet as an orange filled diamond, and the stream gauge location as an orange unfilled diamond. Ice basin(s) that drain to the outlet are outlined in thick dark blue if they exist, and all other ice basins in thin dark blue. Both MAR and RACMO use the same domains. The RCM ice domain is in light blue, and the RCM land domain is not shown, but is outside the light blue ice domain (not including the water). The scale of each map varies, but the basins lines (green and dark blue) are on a 100 m grid, and the RCM grid cells (light blue) are on a 1 km grid.
 
 Panel b shows an example time series - whatever data are available for the last calendar year of the observations.
 
@@ -620,7 +620,7 @@ The above issues are specific to ice basins. Land basin outlets do not change lo
 
 Below, we discuss the known uncertainties, ranging from least to most uncertain.
 
-The basins presented here are static approximations based on 100 m resolution surface DEM of a dynamic system. Land basin boundaries are likely to be more precise and accurate than ice basins, because the land surface is better resolved, has larger surface slopes, has negligible sub-surface flow, and is less dynamic than the ice surface. Even if basins and outlets seem visually correct from the 100 m product, the basin outline still has uncertainty on the order of hundreds of meters and will therefore include many minor errors and non-physical properties, such as drainage basin boundaries bisecting lakes. However, all artefacts we did find are significantly smaller than the resolution of the 1 km^{2} RCM inputs. We do not show but note that when doing the same work with the 150 m BedMachine land surface DEM, some basins change their outlet locations significantly - draining on the opposite side of a spit or isthmus and into a different fjord than the streams do when observed in satellite imagery. We have not observed these errors in streams and basins derived from the 100 m ArcticDEM in a visual comparison with Google Earth, although they may still exist.
+The basins presented here are static approximations based on 100 m DEM of a dynamic system. Land basin boundaries are likely to be more precise and accurate than ice basins, because the land surface is better resolved, has larger surface slopes, has negligible sub-surface flow, and is less dynamic than the ice surface. Even if basins and outlets seem visually correct from the 100 m product, the basin outline still has uncertainty on the order of hundreds of meters and will therefore include many minor errors and non-physical properties, such as drainage basin boundaries bisecting lakes. However, all artefacts we did find are significantly smaller than the 1 km^{2} grid of the RCM inputs. We do not show but note that when doing the same work with the 150 m BedMachine land surface DEM, some basins change their outlet locations significantly - draining on the opposite side of a spit or isthmus and into a different fjord than the streams do when observed in satellite imagery. We have not observed these errors in streams and basins derived from the 100 m ArcticDEM in a visual comparison with Google Earth, although they may still exist.
 
 Moving from land basins to subglacial ice basins, the uncertainty increases because subglacial routing is highly dynamic on timescales from minutes to seasons (e.g. citet:werder_2013). This dynamic system may introduce large spatial changes in outflow location (water or basin "piracy", citet:ahlstrom_2002,lindback_2015,chu_2016_rerouting), but citet:stevens_2018 suggests basins switching outlet locations may not be as common as earlier work suggests, and our sensitivity analysis suggests that near the margin where the majority of runoff occurs, outlet location often changes by less than 10 km under different routing assumptions (Fig. [[fig:k_basin_change]]). The largest (> 100 km) changes in outlet location in Fig. [[fig:k_basin_change]] occur when the continental or ice flow divides move, and one or two of the \(k\) scenario(s) drain cells to an entirely different coast or sector of the ice sheet.
 
@@ -4138,6 +4138,7 @@ df['elev'].plot.hist(bins = 100,
 
 ax.set_yscale("log")    
 ax.set_xlabel("Outlet elevation [m]")
+ax.set_ylabel("Count")
 ax.set_yticks([1E0,1E1,1E2,1E3,1E4])
 
 ax2 = fig.add_subplot(212)
@@ -4168,7 +4169,7 @@ ax2.set_xlim([1,1000])
 ax2.set_xscale("log")
 # ax2.set_yticks([1E0,1E1,1E2,1E3,1E4,1E5])
 
-ax2.set_ylabel("Cumulative\nFrequency")
+ax2.set_ylabel("Cumulative\ncounts")
 ax2.set_xlabel("Elevation [m]")
 
 ax.legend()
@@ -5467,11 +5468,15 @@ cat << EOF | ps.map -e input=- output=./fig/${label}.eps --o
 EOF
 
     convert -trim -density 300 ./fig/${label}.eps ./fig/${label}.png
-    o ./fig/${label}.png
+    # o ./fig/${label}.png
 
 done
-#+END_SRC
 
+## Open each in inkscape, adjust scalebar if necessary (x4 for L and W), save all (even if not adjustments)
+# for f in $(ls fig/{?,??}.eps); do inkscape $f; done
+## Make PNGs: 
+# parallel --verbose --bar "convert -trim -density 300 ./fig/{1}.eps ./fig/{1}.png" ::: Kb K Ks L O Q R T W Z 
+#+END_SRC
 
 #+NAME: plan_view_obs_loc
 #+BEGIN_SRC bash :results verbatim
@@ -5619,7 +5624,7 @@ vareas MAR_ice
   # fcolor 126:206:227
   fcolor none
   scale 1
-  width 1
+  width 3
   label RCM ice
   end
 
@@ -5652,13 +5657,18 @@ vlegend
   fontsize 8
   end
 
-# scalebar f
-#    length 4
-#    units kilometers
-#    segment 2
-#    where 1 3
-#    fontsize 12
-#    end
+text 3% 3% a
+  background white
+  fontsize 20
+  end
+  
+scalebar s
+  length 1
+  units kilometers
+  segment 1
+  where 1 3.25
+  fontsize 12
+  end
 #+END_SRC
 
 
@@ -5669,6 +5679,7 @@ vlegend
 <<py_init_graphics>>
 
 <<load_all_obs>>
+# k='W'; obs={k:obs[k]}
 
 for k in obs.keys():
     fig = plt.figure(1, figsize=(8,3.5)) # w,h
@@ -5710,36 +5721,38 @@ for k in obs.keys():
     plt.legend(fontsize=8, fancybox=False, frameon=False)
     ax1.set_xlabel("Time")
     ax1.set_ylabel("Runoff [m$^{3}$ s$^{-1}$]")
+    ax1.text(-0.14, 0.95, 'b', size=15, color='white', bbox=dict(facecolor='black'), transform=ax1.transAxes)
 
     plt.savefig("./fig/" + k + "_ts.png", bbox_inches='tight', dpi=300)
-    # plt.savefig("./fig/" + l + "_ts.pdf", bbox_inches='tight', dpi=300)
-    # plt.savefig("./fig/" + l + "_ts.svg", bbox_inches='tight', dpi=300)
-
 #+END_SRC
 
 #+RESULTS:
 
 
 
-*** Scatter at each obs
+*** Scatter & Tukey at each obs
 
 #+BEGIN_SRC jupyter-python :eval no-export
 <<py_init>>
 <<py_init_graphics>>
 
 <<load_all_obs>>
-# obs = {'W':obs['W']}
+# k="Q"; obs = {k:obs[k]}
 
 for k in obs.keys():
 
-    fig = plt.figure(1, figsize=(8,3.5)) # w,h
+    fig = plt.figure(1, figsize=(8,6.5)) # w,h
     fig.clf()
     fig.set_tight_layout(True)
-    ax1 = fig.add_subplot(121)
-    ax2 = fig.add_subplot(122)
+    ax1 = fig.add_subplot(221)
+    ax2 = fig.add_subplot(222)
+    ax3 = fig.add_subplot(223)
+    ax4 = fig.add_subplot(224)
 
     adjust_spines(ax1, ['left','bottom'])
     adjust_spines(ax2, ['right','bottom'])
+    adjust_spines(ax3, ['left','bottom'])
+    adjust_spines(ax4, ['right','bottom'])
 
     df = obs[k]
     
@@ -5806,266 +5819,22 @@ for k in obs.keys():
         ax.set_yticklabels(labels)
         ax.set_xticks(ax.get_yticks())
         ax.set_xticklabels(ax.get_yticklabels())
-
-
-    cax = fig.add_axes([0.46, 0.3, 0.01, 0.4])
-    cb = fig.colorbar(s, cax=cax)
-    cb.set_label('Day of year')
-
-    plt.setp(ax1.xaxis.get_majorticklabels(), rotation=30)
-    plt.setp(ax2.xaxis.get_majorticklabels(), rotation=30)
-
-    plt.savefig("./fig/" + k + "_scatter.png", bbox_inches='tight', dpi=300)
-    # plt.savefig("./fig/" + l + "_scatter.svg", bbox_inches='tight', dpi=300)
-    # plt.savefig("./fig/" + l + "_scatter.pdf", bbox_inches='tight', dpi=300)
-
-#+END_SRC
-
-#+RESULTS:
-: <ipython-input-337-d48a18de57d6>:93: RuntimeWarning: invalid value encountered in log10
-:   df = np.log10(df)
-: /home/kdm/local/miniconda3/envs/freshwater/lib/python3.8/site-packages/seaborn/distributions.py:434: UserWarning: The following kwargs were not used by contour: 'linewidth'
-:   cset = contour_func(xx, yy, z, n_levels, **kwargs)
-: <ipython-input-337-d48a18de57d6>:164: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
-:   plt.savefig("./fig/" + k + "_scatter.png", bbox_inches='tight', dpi=300)
-
-*** NOTDONE Scatter at each obs with weighted PI        :noexport:
-
-#+BEGIN_SRC jupyter-python :eval no-export
-import pandas as pd
-import matplotlib.pyplot as plt
-from adjust_spines import adjust_spines as adjust_spines
-
-import matplotlib
-from matplotlib import rc
-rc('font', size=12)
-rc('text', usetex=False)
-# matplotlib.pyplot.xkcd()
-
-names = ['Kb Kobbefjord','K Kingigtorssuaq','L Leverett','Ks Kiattuut Sermiat','O Oriartorfik','Q Qaanaaq','R Røde Elv','T Teqinngalip','W Watson', 'Z Zackenberg']
-name = [' '.join(_.split(" ")[1:]) for _ in names]
-loc = [_.split(" ")[0] for _ in names]
-
-for i,l in enumerate(loc[-1]):
-    # plt.close(1)
-    fig = plt.figure(1, figsize=(8,3.5)) # w,h
-    fig.clf()
-    fig.set_tight_layout(True)
-    ax1 = fig.add_subplot(121)
-    ax2 = fig.add_subplot(122)
-
-    adjust_spines(ax1, ['left','bottom'])
-    adjust_spines(ax2, ['right','bottom'])
-
-    df_obs = pd.read_csv("./dat/runoff/obs_" + l + ".csv", index_col=0, parse_dates=True)
-    df_obs.columns = ['obs'] if l != 'W' else ['obs','err']
-    df_RCM = pd.read_csv("./dat/runoff/" + l + ".csv", index_col=0, parse_dates=True)
-    df = df_obs.merge(df_RCM, left_index=True, right_index=True)
-
-    # add upstream ice to all basins where it exists (not O or K)
-    df['MAR'] = df['MAR_land'] + df['MAR_ice_upstream'] if 'MAR_ice_upstream' in df.columns else df['MAR_land']
-    if l == 'L': df['MAR'] = df['MAR_ice_upstream'] # Leverett should be just upstream ice, no land runoff
-
-    # Same for RACMO
-    df['RACMO'] = df['RACMO_land'] + df['RACMO_ice_upstream'] if 'RACMO_ice_upstream' in df.columns else df['RACMO_land']
-    if l == 'L': df['RACMO'] = df['RACMO_ice']
-
-    # temporal smooth?
-    # df['MAR'] = df['MAR'].rolling('5D', min_periods=5).mean()
-    # df['RACMO'] = df['RACMO'].rolling('5D', min_periods=5).mean()
-    
-    df = df.replace(0, np.nan).dropna()
-    df = np.log10(df)
-    # df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)] # clean up nan and inf
-
-    kw = {'alpha': 1, 'cmap': cm.viridis, 'marker':'.', 'c':df.index.dayofyear, 'edgecolor':'none', 'clip_on':False}
-    s = ax1.scatter(df['obs'], df['MAR'], **kw)
-    s = ax2.scatter(df['obs'], df['RACMO'], **kw)
-
-    lims = [np.min([ax1.get_xlim()[0], ax1.get_ylim()[0], ax2.get_xlim()[0], ax2.get_ylim()[0]]),
-            np.max([ax1.get_xlim()[1], ax1.get_ylim()[1], ax2.get_xlim()[1], ax2.get_ylim()[1]])]
-
-
-    # drop 5/95 outliers
-    # q = df['obs'].quantile([0.05, 0.95])
-    # df = df[(df['obs'] > q[0.05]) & (df['obs'] < q[0.95])]
-
-    x = df['obs']
-    y_MAR = df['MAR']
-    y_RACMO = df['RACMO']
-
-    for y,ax in zip([y_MAR,y_RACMO],[ax1,ax2]):
-        # https://stackoverflow.com/questions/27164114/
         
-        # Modeling with Numpy
-        def equation(a, b):
-            """Return a 1D polynomial."""
-            return np.polyval(a, b) 
-
-        p, cov = np.polyfit(x, y, 1, cov=True) # parameters and covariance from of the fit of 1-D polynom.
-        y_model = equation(p, x)  # model using the fit parameters; NOTE: parameters here are coefficients
-
-        # Statistics
-        n = y.size                                           # number of observations
-        m = p.size                                           # number of parameters
-        dof = n - m                                          # degrees of freedom
-        import scipy.stats as stats
-        t68 = stats.t.ppf(0.68, n - m)                       # used for CI and PI bands
-        t95 = stats.t.ppf(0.95, n - m)                       # used for CI and PI bands
-
-        # Estimates of Error in Data/Model
-        resid = y - y_model                           
-        chi2 = np.sum((resid / y_model)**2) # chi-squared; estimates error in data
-        chi2_red = chi2 / dof               # reduced chi-squared; measures goodness of fit
-        s_err = np.sqrt(np.sum(resid**2) / dof) # standard deviation of the error
-
-        x2 = np.linspace(np.min(x), np.max(x), 100)
-        y2 = equation(p, x2)
-
-        pi68 = t68 * s_err * np.sqrt(1 + 1/n + (x2 - np.mean(x))**2 / np.sum((x - np.mean(x))**2))   
-        pi95 = t95 * s_err * np.sqrt(1 + 1/n + (x2 - np.mean(x))**2 / np.sum((x - np.mean(x))**2))   
-        kw = {'alpha':0.9, 'linewidth':1, 'color':'k', 'linestyle':'--'}
-        # ax.fill_between(x2, y2 + pi68, y2 - pi68, color="grey", linestyle="--", alpha=0.25)
-        ax.fill_between(x2, y2 + pi95, y2 - pi95, color="grey", alpha=0.25)
-        # ax.plot(x2, y2 - pi, **kw)
-        # ax.plot(x2, y2 + pi, **kw)
-
-
-    ax1.text(0.05, 0.9, 'n:' + str(df['obs'].size), transform=ax1.transAxes, horizontalalignment='left')
-
-    ax1.set_xlabel('Observed [m$^{3}$ s$^{-1}$]')
-    ax1.set_ylabel('MAR [m$^{3}$ s$^{-1}$]')
-    ax2.set_xlabel('Observed [m$^{3}$ s$^{-1}$]')
-    ax2.set_ylabel('RACMO [m$^{3}$ s$^{-1}$]')
-
-
-    if lims[0] < -3: lims[0] = -3
-    lims_upstreamp = np.log10((10**np.array(lims))*5)
-    lims_down = np.log10((10**np.array(lims))/5)
-    kw = {'alpha':0.5, 'linewidth':1, 'color':'k', 'linestyle':'-'}
-    for ax in [ax1,ax2]:
-        ax.plot(([lims[0],lims[1]]), ([lims[0],lims[1]]), **kw)
-        ax.plot(([lims[0],lims[1]]), ([lims_upstreamp[0],lims_upstreamp[1]]), **kw)
-        ax.plot(([lims[0],lims[1]]), ([lims_down[0],lims_down[1]]), **kw)
-        ax.set_ylim(lims[0], lims[1])
-        ax.set_xlim(lims[0], lims[1])
-
-        ticks = np.arange(round(lims[0]), round(lims[1])+1)
-        ax.set_yticks(ticks)
-        labels = ['10$^{' + str(int(_)) + '}$' for _ in ticks]
-        ax.set_yticklabels(labels)
-        ax.set_xticks(ax.get_yticks())
-        ax.set_xticklabels(ax.get_yticklabels())
-
-
-    cax = fig.add_axes([0.13, 0.4, 0.01, 0.4])
-    cb = fig.colorbar(s, cax=cax)
+    # cax = fig.add_axes([0.46, 0.6, 0.01, 0.2])
+    # cb = fig.colorbar(s, cax=cax)
+    cax = fig.add_axes([0.40, 0.53, 0.2, 0.015])
+    cb = fig.colorbar(s, cax=cax, orientation='horizontal')
+    cax.xaxis.set_ticks_position('top')
+    cax.xaxis.set_label_position('top')
     cb.set_label('Day of year')
-
-
-    # import statsmodels.api as sm
-    # from statsmodels.sandbox.regression.predstd import wls_prediction_std
-
-    df.sort_values(by='obs', inplace=True)
-    # err = (df['obs'] - df['MAR']).quantile([0.05,0.95])
-    # err_l = err[0.05] * np.sqrt(1 + 1/n + (x2 - np.mean(x))**2 / np.sum((x - np.mean(x))**2))
-    # err_u = err[0.95] * np.sqrt(1 + 1/n + (x2 - np.mean(x))**2 / np.sum((x - np.mean(x))**2))
-    # pi95 = t95 * s_err * np.sqrt(1 + 1/n + (x2 - np.mean(x))**2 / np.sum((x - np.mean(x))**2))   
-    # kw = {'alpha':0.9, 'linewidth':1, 'color':'k', 'linestyle':'--'}
-    # # ax.fill_between(x2, y2 + pi68, y2 - pi68, color="grey", linestyle="--", alpha=0.25)
-    # ax1.fill_between(x2, y2+err_u, y2-err_l, color="red", alpha=0.25)
-
-    x = df['obs']
-    y_MAR = df['MAR']
-    y_RACMO = df['RACMO']
-
-    # # x = sm.add_constant(x)
-    # # model = sm.OLS(y_MAR, x)
-    # # results = model.fit()
-    # # print(results.summary())
-    # res = sm.OLS(y_MAR,x).fit()
-    # prstd, iv_l, iv_u = wls_prediction_std(res)
-    # # ax1.plot(x, res.fittedvalues, 'r--.', label="OLS")
-    # ax1.plot(x, iv_u, 'r--')
-    # ax1.plot(x, iv_l, 'r--')
-    
-    # print((iv_u-iv_l).shape)
-    # print((iv_u-iv_l).dropna().shape)
-
-    # # weights = x.values - np.min(x.values) + 1
-    # # weights = 10**x.values
-    err = 1/(10**x.values); err = (err - np.min(err)) / (np.max(err) - np.min(err))+0.01;
-    weights = err * 10**(x.values)# ; weights = weights - np.min(weights)+1
-    # weights = 10**x.values; weights = (weights - np.min(weights)) / (np.max(weights) - np.min(weights))*94+1; 
-
-    mod_wls_MAR = sm.WLS(y_MAR.values, sm.add_constant(x), weights=weights)
-    res_wls_MAR = mod_wls_MAR.fit()
-    # print(res_wls_MAR.summary())
-    prstd, iv_l_MAR, iv_u_MAR = wls_prediction_std(res_wls_MAR)
-
-    # mod_wls_MAR = sm.WLS(y_MAR.values, sm.add_constant(x))
-    # res_wls_MAR = mod_wls_MAR.fit()
-    # # print(res_wls_MAR.summary())
-    # prstd, iv_l_MAR, iv_u_MAR = wls_prediction_std(res_wls_MAR, weights=weights)
-
-
-    ### RACMO
-    mod_wls_RACMO = sm.WLS(y_RACMO.values, sm.add_constant(x), weights=weights)
-    # mod_wls_RACMO = sm.WLS(y_RACMO.values, sm.add_constant(x), weights=np.sqrt(weights))
-    # mod_wls_RACMO = sm.WLS(y_RACMO.values, sm.add_constant(x))
-    res_wls_RACMO = mod_wls_RACMO.fit()
-    # print(res_wls_RACMO.summary())
-    prstd, iv_l_RACMO, iv_u_RACMO = wls_prediction_std(res_wls_RACMO)
-    # prstd, iv_l_RACMO, iv_u_RACMO = wls_prediction_std(res_wls_RACMO, weights=weights)
-    # prstd, iv_l_RACMO, iv_u_RACMO = wls_prediction_std(res_wls_RACMO, weights=np.sqrt(weights))
-
-    # mod_wls_RACMO = sm.WLS(y_RACMO.values, sm.add_constant(x))
-    # res_wls_RACMO = mod_wls_RACMO.fit()
-    # # print(res_wls_RACMO.summary())
-    # prstd, iv_l_RACMO, iv_u_RACMO = wls_prediction_std(res_wls_RACMO, weights=weights)
-
-    kw = {'color':'black', 'linestyle':'--', 'linewidth':1}
-    ax1.plot((x), (res_wls_MAR.fittedvalues), **kw)
-    ax1.plot((x), (iv_u_MAR), **kw)
-    ax1.plot((x), (iv_l_MAR), **kw)
-
-    ax2.plot((x), (res_wls_RACMO.fittedvalues), **kw)
-    ax2.plot((x), (iv_u_RACMO), **kw)
-    ax2.plot((x), (iv_l_RACMO), **kw)
-
 
     plt.setp(ax1.xaxis.get_majorticklabels(), rotation=30)
     plt.setp(ax2.xaxis.get_majorticklabels(), rotation=30)
 
-    plt.savefig("./fig/" + l + "_scatter.png", bbox_inches='tight', dpi=300)
-    # plt.savefig("./fig/" + l + "_scatter.svg", bbox_inches='tight', dpi=300)
-    # plt.savefig("./fig/" + l + "_scatter.pdf", bbox_inches='tight', dpi=300)
 
-#+END_SRC
 
-#+RESULTS:
-: <ipython-input-338-0b2e86300c47>:206: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
-:   plt.savefig("./fig/" + l + "_scatter.png", bbox_inches='tight', dpi=300)
-
-*** Tukey mean-difference a.k.a Bland Altman plot at each obs
-
-#+BEGIN_SRC jupyter-python :eval no-export
-<<py_init>>
-<<py_init_graphics>>
-
-<<load_all_obs>>
-
-for k in obs.keys():
-
-    fig = plt.figure(1, figsize=(8,3.5)) # w,h
-    fig.clf()
-    fig.set_tight_layout(True)
-    ax1 = fig.add_subplot(121)
-    ax2 = fig.add_subplot(122)
-
-    adjust_spines(ax1, ['left','bottom'])
-    adjust_spines(ax2, ['right','bottom'])
-
+    ### LOWER PANELS
+    # Included here so that we can easily match the x-axis limits
     df = obs[k]
 
     df['x'] = df['obs']
@@ -6075,28 +5844,29 @@ for k in obs.keys():
     df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]
     df = np.log10(df)
 
-    THRESH=3
-    df['y_MAR'] = df['y_MAR'].apply(lambda x: x if abs(x) < THRESH else sign(x)*THRESH)
-    df['y_RACMO'] = df['y_RACMO'].apply(lambda x: x if abs(x) < THRESH else sign(x)*THRESH)
-
     kw = {'mincnt':1,
           'bins':'log',
           'clip_on':True,
           'gridsize':20,
-          'extent':[-THRESH,THRESH,-THRESH,THRESH],
           'cmap':cm.cividis}
 
-    # kw = {'mincnt':1, 'bins':'log', 'clip_on':True, 'gridsize':20, 'extent':[-3,3,-3,3], 'cmap':cm.cividis}
     # plot all to get max of both for colorbar range
-    h_MAR = ax1.hexbin(df['x'], df['y_MAR'], alpha=0, **kw)
-    h_RACMO = ax2.hexbin(df['x'], df['y_RACMO'], alpha=0, **kw)
-    hmax = max([h_MAR.get_array().max(),h_RACMO.get_array().max()])
+    h_MAR = ax3.hexbin(df['x'], df['y_MAR'], alpha=0, **kw)
+    h_RACMO = ax4.hexbin(df['x'], df['y_RACMO'], alpha=0, **kw)
     
-    h_MAR = ax1.hexbin(df['x'], df['y_MAR'], vmax=hmax, **kw)
-    h_RACMO = ax2.hexbin(df['x'], df['y_RACMO'], vmax=hmax, **kw)
+    ymin = np.floor(np.min([ax1.get_ylim()[0], ax2.get_ylim()[0]]))
+    ymax = np.ceil(np.max([ax1.get_ylim()[1], ax2.get_ylim()[1]]))
+    THRESH=3
+    if ymax > THRESH: ymax = THRESH
+
+    kw['alpha'] = 1
+    kw['extent'] = [lims[0], lims[1], ymin, ymax]
+    kw['vmax'] = max([h_MAR.get_array().max(),h_RACMO.get_array().max()])
+
+    h_MAR = ax3.hexbin(df['x'], df['y_MAR'], **kw)
+    h_RACMO = ax4.hexbin(df['x'], df['y_RACMO'], **kw)
 
     df_top = df[df['obs'] > df['obs'].quantile(0.33)]
-    # df_mid = df[(df['obs'] < df['obs'].quantile(0.66)) & (df['obs'] > df['obs'].quantile(0.33))]
     df_bot = df[df['obs'] < df['obs'].quantile(0.33)]
 
     kwline = {'color':'k'}
@@ -6106,16 +5876,21 @@ for k in obs.keys():
               'verticalalignment':'center'}
     for d in [df_top, df_bot]:
     
-        for ax in [ax1,ax2]:
+        for ax in [ax3,ax4]:
             if d is df_top:
-                xpos = 2.5
+                max_MAR = np.max([_[0] for _ in h_MAR.get_offsets()])
+                max_RACMO = np.max([_[0] for _ in h_RACMO.get_offsets()])
+                xpos = np.max([max_MAR, max_RACMO])
+                # xpos = round(xmax)
                 kwtext['horizontalalignment'] = 'left'
             elif d is df_bot:
-                xpos = -1.5
+                min_MAR = np.min([_[0] for _ in h_MAR.get_offsets()])
+                min_RACMO = np.min([_[0] for _ in h_RACMO.get_offsets()])
+                xpos = np.min([min_MAR, min_RACMO])
                 kwtext['horizontalalignment'] = 'right'
 
-            if ax is ax1: yy = d['y_MAR']
-            if ax is ax2: yy = d['y_RACMO']
+            if ax is ax3: yy = d['y_MAR']
+            if ax is ax4: yy = d['y_RACMO']
             y = yy.mean()
             ax.plot([d['x'].min(),d['x'].max()], [y,y], **kwline)
             ax.text(xpos, y, str(round(10**y,2)), **kwtext)
@@ -6128,43 +5903,49 @@ for k in obs.keys():
             ax.plot([d['x'].min(),d['x'].max()], [y,y], linestyle='--', **kwline)
             ax.text(xpos, y-0.15, str(round(10**y,2)), **kwtext)
             
-    ax1.set_xlabel('Observed [m$^{3}$ s$^{-1}$]')
-    ax1.set_ylabel('MAR / Observed')
-    ax2.set_xlabel('Observed [m$^{3}$ s$^{-1}$]')
-    ax2.set_ylabel('RACMO / Observed')
+    ax3.set_xlabel('Observed [m$^{3}$ s$^{-1}$]')
+    ax3.set_ylabel('MAR / Observed')
+    ax4.set_xlabel('Observed [m$^{3}$ s$^{-1}$]')
+    ax4.set_ylabel('RACMO / Observed')
 
-    lims = [np.min([ax1.get_xlim()[0], ax1.get_ylim()[0], ax2.get_xlim()[0], ax2.get_ylim()[0]]),
-            np.max([ax1.get_xlim()[1], ax1.get_ylim()[1], ax2.get_xlim()[1], ax2.get_ylim()[1]])]
-    for ax in [ax1,ax2]:
-        None
-        ticks = np.arange(round(lims[0]), round(lims[1])+1)
-        # ax.set_ylim(lims[0], lims[1])
-        # ax.set_xlim(lims[0], lims[1])
-        ax.set_xticks(ticks)
-        ax.set_yticks(ticks)
+    for ax in [ax3,ax4]:
+        ax.set_xlim(lims[0], lims[1])
+        ax.set_xticks(ax1.get_xticks())
+        ax.set_xticklabels(ax1.get_xticklabels())
+        ticks = np.arange(round(ymin), round(ymax)+1)
         labels = ['10$^{' + str(int(_)) + '}$' for _ in ticks]
+        ax.set_yticks(ticks)
+        ax.set_ylim([ticks[0], ticks[-1]])
         ax.set_yticklabels(labels)
-        ax.set_xticks(ax.get_yticks())
-        ax.set_xticklabels(ax.get_yticklabels())
 
+    ax1.text(-0.33, 0.95, 'c', size=15, color='white', bbox=dict(facecolor='black'), transform=ax1.transAxes)
+    ax3.text(-0.33, 0.99, 'd', size=15, color='white', bbox=dict(facecolor='black'), transform=ax3.transAxes)
 
-    cax = fig.add_axes([0.40, 0.93, 0.2, 0.04])
+    cax = fig.add_axes([0.40, 0.5, 0.2, 0.015])
     cb = fig.colorbar(h_MAR, cax=cax, orientation='horizontal')
-    # cb.set_label('N')
+    if k in ['Ks','R','Q']: cax.xaxis.set_minor_formatter(plt.ScalarFormatter())
+    cb.set_label('Count')
 
-    plt.setp(ax1.xaxis.get_majorticklabels(), rotation=30)
-    plt.setp(ax2.xaxis.get_majorticklabels(), rotation=30)
+    plt.setp(ax3.xaxis.get_majorticklabels(), rotation=30)
+    plt.setp(ax4.xaxis.get_majorticklabels(), rotation=30)
 
-    plt.savefig("./fig/" + k + "_tukey.png", bbox_inches='tight', dpi=300)
-    # # # plt.savefig("./fig/" + l + "_scatter.svg", bbox_inches='tight', dpi=300)
-    # # # plt.savefig("./fig/" + l + "_scatter.pdf", bbox_inches='tight', dpi=300)
+    # clean up upper panel
+    adjust_spines(ax1,['left'])
+    adjust_spines(ax2,['right'])
+    ax1.set_xlabel('')
+    ax2.set_xlabel('')
 
+    plt.savefig("./fig/" + k + "_tukey_scatter.png", bbox_inches='tight', dpi=300)
 #+END_SRC
 
 #+RESULTS:
-: <ipython-input-320-f734d0ff2503>:178: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
-:   plt.savefig("./fig/" + k + "_tukey.png", bbox_inches='tight', dpi=300)
-: <ipython-input-320-f734d0ff2503>:96: RuntimeWarning: invalid value encountered in log10
+: /home/kdm/local/miniconda3/envs/freshwater/lib/python3.8/site-packages/seaborn/distributions.py:434: UserWarning: The following kwargs were not used by contour: 'linewidth'
+:   cset = contour_func(xx, yy, z, n_levels, **kwargs)
+: <ipython-input-43-041ea3bb733d>:275: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+:   plt.savefig("./fig/" + k + "_tukey_scatter.png", bbox_inches='tight', dpi=300)
+: <ipython-input-43-041ea3bb733d>:97: RuntimeWarning: invalid value encountered in log10
+:   df = np.log10(df)
+: <ipython-input-43-041ea3bb733d>:182: RuntimeWarning: invalid value encountered in log10
 :   df = np.log10(df)
 
 *** Stack
@@ -6177,22 +5958,14 @@ for f in $(ls fig/{?,??}_ts.png); do
   k=$(echo ${ff} | cut -d"_" -f1)
   echo $ff $k
 
-  ps=80
-  convert fig/${k}.png -gravity northwest -pointsize ${ps} -fill black -strokewidth 10 -undercolor white -annotate 0x0+150+605 'a' ./tmp/stack/map.png
-  convert fig/${k}_ts.png -gravity northwest -pointsize ${ps} -fill white -undercolor black -annotate 0x0+40+25 'b' ./tmp/stack/ts.png
-
-  # convert fig/${k}_scatter.png -gravity northwest -pointsize ${ps} -fill white -undercolor black -annotate 0x0+40+0 'c' ./tmp/stack/scatter.png
-
-  # c and d in this graphic because axis label too long in tukey graphic
-  convert fig/${k}_scatter.png -gravity northwest -pointsize ${ps} -fill white -undercolor black -annotate 0x0+40+0 'c' -gravity southwest -annotate 0x0+40+0 'd' ./tmp/stack/scatter.png
-
-  # convert fig/${k}_tukey.png -gravity northwest -pointsize ${ps} -fill white -undercolor black -annotate 0x0+40-30 'd' ./tmp/stack/tukey.png
-  cp fig/${k}_tukey.png ./tmp/stack/tukey.png
+  cp fig/${k}.png ./tmp/stack/map.png
+  cp fig/${k}_ts.png ./tmp/stack/ts.png
+  cp fig/${k}_tukey_scatter.png ./tmp/stack/tukey_scatter.png
   
-  convert ./tmp/stack/{map,ts,scatter,tukey}.png -gravity center -append fig/${k}_stack.png
+  convert ./tmp/stack/{map,ts,tukey_scatter}.png -gravity center -append fig/${k}_stack.png
 done
 
-convert -pointsize 40 -fill red -draw 'text 1000,565 "X"' ./fig/L_stack.png ./fig/tmp.png
+convert -pointsize 40 -fill red -draw 'text 850,250 "X"' ./fig/L_stack.png ./fig/tmp.png
 mv ./fig/tmp.png ./fig/L_stack.png
 #+END_SRC
 
@@ -6223,19 +5996,19 @@ rc('font', size=12)
 rc('text', usetex=False)
 # matplotlib.pyplot.xkcd()
 
-import runoff as ru
+from discharge import discharge 
 import geopandas as gp
 from adjust_spines import adjust_spines as adjust_spines
 
 if 'r_land' not in locals():
     # runoff at Watson land outlet, and for two ice basins to the S not included in the uptream Watson outlets
-    r_land = ru.runoff(base="./freshwater", roi="-50.68,67.01", upstream=True, quiet=False).RCM()
-    r_ice0 = ru.runoff(base="./freshwater", roi="-49.40,66.90", upstream=False, quiet=False).RCM()
-    r_ice1 = ru.runoff(base="./freshwater", roi="-49.25,66.80", upstream=False, quiet=False).RCM()
+    r_land = discharge(base="./freshwater", roi="-50.68,67.01", upstream=True, quiet=False).discharge()
+    r_ice0 = discharge(base="./freshwater", roi="-49.40,66.90", upstream=False, quiet=False).discharge()
+    r_ice1 = discharge(base="./freshwater", roi="-49.25,66.80", upstream=False, quiet=False).discharge()
 
-    g_land = ru.runoff(base="./freshwater", roi="-50.68,67.01", upstream=True, quiet=False).outlets().set_geometry('basin')
-    g_ice0 = ru.runoff(base="./freshwater", roi="-49.40,66.90", upstream=False, quiet=False).outlets().set_geometry('basin')
-    g_ice1 = ru.runoff(base="./freshwater", roi="-49.25,66.80", upstream=False, quiet=False).outlets().set_geometry('basin')
+    g_land = discharge(base="./freshwater", roi="-50.68,67.01", upstream=True, quiet=False).outlets().set_geometry('basin')
+    g_ice0 = discharge(base="./freshwater", roi="-49.40,66.90", upstream=False, quiet=False).outlets().set_geometry('basin')
+    g_ice1 = discharge(base="./freshwater", roi="-49.25,66.80", upstream=False, quiet=False).outlets().set_geometry('basin')
 
 # plt.close(1)
 fig = plt.figure(1, figsize=(4,4.5)) # w,h
@@ -6277,7 +6050,8 @@ ax1.plot(list(xy[0])*2,[-2.54E6,-2.59E6], 'k--', alpha=0.5, clip_on=False)
 # ax1.yaxis.set_major_locator(plt.NullLocator())
 adjust_spines(ax1, [])
 
-
+from matplotlib_scalebar.scalebar import ScaleBar
+ax1.add_artist(ScaleBar(1))
 
 W = pd.read_csv("./dat/runoff/obs_W.csv", index_col=0, parse_dates=True)
 
@@ -6413,7 +6187,7 @@ plt.savefig('./fig/watson_adjusted_south.png', transparent=True, bbox_inches='ti
 #+NAME: fig:T
 #+ATTR_LATEX: :width 0.4\textwidth :placement [!h]
 #+CAPTION: Graphical summary of Teqinngalip outlet, basin, and discharge (T in Fig. \ref{fig:overview}). See Sect. \ref{sec:graphics} for general overview of graphical elements, and Sect. \ref{sec:T} for discussion of the Teqinngalip basin. Basemap from citet:howat_2014,NSIDC_0713.
-[[./fig/t_stack.png]]
+[[./fig/T_stack.png]]
 
 ** Kobbefjord
 :PROPERTIES:
@@ -6545,7 +6319,7 @@ All code used in this work is available in the Supplemental Online Material.
 
 
 #+BEGIN_acknowledgements
-Funding was provided by the Programme for Monitoring of the Greenland Ice Sheet (PROMICE). Parts of this work were funded by the INTAROS project under the European Union's Horizon 2020 research and innovation program under grant agreement No. 727890. BN was funded by NWO VENI grant VI.Veni.192.019. DEMs were provided by the Polar Geospatial Center under NSF-OPP awards 1043681, 1559691, and 1542736. Data from the Greenland Ecosystem Monitoring Programme (GEM) were provided by Asiaq – Greenland Survey, Nuuk, Greenland. We thank Dorthe Petersen (Asiaq) for help with basin quality control.
+Funding was provided by the Programme for Monitoring of the Greenland Ice Sheet (PROMICE). Parts of this work were funded by the INTAROS project under the European Union's Horizon 2020 research and innovation program under grant agreement No. 727890. BN was funded by NWO VENI grant VI.Veni.192.019. DEMs were provided by the Polar Geospatial Center under NSF-OPP awards 1043681, 1559691, and 1542736. Data from the Greenland Ecosystem Monitoring Programme (GEM) were provided by Asiaq – Greenland Survey, Nuuk, Greenland. We thank Dorthe Petersen (Asiaq) for help with basin quality control. The editor and two anonymous reviewers provided valuable feedback and helped improve this paper \citep{ESSD_reviewer1,ESSD_reviewer2}.
 #+END_acknowledgements
 
 

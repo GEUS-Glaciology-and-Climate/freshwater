@@ -1013,3 +1013,43 @@ plt.savefig("./fig/scatter_yearsum.png", bbox_inches='tight', dpi=300)
 :   df = np.log10(df)
 
 
+
+** Nash-Sutcliff
+
+#+BEGIN_SRC jupyter-python
+# <<load_all_obs>>
+
+for k in obs.keys():
+    df = obs[k].dropna()
+    if 'MAR_ice_upstream' not in df.columns: continue
+    df['model'] = df['MAR_ice_upstream'] + df['MAR_land']
+    NSE_MAR = 1 - (np.sum((df['model'] - df['obs'])**2) / np.sum((df['obs'] - df['obs'].mean())**2))
+    df['model'] = df['RACMO_ice_upstream'] + df['RACMO_land']
+    NSE_RACMO = 1 - (np.sum((df['model'] - df['obs'])**2) / np.sum((df['obs'] - df['obs'].mean())**2))
+    print(k, NSE_MAR, NSE_RACMO)
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+Kb -0.3311528507543031 0.15196649185125832
+L -1.9704279766951291 -3.1758415237024353
+Ks -9.961143379662456 -7.873864723176627
+Q 0.28474326943825123 -0.046580716974496506
+R -3.530503129196984 -3.0086507560529707
+T 0.12399308048237867 -0.36693117237732453
+W 0.38793291557573695 0.39388939202744044
+Z -0.3324706532094066 0.23826737271958642
+<ipython-input-33-b21cf7fdada4>:52: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  df['model'] = df['MAR_ice_upstream'] + df['MAR_land']
+<ipython-input-33-b21cf7fdada4>:54: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  df['model'] = df['RACMO_ice_upstream'] + df['RACMO_land']
+#+end_example
