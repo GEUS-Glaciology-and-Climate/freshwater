@@ -29,8 +29,8 @@
 
 This is the source for "Greenland liquid water discharge from 1958 through 2019" and subsequent versions. 
 
-+ The paper is located at https://doi.org/10.5194/essd-2020-47.
-+ The data sets are located at [[https://doi.org/10.22008/promice/freshwater][doi:10.22008/promice/freshwater]
++ The paper is located at https://doi.org/10.5194/essd-12-2811-2020.
++ The data sets are located at [[https://doi.org/10.22008/promice/freshwater][doi:10.22008/promice/freshwater]]
 + Companion paper: "Greenland Ice Sheet solid ice discharge from 1986 through 2019"
   + Publication: [[https://doi.org/10.5194/essd-12-1367-2020][doi:10.5194/essd-12-1367-2020]]
   + Source: https://github.com/mankoff/ice_discharge/
@@ -38,29 +38,30 @@ This is the source for "Greenland liquid water discharge from 1958 through 2019"
 
 
 The source for this work is hosted on GitHub at https://github.com/mankoff/freshwater. GitHub [[https://github.com/mankoff/freshwater/issues?utf8=%E2%9C%93&q=is%3Aissue][issues]] are used to collect suggested improvements to the paper, problems that made it through review, and mention of similar papers that have been published since this was accepted. The work may be under be under active development, including updating data (and therefore tables) within the source document.
-+ This [[https://github.com/mankoff/freshwater/compare/TAG...main][diff]] shows changes between the published version of the paper and the current (active) development version.
++ This [[https://github.com/mankoff/freshwater/compare/10.5194/essd-12-2811-2020...main][diff]] shows changes between the published version of the paper and the current (active) development version.
 + The source for the active development version can be viewed at https://github.com/mankoff/freshwater/tree/main
-+ The source for the published paper can be viewed at https://github.com/mankoff/freshwater/tree/TAG
++ The source for the published paper can be viewed at https://github.com/mankoff/freshwater/tree/10.5194/essd-12-2811-2020
 
 * WARNING
 
-Bugs may exist in this data or the [[./discharge.py]] access script. All known bugs will be documented at [[https://github.com/mankoff/freshwater/issue]]. Before using this software or finalizing results, you should check if any [[https://github.com/mankoff/freshwater/issues][open issues]] impact your results, or if any issue have been [[https://github.com/mankoff/freshwater/issues?q=is%3Aissue+is%3Aclosed][closed]] since you  downloaded the data or script.
+Bugs may exist in this data or the [[./discharge.py]] access script. All known bugs will be documented at [[https://github.com/mankoff/freshwater/issues]]. Before using this software or finalizing results, you should check if any [[https://github.com/mankoff/freshwater/issues][open issues]] impact your results, or if any issue have been [[https://github.com/mankoff/freshwater/issues?q=is%3Aissue+is%3Aclosed][closed]] since you  downloaded the data or script.
 
 * Citation
 
 #+BEGIN_EXAMPLE
-@article{Mankoff_2020_water,
-  doi = {10.5194/essd-2020-47},
-  url = {https://doi.org/10.5194/essd-2020-47},
-  year = {2020},
-  month = 4,
-  publisher = {Copernicus {GmbH}},
-  author = {Kenneth D. Mankoff and Brice Noël and Xavier Fettweis and Andreas P. Ahlstrøm 
-            and William Colgan and Ken Kondo and Kirsty Langley and Shin Sugiyama 
-            and Dirk van As and Robert S. Fausto},
-  title = {Greenland liquid water discharge from 1958 through 2019},
-  journal = {Earth System Science Data Discussions},
-  note = {In Review}
+@article{mankoff_2020_liquid,
+  author    = {Mankoff, Kenneth D. and Noël, Brice and Fettweis, Xavier and Ahlstrøm, Andreas P. and
+                  Colgan, William and Kondo, Ken and Langley, Kirsty and Sugiyama, Shin and van As,
+                  Dirk and Fausto, Robert S.},
+  title     = {{G}reenland liquid water discharge from 1958 through 2019},
+  journal   = {Earth System Science Data},
+  year 	    = 2020,
+  volume    = 12,
+  number    = 4,
+  pages     = {2811–2841},
+  month     = 11,
+  DOI 	    = {10.5194/essd-12-2811-2020},
+  publisher = {Copernicus GmbH}
 }
 #+END_EXAMPLE
 
