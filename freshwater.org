@@ -10,7 +10,7 @@
 #+PROPERTY: header-args:xml+ :eval no
 #+PROPERTY: header-args:bash+ :eval no-export :noweb yes :comments both
 #+PROPERTY: header-args:bash+ :session (concat "*" (file-name-sans-extension (buffer-name)) "-shell*")
-#+PROPERTY: header-args:bash+ :tangle-mode (identity #o744) :shebang #!/usr/bin/env bash
+#+PROPERTY: header-args:bash+ :tangle-mode (identity #o544) :shebang #!/usr/bin/env bash
 #+PROPERTY: header-args:jupyter-python+ :session freshwater
 #+PROPERTY: header-args:jupyter-python+ :eval no-export :noweb yes :comments both :kernel freshwater
 #+PROPERTY: header-args:elisp+ :eval no-export :noweb yes
@@ -4821,7 +4821,7 @@ plt.savefig("./fig/overview.png", bbox_inches='tight', dpi=300, pad_inches=0)
 :PROPERTIES:
 :header-args:bash+: :tangle k_basin_change.sh
 :header-args:bash+: :comments both
-:header-args:bash+: :tangle-mode (identity #o744)
+:header-args:bash+: :tangle-mode (identity #o544)
 :header-args:bash+: :shebang #!/usr/bin/env bash
 :clearpage: t
 :END:
@@ -4998,7 +4998,7 @@ r.in.xyz input=./tmp/cells_xy_ice_stats.bsv output=ice_avg method=mean x=4 y=5 z
 # :PROPERTIES:
 # :header-args:bash+: :tangle k_basin_change_graphics.sh
 # :header-args:bash+: :comments both
-# :header-args:bash+: :tangle-mode (identity #o744)
+# :header-args:bash+: :tangle-mode (identity #o544)
 # :header-args:bash+: :shebang #!/usr/bin/env bash
 # :END:
 
