@@ -148,6 +148,9 @@ class discharge(object):
         # Return datastructure: Initialize with land and MAR
         key="MAR_land"; geo_key='_'.join(key.split("_")[1:])
         rtmp = self._discharge[key]; rtmp.columns.name = geo_key
+        if rtmp.size == 0:
+            print("Error: No points found within ROI")
+            assert(rtmp.size != 0)
         r = xr.DataArray(rtmp.values, dims=('time',geo_key), 
                          coords={'time':rtmp.index, geo_key:rtmp.columns}).to_dataset(name=key)
         for key in self._discharge.keys():
