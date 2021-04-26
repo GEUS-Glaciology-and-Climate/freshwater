@@ -2,6 +2,7 @@
 * Table of contents                               :toc_5:noexport:
 - [[#greenland-liquid-water-discharge-from-1958-through-2019][Greenland liquid water discharge from 1958 through 2019]]
 - [[#warning][WARNING]]
+- [[#related-work][Related Work]]
 - [[#citation][Citation]]
 - [[#accessing-this-data][Accessing this data]]
   - [[#introduction][Introduction]]
@@ -45,6 +46,18 @@ The source for this work is hosted on GitHub at https://github.com/GEUS-PROMICE/
 * WARNING
 
 Bugs may exist in this data or the [[./discharge.py]] access script. All known bugs will be documented at [[https://github.com/GEUS-PROMICE/freshwater/issues]]. Before using this software or finalizing results, you should check if any [[https://github.com/mankoff/freshwater/issues][open issues]] impact your results, or if any issue have been [[https://github.com/mankoff/freshwater/issues?q=is%3Aissue+is%3Aclosed][closed]] since you  downloaded the data or script.
+
+* Related Work  
+
++ Companion paper: "Greenland ice sheet mass balance from 1840 through next week"
+  + Publication: [[https://doi.org/10.5194/essd-2021-131][doi:10.5194/essd-2021-131]]
+  + Source: https://github.com/GEUS-PROMICE/mass_balance/
+  + Data: https://dataverse01.geus.dk/dataverse/mass_balance
+
++ Companion paper: "Greenland Ice Sheet solid ice discharge from 1986 through March 2020"
+  + Publication: [[https://doi.org/10.5194/essd-12-1367-2020][doi:10.5194/essd-12-1367-2020]]
+  + Source: https://github.com/GEUS-PROMICE/ice_discharge/
+  + Data: [[https://doi.org/10.22008/promice/data/ice_discharge][doi:10.22008/promice/data/ice_discharge]]
 
 * Citation
 
