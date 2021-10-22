@@ -87,6 +87,7 @@ doi:10.22008/promice/freshwater citep:GEUS_freshwater_paper and code is availabl
 * Table of contents                               :toc_2:noexport:
 - [[#about-this-document][About this document]]
   - [[#workflow][Workflow]]
+- [[#new-in-this-version][New in this version]]
 - [[#introduction][Introduction]]
 - [[#input-and-validation-data][Input and validation data]]
   - [[#static-data][Static data]]
@@ -180,6 +181,10 @@ To recreate this work
   + Executing all blocks (without =:eval no=) using =C-c C-v C-b= or (org-babel-execute-buffer)
 
 This is captured programatically by [[workflow-update]]
+
+* New in this version
+
+The discussion of quality control and land runoff with depth < 0 as invalid has been updated. Land runoff with depth << 0 is possible and occurs when land-source runoff enters the subglacial system and discharges subglacially at depth from a marine terminating glacier. This occurs often when runoff is sourced from nunatuks. This scenario also generates land outlets that exist outside of land basins.
 
 * Introduction                                            :ignore:
 
@@ -652,7 +657,7 @@ Temporally, errors introduced by this study's assumption of instantaneous discha
 
 The scale of the data are such that manual editing to remove artifacts is time and cost prohibitive. Here we provide one example of incorrect metadata. The elevation of each outlet is included as metadata by looking up the bed elevation in the BedMachine data set at the location of each outlet. Errors in BedMachine or in the outlet location (defined by the GIMP ocean mask) introduce errors in outlet elevation. 
 
-A large basin in NW Greenland has metadata outlet elevation > 0 (gray in Fig. [[fig:overview]]) but appears to be marine terminating when viewed in satellite imagery. Elsewhere the land- vs. marine-terminating color coding in Fig. [[fig:overview]] appears to be mostly correct, but this view only provides information about the sign of the elevation and not the magnitude (i.e., if the reported depth is correct). Ice outlets can occur above, at, or below 0 m. It is easier to validate the land-terminating basins, which should in theory all have an outlet elevation of 0 m. That is not the case (Fig. [[fig:elev]]). It is possible for land outlets to be correctly assigned an elevation > 0 m, if a land basin outlet occurs at a waterfall off a cliff (as might occur the edges of Petermann fjord) or due to DEM discretization of steep cells. However, most of the land outlets at elevations other than 0 are likely due to mask misalignment placing a section of coastline in a  fjord (negative land elevation) or inland (positive land elevation). The bulk of land discharge (75 %) occurs within 0 \pm10 m elevation and 90 % within 0 \pm30 m elevation (Fig. [[fig:elev]]).
+A large basin in NW Greenland has metadata outlet elevation > 0 (gray in Fig. [[fig:overview]]) but appears to be marine terminating when viewed in satellite imagery. Elsewhere the land- vs. marine-terminating color coding in Fig. [[fig:overview]] appears to be mostly correct, but this view only provides information about the sign of the elevation and not the magnitude (i.e., if the reported depth is correct). Ice outlets can occur above, at, or below 0 m. It is easier to validate the land-terminating basins, which should in theory all have an outlet elevation of \le 0 m. That is not the case (Fig. [[fig:elev]]). Outlets at 0 m are coastal outlets. Outlets < 0 m occur when land-source runoff enters the subglacial system and discharges at depth from a marine terminating glacier, but we expect these outlets to be << 0 m, not near 0 m. This edge case also produces land outlets that exist outside of land basins. It is possible for land outlets to be correctly assigned an elevation > 0 m, if a land basin outlet occurs at a waterfall off a cliff (as might occur the edges of Petermann fjord) or due to DEM discretization of steep cells. However, most of the land outlets near but not at 0 m are likely due to mask misalignment placing a section of coastline in a  fjord (negative land elevation) or inland (positive land elevation), or discretization issues in BedMachine. The bulk of land discharge (75 %) occurs within 0 \pm10 m elevation and 90 % within 0 \pm30 m elevation (Fig. [[fig:elev]]).
 
 ** Other sources of freshwater
 
