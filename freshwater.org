@@ -2639,7 +2639,7 @@ run: FORCE
 	python coverage_csv2nc.py
 	
 	# create end-user data product
-	parallel --bar "python bsv2netcdf.py {}" ::: $(ls dat/*_runoff_*.bsv)
+	parallel --bar "python bsv2netcdf.py {}" ::: $$(ls dat/*_runoff_*.bsv)
 
 dist: freshwater.zip
 	zip -r freshwater.zip freshwater
