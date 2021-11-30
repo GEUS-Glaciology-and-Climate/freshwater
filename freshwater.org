@@ -3990,7 +3990,7 @@ This is just for the outlines on the Disko island figure.
 
 Sum a bunch of the data, then assume wherever it is not 0 is an outlet grid cell.
 
-#+BEGIN_SRC bash :tangle
+#+BEGIN_SRC bash
 g.mapset -c Bamber_2018
 FILE=${DATADIR}/Bamber_2018/FWF17.v3_a.nc
 
@@ -4854,6 +4854,13 @@ echo "x,y,${LIST}" | tr "," "|" > ./tmp/cells_xy.bsv
 g.region res=1000 -a
 r.out.xyz input=${LIST} output=- >> ./tmp/cells_xy.bsv
 g.region -d
+
+
+LIST=ice_100_x,ice_100_y,ice_80_x,ice_80_y,ice_90_x,ice_90_y,z_s@ArcticDEM
+echo "x,y,${LIST}" | tr "," "|" > ./tmp/cells_elev.bsv
+g.region res=1000 -a
+r.out.xyz input=${LIST} output=- >> ./tmp/cells_elev.bsv
+g.region -d
 #+END_SRC
 
 
@@ -5136,15 +5143,6 @@ done
 ::header-args:bash+: :export no
 ::header-args:jupyter-python+: :export no
 :END:
-***** Export
-#+BEGIN_SRC bash :results verbatim
-# LIST=$(g.list type=raster pattern='^[i|l][ceand]*_*[x|y]$' separator=,),z_s@ArcticDEM
-LIST=ice_100_x,ice_100_y,ice_80_x,ice_80_y,ice_90_x,ice_90_y,z_s@ArcticDEM
-echo "x,y,${LIST}" | tr "," "|" > ./tmp/cells_elev.bsv
-g.region res=1000 -a
-r.out.xyz input=${LIST} output=- >> ./tmp/cells_elev.bsv
-g.region -d
-#+END_SRC
 ***** Import & process in Python
 
 #+BEGIN_SRC jupyter-python :tangle k_basin_change.py
