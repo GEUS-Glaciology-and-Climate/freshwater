@@ -200,7 +200,7 @@ Freshwater discharge from Greenland primarily takes three forms: solid ice from 
 * Input and validation data
 ** Static data
 
-The static products (streams, outlets, and basins (Fig. [[fig:overview]])) are derived from an ice sheet surface digital elevation model (DEM), an ice sheet bed DEM, an ice sheet mask, the land surface DEM, and an ocean mask. For the surface DEM, we use ArcticDEM v7 100 m citep:ArcticDEM. Subglacial routing uses ArcticDEM and ice thickness from BedMachine v3 citep:NSIDC_BedMachine_GL,morlighem_2017. Both DEMs are referenced to the WGS84 ellipsoid. For the ice mask we use the Programme for Monitoring of the Greenland Ice Sheet (PROMICE) ice extent citep:citterio_2013. For the ocean mask we use the Making Earth System Data Records for Use in Research Environments (MEaSUREs) Greenland Ice Mapping Project (GIMP) Land Ice and Ocean Classification Mask, Version 1 citep:NSIDC_0714,howat_2014.
+The static products (streams, outlets, and basins (Fig. [[fig:overview]])) are derived from an ice sheet surface digital elevation model (DEM), an ice sheet bed DEM, an ice sheet mask, the land surface DEM, and an ocean mask. For the surface DEM, we use ArcticDEM v7 100 m citep:ArcticDEM. Subglacial routing uses ArcticDEM and ice thickness from BedMachine v4 citep:NSIDC_BedMachine_GL_v4,morlighem_2017. Both DEMs are referenced to the WGS84 ellipsoid. For the ice mask we use the Programme for Monitoring of the Greenland Ice Sheet (PROMICE) ice extent citep:citterio_2013. For the ocean mask we use the Making Earth System Data Records for Use in Research Environments (MEaSUREs) Greenland Ice Mapping Project (GIMP) Land Ice and Ocean Classification Mask, Version 1 citep:NSIDC_0714,howat_2014.
 
 ** RCM time series
 
@@ -2822,32 +2822,34 @@ Band 1 Block=16620x1 Type=Int16, ColorInterp=Gray
 #+end_example
 
 
-*** BedMachine v3
+*** BedMachine v4
 
-#+NAME: BM3_md5sum_ncdump
+#+NAME: BM4_md5sum_ncdump
 #+BEGIN_SRC bash :results verbatim :exports both
-md5sum ${DATADIR}/Morlighem_2017/BedMachineGreenland-2017-09-20.nc
+md5sum ${DATADIR}/Morlighem_2017/BedMachineGreenland-2021-04-20.nc
 echo ""
-ncdump -chs ${DATADIR}/Morlighem_2017/BedMachineGreenland-2017-09-20.nc
+ncdump -chs ${DATADIR}/Morlighem_2017/BedMachineGreenland-2021-04-20.nc
 #+END_SRC
 
-#+RESULTS: BM3_md5sum_ncdump
+#+RESULTS: BM4_md5sum_ncdump
 #+begin_example
-6cabf8b507e3bddea089f60204891168  /home/kdm/data/Morlighem_2017/BedMachineGreenland-2017-09-20.nc
+11f50b15079b4a8eb06ec98c142ff4bf  /home/kdm/data/Morlighem_2017/BedMachineGreenland-2021-04-20.nc
 
-netcdf BedMachineGreenland-2017-09-20 {
+netcdf BedMachineGreenland-2021-04-20 {
 dimensions:
 	x = 10218 ;
 	y = 18346 ;
 variables:
 	char mapping ;
 		mapping:geoid = "eigen-6c4" ;
-		mapping:false_easting = 0. ;
-		mapping:false_northing = 0. ;
 		mapping:grid_mapping_name = "polar_stereographic" ;
 		mapping:latitude_of_projection_origin = 90. ;
 		mapping:standard_parallel = 70. ;
 		mapping:straight_vertical_longitude_from_pole = -45. ;
+		mapping:semi_major_axis = 6378273. ;
+		mapping:inverse_flattening = 298.27940504282 ;
+		mapping:false_easting = 0. ;
+		mapping:false_northing = 0. ;
 	int x(x) ;
 		x:long_name = "Cartesian x-coordinate" ;
 		x:standard_name = "projection_x_coordinate" ;
@@ -2868,7 +2870,7 @@ variables:
 		mask:flag_meanings = "ocean ice_free_land grounded_ice floating_ice non_greenland_land" ;
 		mask:source = "gimpmask v2.0 (http://bprc.osu.edu/GDG/icemask.php) combined with coastline from Jeremie Mouginot" ;
 		mask:_Storage = "contiguous" ;
-	short surface(y, x) ;
+	float surface(y, x) ;
 		surface:long_name = "ice surface elevation" ;
 		surface:standard_name = "surface_altitude" ;
 		surface:units = "meters" ;
@@ -2876,7 +2878,7 @@ variables:
 		surface:source = "gimpdem v2.1 (http://bprc.osu.edu/GDG/gimpdem.php)" ;
 		surface:_Storage = "contiguous" ;
 		surface:_Endianness = "little" ;
-	short thickness(y, x) ;
+	float thickness(y, x) ;
 		thickness:long_name = "ice thickness" ;
 		thickness:standard_name = "land_ice_thickness" ;
 		thickness:units = "meters" ;
@@ -2884,13 +2886,13 @@ variables:
 		thickness:source = "Mass conservation (Mathieu Morlighem)" ;
 		thickness:_Storage = "contiguous" ;
 		thickness:_Endianness = "little" ;
-	short bed(y, x) ;
+	float bed(y, x) ;
 		bed:long_name = "bed topography" ;
 		bed:standard_name = "bedrock_altitude" ;
 		bed:units = "meters" ;
 		bed:grid_mapping = "mapping" ;
 		bed:source = "Mass conservation (Mathieu Morlighem)" ;
-		bed:_FillValue = -9999s ;
+		bed:_FillValue = -9999.f ;
 		bed:_Storage = "contiguous" ;
 		bed:_Endianness = "little" ;
 	short errbed(y, x) ;
@@ -2899,43 +2901,53 @@ variables:
 		errbed:grid_mapping = "mapping" ;
 		errbed:source = "Mathieu Morlighem" ;
 		errbed:_FillValue = -9999s ;
-		errbed:_Storage = "contiguous" ;
+		errbed:_Storage = "chunked" ;
+		errbed:_ChunkSizes = 1835, 1022 ;
+		errbed:_DeflateLevel = 2 ;
+		errbed:_Shuffle = "true" ;
 		errbed:_Endianness = "little" ;
 	byte source(y, x) ;
 		source:long_name = "data source (0 = none, 1 = gimpdem, 2 = Mass conservation, 3 = synthetic, 4 = interpolation, 5 = hydrostatic equilibrium, 6 = kriging, 7 = RTOPO-2, 8 = gravity inversion, 10+ = bathymetry data)" ;
 		source:grid_mapping = "mapping" ;
-		source:valid_range = 0b, 40b ;
-		source:flag_values = 0b, 1b, 2b, 3b, 4b, 5b, 6b, 7b, 8b, 10b, 11b, 12b, 13b, 14b, 15b, 16b, 17b, 18b, 19b, 20b, 21b, 22b, 23b, 24b, 25b, 26b, 27b, 28b, 29b, 30b, 31b, 32b, 33b, 34b, 35b, 36b, 37b, 38b, 39b, 40b ;
-		source:flag_meanings = "none gimpdem mass_conservation synthetic interpolation hydrodstatic_equilibrium kriging RTopo_2 gravity_inversion bathymetry1 bathymetry2 bathymetry3 bathymetry4 bathymetry5 bathymetry6 bathymetry7 bathymetry8 bathymetry9 bathymetry10 bathymetry11 bathymetry12 bathymetry13 bathymetry14 bathymetry15 bathymetry16 bathymetry17 bathymetry18 bathymetry19 bathymetry20 bathymetry21 bathymetry22 bathymetry23 bathymetry24 bathymetry25 bathymetry26 bathymetry27 bathymetry28 bathymetry29 bathymetry30 bathymetry31" ;
+		source:valid_range = 0b, 46b ;
+		source:flag_values = 0b, 1b, 2b, 3b, 4b, 5b, 6b, 7b, 8b, 10b, 11b, 12b, 13b, 14b, 15b, 16b, 17b, 18b, 19b, 20b, 21b, 22b, 23b, 24b, 25b, 26b, 27b, 28b, 29b, 30b, 31b, 32b, 33b, 34b, 35b, 36b, 37b, 38b, 39b, 40b, 41b, 42b, 43b, 44b, 45b, 46b ;
+		source:flag_meanings = "none gimpdem mass_conservation synthetic interpolation hydrodstatic_equilibrium kriging RTopo_2 gravity_inversion bathymetry1 bathymetry2 bathymetry3 bathymetry4 bathymetry5 bathymetry6 bathymetry7 bathymetry8 bathymetry9 bathymetry10 bathymetry11 bathymetry12 bathymetry13 bathymetry14 bathymetry15 bathymetry16 bathymetry17 bathymetry18 bathymetry19 bathymetry20 bathymetry21 bathymetry22 bathymetry23 bathymetry24 bathymetry25 bathymetry26 bathymetry27 bathymetry28 bathymetry29 bathymetry30 bathymetry31 bathymetry32 bathymetry33 bathymetry34 bathymetry35 bathymetry36 bathymetry37" ;
 		source:source = "Mathieu Morlighem, RTOPO-2" ;
 		source:_Storage = "contiguous" ;
+	byte dataid(y, x) ;
+		dataid:long_name = "data id" ;
+		dataid:grid_mapping = "mapping" ;
+		dataid:valid_range = 1b, 10b ;
+		dataid:flag_values = 1b, 2b, 7b, 10b ;
+		dataid:flag_meanings = "GIMPdem Radar seismic multibeam" ;
+		dataid:source = "Mathieu Morlighem" ;
+		dataid:_Storage = "chunked" ;
+		dataid:_ChunkSizes = 2621, 1460 ;
+		dataid:_DeflateLevel = 1 ;
+		dataid:_Shuffle = "true" ;
 	short geoid(y, x) ;
 		geoid:long_name = "EIGEN-EC4 Geoid - WGS84 Ellipsoid difference" ;
 		geoid:standard_name = "geoid_height_above_reference_ellipsoid" ;
 		geoid:units = "meters" ;
 		geoid:grid_mapping = "mapping" ;
 		geoid:geoid = "eigen-6c4 (Forste et al 2014)" ;
-		geoid:_Storage = "contiguous" ;
+		geoid:_Storage = "chunked" ;
+		geoid:_ChunkSizes = 1835, 1022 ;
+		geoid:_DeflateLevel = 2 ;
+		geoid:_Shuffle = "true" ;
 		geoid:_Endianness = "little" ;
 
 // global attributes:
-		:Conventions = "CF-1.6" ;
-		:Metadata_Conventions = "CF-1.6, Unidata Dataset Discovery v1.0, GDS v2.0" ;
-		:title = "BedMachine Greenland" ;
-		:summary = "self-consistent bed/bathymetry/surface/thickness/mask dataset of the Greenland ice sheet based on mass conservation, ice penetrating radar data and bathymetry data" ;
-		:keywords = "0720 Glaciers, 0726 Ice sheets, 0730 Ice streams, 0794 Instruments and techniques, 0798 Modeling" ;
-		:keywords_vocabulary = "AGU Index Terms" ;
-		:author = "Mathieu Morlighem" ;
-		:creator_name = "Mathieu Morlighem" ;
-		:creator_email = "mathieu.morlighem@uci.edu" ;
-		:institution = "Department of Earth System Science, University of California Irvine" ;
-		:date_created = "20-Sep-2017 09:03:04" ;
-		:product_version = "v3.10" ;
-		:cdm_data_type = "Grid" ;
-		:nx = 18346. ;
-		:ny = 10218. ;
+		:Conventions = "CF-1.7" ;
+		:Title = "BedMachine Greenland" ;
+		:Author = "Mathieu Morlighem" ;
+		:version = "20-Apr-2021 (v4.10)" ;
+		:nx = 10218. ;
+		:ny = 18346. ;
 		:Projection = "Polar Stereographic North (70N, 45W)" ;
 		:proj4 = "+init=epsg:3413" ;
+		:sea_water_density\ \(kg\ m-3\) = 1023. ;
+		:ice_density\ \(kg\ m-3\) = 917. ;
 		:xmin = -652925 ;
 		:ymax = -632675 ;
 		:spacing = 150 ;
@@ -3948,24 +3960,24 @@ r.mapcalc "z_s = if(mask_o_l_i == 1, null(), z_s_ocean)"
 #+END_SRC
 
 
-*** BedMachine v3
+*** BedMachine v4
 :PROPERTIES:
-:CUSTOM_ID: import_BM3
+:CUSTOM_ID: import_BM4
 :END:
 #+BEGIN_SRC bash :results verbatim
 log_info "Importing BedMachine"
 g.mapset -c BedMachine
 
 ROOT=${DATADIR}/Morlighem_2017
-# cdo sinfon ${ROOT}/BedMachineGreenland-2017-09-20.nc
-r.external source=netCDF:${ROOT}/BedMachineGreenland-2017-09-20.nc:bed output=z_b
-r.external source=netCDF:${ROOT}/BedMachineGreenland-2017-09-20.nc:surface output=z_s
-r.external source=netCDF:${ROOT}/BedMachineGreenland-2017-09-20.nc:mask output=mask
-r.external source=netCDF:${ROOT}/BedMachineGreenland-2017-09-20.nc:thickness output=thickness
-r.external source=netCDF:${ROOT}/BedMachineGreenland-2017-09-20.nc:errbed output=errbed
-r.external source=netCDF:${ROOT}/BedMachineGreenland-2017-09-20.nc:geoid output=geoid
-r.external source=netCDF:${ROOT}/BedMachineGreenland-2017-09-20.nc:source output=source
-g.region raster=z_b -pa
+cdo sinfon ${ROOT}/BedMachineGreenland-2021-04-20.nc
+g.region n=-632600 s=-3384500 w=-653000 e=879700 res=150 -p
+r.external -o source=netCDF:${ROOT}/BedMachineGreenland-2021-04-20.nc:bed output=z_b
+r.external -o source=netCDF:${ROOT}/BedMachineGreenland-2021-04-20.nc:surface output=z_s
+r.external -o source=netCDF:${ROOT}/BedMachineGreenland-2021-04-20.nc:mask output=mask
+r.external -o source=netCDF:${ROOT}/BedMachineGreenland-2021-04-20.nc:thickness output=thickness
+r.external -o source=netCDF:${ROOT}/BedMachineGreenland-2021-04-20.nc:errbed output=errbed
+r.external -o source=netCDF:${ROOT}/BedMachineGreenland-2021-04-20.nc:geoid output=geoid
+r.external -o source=netCDF:${ROOT}/BedMachineGreenland-2021-04-20.nc:source output=source
 #+END_SRC
 
 *** NSIDC 0713 Basemap
