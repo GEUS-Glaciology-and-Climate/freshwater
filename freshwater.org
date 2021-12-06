@@ -81,7 +81,7 @@
 #+BEGIN_abstract
 Greenland runoff, from ice mass loss and rainfall, is increasing. That runoff, as discharge, impacts the physical, chemical, and biological properties of the adjacent fjords. However, where and when the discharge occurs is not readily available in an open database. Here we provide data sets of high-resolution Greenland hydrologic outlets, basins, and streams, as well as a daily 1950 through September 2021 time series of Greenland liquid water discharge for each outlet. The data include src_bash{cat ./freshwater/ice/basins.csv | grep -v "^cat" |wc -l} {{{results(=24507=)}}} ice marginal outlets and upstream basins, and src_bash{cat ./freshwater/land/basins.csv | grep -v "^cat" |wc -l} {{{results(=29635=)}}} land coast outlets and upstream basins, derived from the 100 m ArcticDEM and 150 m BedMachine. At each outlet there are daily discharge data for src_jupyter-python[:eval no :session export]{import xarray as xr; ds = xr.open_mfdataset("./freshwater/land/runoff/*.nc", combine='nested', concat_dim='time'); (ds.time.max() - ds.time.min()).values.astype('timedelta64[D]').tolist().days+1} {{{results(=22645=)}}} days - ice sheet runoff routed subglacially to ice margin outlets, and land runoff routed to coast outlets - from two regional climate models (RCMs; MAR and RACMO).
 Our sensitivity study of how outlet location changes for every inland cell based on subglacial routing assumptions, shows that most inland cells where runoff occurs are not highly sensitive to those routing assumptions, and outflow location does not move far. We compare RCM results with 10 gauges from streams with discharge rates spanning 4 orders of magnitude. Results show that for daily discharge at the individual basin scale the 5 to 95 % prediction interval between modeled discharge and observations generally falls within plus or minus a factor of 5 (half an order of magnitude, or +500%/-80%). Results from this study are available at
-doi:10.22008/promice/freshwater citep:GEUS_freshwater_paper and code is available at http://github.com/GEUS-PROMICE/freshwater citep:github_freshwater.
+doi:10.22008/promice/freshwater citep:GEUS_freshwater_paper and code is available at https://github.com/GEUS-Glaciology-and-Climate/freshwater citep:github_freshwater.
 #+END_abstract
 
 * Table of contents                               :toc_2:noexport:
@@ -364,7 +364,7 @@ Results of this work include (1) ice-margin-terminating streams, outlets, and ba
 
 # read ./tmp/coverage_report
 
-Of the 361,950 km^{2} of basin land cells, the RCMs cover 339,749 km^{2} (~94 %) with their land grid cells, and 22,201 km^{2} (~6 %) of basin grid cells are filled in with our coverage algorithm (Sect. \ref{sec:methods:discharge}; the RCMs have these as ice or ocean). A total of 51,532 km^{2} of RCM land is discarded because the basins classify part or all of these cells as ice or ocean. Of the 1,781,816 km^{2} of basin ice cells, the RCMs cover 1,760,912 km^{2} (~99 %) with their ice cells, and 20,904 km^{2} (~1 %) of basin grid cells are filled in (the RCMs have these as land or ocean). A total of 21,793 km^2 of RCM ice is discarded, because the basins classify part or all of these cells as land or ice (table and data available in at https://github.com/GEUS-PROMICE/freshwater citep:github_freshwater).
+Of the 361,950 km^{2} of basin land cells, the RCMs cover 339,749 km^{2} (~94 %) with their land grid cells, and 22,201 km^{2} (~6 %) of basin grid cells are filled in with our coverage algorithm (Sect. \ref{sec:methods:discharge}; the RCMs have these as ice or ocean). A total of 51,532 km^{2} of RCM land is discarded because the basins classify part or all of these cells as ice or ocean. Of the 1,781,816 km^{2} of basin ice cells, the RCMs cover 1,760,912 km^{2} (~99 %) with their ice cells, and 20,904 km^{2} (~1 %) of basin grid cells are filled in (the RCMs have these as land or ocean). A total of 21,793 km^2 of RCM ice is discarded, because the basins classify part or all of these cells as land or ice (table and data available in at https://github.com/GEUS-Glaciology-and-Climate/freshwater citep:github_freshwater).
 
 Our coverage correction (Sect. \ref{sec:methods:discharge}) adjusts RCM ice runoff values by ~3 %. Discarding RCM ice runoff that does not match the underlying mask ice cells results in a 5 % reduction in discharge. However, applying our coverage algorithm to adjust RCM inputs for regions where basins have ice but the RCMs do not results in an 8 % increase from the reduced discharge (net gain of ~3 %). A similar adjustment occurs for RCM land runoff.
 
@@ -720,7 +720,7 @@ For example, to query for discharge at one point (50.5 °W, 67.2 °N), the follo
 
 ~python ./discharge.py --base ./freshwater --roi=-50.5,67.2 --discharge~, 
 
-where =discharge.py= is the provided script, =./freshwater= is the folder containing the downloaded data, and =--discharge= tells the program to return RCM discharge (as opposed to =--outlets= which would return basin and outlet information). The program documentation and usage examples are available at http://github.com/GEUS-PROMICE/freshwater citep:github_freshwater.
+where =discharge.py= is the provided script, =./freshwater= is the folder containing the downloaded data, and =--discharge= tells the program to return RCM discharge (as opposed to =--outlets= which would return basin and outlet information). The program documentation and usage examples are available at https://github.com/GEUS-Glaciology-and-Climate/freshwater citep:github_freshwater.
 
 Because the =--upstream= option is not set, the =--discharge= option is set, and the point is over land, the results of this command are a time series for the MAR and RACMO land discharge for the basin containing this point. A small subset (the first 10 days of June 2012) is shown as an example:
 
@@ -782,7 +782,7 @@ This estimate of freshwater volume flow rate into Greenland fjords aims to suppo
 
 The data from this work are available at doi:10.22008/promice/freshwater citep:GEUS_freshwater_paper.
 
-The code and a website for postpublication updates are available at https://github.com/GEUS-PROMICE/freshwater citep:github_freshwater where we document changes to this work and use the GitHub Issues feature to collect suggested improvements, document those improvements as they are implemented, and document problems that made it through review. This version of the document is generated with git commit version \input{|"git describe --always --dirty='*'"}.
+The code and a website for postpublication updates are available at https://github.com/GEUS-Glaciology-and-Climate/freshwater citep:github_freshwater where we document changes to this work and use the GitHub Issues feature to collect suggested improvements, document those improvements as they are implemented, and document problems that made it through review. This version of the document is generated with git commit version \input{|"git describe --always --dirty='*'"}.
 
 #+LATEX: }
 
@@ -6203,7 +6203,7 @@ plt.savefig('./fig/watson_adjusted_south.png', transparent=True, bbox_inches='ti
 README for "Greenland liquid water runoff from 1950 through September 2021"
 
 Data DOI: doi:10.22008/promice/freshwater
-Source: https://github.com/mankoff/freshwater
+Source: https://github.com/GEUS-Glaciology-and-Climate/freshwater
 
 ,* Data Description
 
@@ -6250,7 +6250,7 @@ In the runoff sub-folders, files are named <RCM>_<YYYY>.nc, where =RCM= is one o
 
 The =discharge.py= script provides high-level access to the database. See =README.org= for usage examples.
 
-Complete documentation and example use cases with code are available at https://github.com/mankoff/freshwater, or by contacting Ken Mankoff <kdm@geus.dk>
+Complete documentation and example use cases with code are available at https://github.com/GEUS-Glaciology-and-Climate/freshwater, or by contacting Ken Mankoff <kdm@geus.dk>
 #+END_SRC
 
 
@@ -6265,7 +6265,7 @@ Complete documentation and example use cases with code are available at https://
 :clearpage: t
 :END:
 
-This work was performed using only open-source software, primarily =GRASS GIS= citep:neteler_2012, CDO citep:CDO, NCO citep:NCO, GDAL citep:GDAL, and =Python= citep:van-rossum_1995, in particular the =Jupyter= citep:kluyver_2016, =dask= citep:dask_sw,dask_paper, =pandas= citep:mckinney_2010, =geopandas= citep:geopandas, =numpy= citep:oliphant_2006, =x-array= citep:hoyer_2017, and =Matplotlib= citep:hunter_2007 packages. The entire work was performed in =Emacs= citep:stallman_1981 using =Org Mode= citep:schulte_2012 on GNU/Linux and using many GNU utilities (See https://github.com/mankoff/freshwater citep:github_freshwater). The =parallel= citep:tange_2011 tool was used to speed up processing. We used =proj4= citep:proj4 to compute the errors in the EPSG 3413 projection. The color map for Fig. [[fig:k_basin_change]] comes from citet:colorbrewer.
+This work was performed using only open-source software, primarily =GRASS GIS= citep:neteler_2012, CDO citep:CDO, NCO citep:NCO, GDAL citep:GDAL, and =Python= citep:van-rossum_1995, in particular the =Jupyter= citep:kluyver_2016, =dask= citep:dask_sw,dask_paper, =pandas= citep:mckinney_2010, =geopandas= citep:geopandas, =numpy= citep:oliphant_2006, =x-array= citep:hoyer_2017, and =Matplotlib= citep:hunter_2007 packages. The entire work was performed in =Emacs= citep:stallman_1981 using =Org Mode= citep:schulte_2012 on GNU/Linux and using many GNU utilities (See https://github.com/GEUS-Glaciology-and-Climate/freshwater citep:github_freshwater). The =parallel= citep:tange_2011 tool was used to speed up processing. We used =proj4= citep:proj4 to compute the errors in the EPSG 3413 projection. The color map for Fig. [[fig:k_basin_change]] comes from citet:colorbrewer.
 
 * Misc journal sections                                   :ignore:
 
