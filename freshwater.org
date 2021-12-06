@@ -186,6 +186,8 @@ This is captured programatically by [[workflow-update]]
 
 The discussion of quality control and land runoff with depth < 0 as invalid has been updated. Land runoff with depth << 0 is possible and occurs when land-source runoff enters the subglacial system and discharges subglacially at depth from a marine terminating glacier. This occurs often when runoff is sourced from nunatuks. This scenario also generates land outlets that exist outside of land basins.
 
+Various input data products have been upgraded. BedMachine has been upgraded from v3 to v4. MAR has been upgraded from version 3.11 to 3.12, and the simulation period has been extended from 1979 through September 2019, to 1950 through September 2021. The RACMO simulation period has been extended from 1958 through September 2019 to 1958 through September 2021. Both the MAR and RACMO domain boundaries have been corrected, fixing a small alignment error in the initial version.
+
 * Introduction                                            :ignore:
 
 \introduction
