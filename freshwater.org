@@ -45,7 +45,7 @@
 #+RESULTS: workflow-update
 
 #+BEGIN_EXPORT LaTeX
-\title{Greenland liquid water discharge from 1958 through 2019}
+\title{Greenland liquid water discharge from 1950 through September 2021}
 \Author[1]{Kenneth D.}{Mankoff}
 \Author[2]{Brice}{Noël}
 \Author[3]{Xavier}{Fettweis}
@@ -79,7 +79,7 @@
 #+END_EXPORT
 
 #+BEGIN_abstract
-Greenland runoff, from ice mass loss and rainfall, is increasing. That runoff, as discharge, impacts the physical, chemical, and biological properties of the adjacent fjords. However, where and when the discharge occurs is not readily available in an open database. Here we provide data sets of high-resolution Greenland hydrologic outlets, basins, and streams, as well as a daily 1958 through 2019 time series of Greenland liquid water discharge for each outlet. The data include src_bash{cat ./freshwater/ice/basins.csv | grep -v "^cat" |wc -l} {{{results(=24507=)}}} ice marginal outlets and upstream basins, and src_bash{cat ./freshwater/land/basins.csv | grep -v "^cat" |wc -l} {{{results(=29635=)}}} land coast outlets and upstream basins, derived from the 100 m ArcticDEM and 150 m BedMachine. At each outlet there are daily discharge data for src_jupyter-python[:eval no :session export]{import xarray as xr; ds = xr.open_mfdataset("./freshwater/land/runoff/*.nc", combine='nested', concat_dim='time'); (ds.time.max() - ds.time.min()).values.astype('timedelta64[D]').tolist().days+1} {{{results(=22645=)}}} days - ice sheet runoff routed subglacially to ice margin outlets, and land runoff routed to coast outlets - from two regional climate models (RCMs; MAR and RACMO).
+Greenland runoff, from ice mass loss and rainfall, is increasing. That runoff, as discharge, impacts the physical, chemical, and biological properties of the adjacent fjords. However, where and when the discharge occurs is not readily available in an open database. Here we provide data sets of high-resolution Greenland hydrologic outlets, basins, and streams, as well as a daily 1950 through September 2021 time series of Greenland liquid water discharge for each outlet. The data include src_bash{cat ./freshwater/ice/basins.csv | grep -v "^cat" |wc -l} {{{results(=24507=)}}} ice marginal outlets and upstream basins, and src_bash{cat ./freshwater/land/basins.csv | grep -v "^cat" |wc -l} {{{results(=29635=)}}} land coast outlets and upstream basins, derived from the 100 m ArcticDEM and 150 m BedMachine. At each outlet there are daily discharge data for src_jupyter-python[:eval no :session export]{import xarray as xr; ds = xr.open_mfdataset("./freshwater/land/runoff/*.nc", combine='nested', concat_dim='time'); (ds.time.max() - ds.time.min()).values.astype('timedelta64[D]').tolist().days+1} {{{results(=22645=)}}} days - ice sheet runoff routed subglacially to ice margin outlets, and land runoff routed to coast outlets - from two regional climate models (RCMs; MAR and RACMO).
 Our sensitivity study of how outlet location changes for every inland cell based on subglacial routing assumptions, shows that most inland cells where runoff occurs are not highly sensitive to those routing assumptions, and outflow location does not move far. We compare RCM results with 10 gauges from streams with discharge rates spanning 4 orders of magnitude. Results show that for daily discharge at the individual basin scale the 5 to 95 % prediction interval between modeled discharge and observations generally falls within plus or minus a factor of 5 (half an order of magnitude, or +500%/-80%). Results from this study are available at
 doi:10.22008/promice/freshwater citep:GEUS_freshwater_paper and code is available at http://github.com/GEUS-PROMICE/freshwater citep:github_freshwater.
 #+END_abstract
@@ -194,7 +194,7 @@ Various input data products have been upgraded. BedMachine has been upgraded fro
 
 Over the past decades, liquid runoff from Greenland has increased citep:mernild_2012,bamber_2018_freshwater,trusel_2018,perner_2019 contributing to mass decrease citep:sasgen_2020. When that runoff leaves the ice sheet and discharges into fjords and coastal seas, it influences a wide range of physical citep:straneo_2011,an_2012,mortensen_2013,bendtsen_2015,cowton_2015,mankoff_2016,fried_2019,cowton_2019,beckmann_2019, chemical citep:kanna_2018,balmonte_2019, and biological citep:kamenos_2012,kanna_2018,balmonte_2019 systems citep:catania_2020. The scales of the impacts range from instantaneous at the ice--ocean boundary to decadal in the distal ocean citep:gillard_2016. The influence of freshwater on multiple domains and disciplines citep:catania_2020 is the reason several past studies have estimated runoff and discharge at various temporal and spatial scales (e.g., citet:mernild_2008,mernild_2009,mernild_2010,langen_2015,ahlstrom_2017,citterio_2017,van-as_2018,bamber_2018_freshwater,perner_2019,slater_2019).
 
-To date no product provides discharge estimates at high spatial resolution (~100 m; resolving individual streams), daily temporal resolution, for all of Greenland, covering a broad time span (1958 through 2019), from multiple regional climate models (RCMs), and with a simple database access software to support downstream users. Here we present these data. In the following description and methods, we document the inputs, assumptions, methodologies, and results we use to estimate Greenland discharge from 1958 through 2019.
+To date no product provides discharge estimates at high spatial resolution (~100 m; resolving individual streams), daily temporal resolution, for all of Greenland, covering a broad time span (1950 through September 2021), from multiple regional climate models (RCMs), and with a simple database access software to support downstream users. Here we present these data. In the following description and methods, we document the inputs, assumptions, methodologies, and results we use to estimate Greenland discharge from 1950 through September 2021.
 
 Freshwater discharge from Greenland primarily takes three forms: solid ice from calving at marine-terminating glaciers; submarine meltwater from ice-ocean boundary melting at marine-terminating glaciers; and liquid runoff from melted inland surface ice, rain, and condensation. A recent paper by citet:mankoff_2020_ice targets the solid ice discharge plus submarine melt budget by estimating the ice flow rate across gates 5 km upstream from all fast-flowing marine-terminating glaciers in Greenland. Complementing that paper, this paper targets Greenland's point-source liquid water discharge budget by partitioning RCM runoff estimates to all ice margin and coastal outlets. The sum of these data and citet:mankoff_2020_ice is an estimate of the majority of freshwater (in both liquid and solid form) volume flow rates into Greenland fjords. Those two terms comprise the bulk but not all freshwater - they exclude precipitation directly onto the fjord or ocean surface, as well as relatively minor contributions from evaporation and condensation, sea ice formation and melt, or subglacial basal melting. 
 
@@ -768,7 +768,7 @@ If the script is accessed from within Python, then the =discharge= option return
 * Conclusions                                             :ignore:
 \conclusions
 
-We provide a 100 m spatial resolution data set of streams, outlets, and basins, and a 1 day temporal resolution data set of discharge through those outlets for the entire ice sheet area from 1958 through 2019. Access to this database is made simple for nonspecialists with a Python script. Comparing the two RCM-derived discharge products to 10 gauged streams shows the uncertainty is approximately plus or minus a factor of 5, or half an order of magnitude, or +500%/-80%, when comparing daily discharge for single or few basins. 
+We provide a 100 m spatial resolution data set of streams, outlets, and basins, and a 1 day temporal resolution data set of discharge through those outlets for the entire ice sheet area from 1950 through September 2021. Access to this database is made simple for nonspecialists with a Python script. Comparing the two RCM-derived discharge products to 10 gauged streams shows the uncertainty is approximately plus or minus a factor of 5, or half an order of magnitude, or +500%/-80%, when comparing daily discharge for single or few basins. 
 
 Because of the high spatial (individual basins) and temporal (daily) resolution, larger uncertainty exists than when working over larger areas or time steps. These larger areas and times can be achieved through spatial and temporal aggregating or by implementing a lag function.
 
@@ -1528,7 +1528,7 @@ At this point the static work is done - we have basins, streams, and outlets for
 
 The remaining tasks are to SUM the daily model variables by each basin, and assign results to the outlet for each basin.
 
-Working with the provided NetCDF files directly is possible but accessing them is very slow (in GRASS). I believe this has to do with extracting one variable from a multi-variable file, and/or chunking and compression issues. Given that the code operates day-by-day, that means from 1958 through 2019 there are src_bash{frink "#2019-12-31# - #1958-01-01# -> days"} {{{results(=22644=)}}} days, if I can cut access time down by 1 second that save 6.3 hours. In reality, by pre-processing the NetCDF files access time is reduced from 10 seconds to 1 second, saving ~2.5 days of processing time (cutting processing time in half). The cost for this savings is a few dozen lines of code and a few hours of processing.
+Working with the provided NetCDF files directly is possible but accessing them is very slow (in GRASS). I believe this has to do with extracting one variable from a multi-variable file, and/or chunking and compression issues. Given that the code operates day-by-day, that means from 1950 through September 2021 there are src_bash{echo $(( ($(date -d 2021-09-30 +%s) - $(date -d 1950-01-01 +%s)) / 86400 ))} {{{results(=26204=)}}} days, if I can cut access time down by 1 second that save 6.3 hours. In reality, by pre-processing the NetCDF files access time is reduced from 10 seconds to 1 second, saving ~2.5 days of processing time (cutting processing time in half). The cost for this savings is a few dozen lines of code and a few hours of processing.
 
 + MAR: One RUNOFF variable that contains appropriate runoff for both ice and land
 + RACMO: One RUNOFF variable that contains appropriate runoff for both ice and land
@@ -2181,7 +2181,7 @@ g.mapset RACMO
 log_info "Using EXTRA GNU parallel options via \${PARALLEL}: ${PARALLEL:-Not set}"
 
 # ice
-for y in $(seq 1958 2019); do
+for y in $(seq 1958 2021); do
   for k_pct in 100 90 80; do
     file_base=RACMO_runoff_ice_${y}
     infile=${file_base}.nc
@@ -2205,7 +2205,7 @@ done
 
 # land
 k_pct=100
-for y in $(seq 1958 2019); do
+for y in $(seq 1950 2021); do
   file_base=RACMO_runoff_land_${y}
   infile=${file_base}.nc
   outfile=${file_base}_${k_pct}.bsv
@@ -2492,7 +2492,7 @@ ds["time"].attrs["axis"] = "T"
 # gridsize = 100 x 100
 CONV = 1E-3 * 100 * 100 / 86400
 ds["runoff"] = (("station", "time"), df.values.T*CONV)
-ds["runoff"].attrs["long_name"] = "MAR runoff"
+ds["runoff"].attrs["long_name"] = RCM + " runoff"
 ds["runoff"].attrs["standard_name"] = "water_volume_transport_in_river_channel"
 ds["runoff"].attrs["units"] = "m3 s-1"
 ds["runoff"].attrs["coordinates"] = "lat lon alt station"
@@ -6200,7 +6200,7 @@ plt.savefig('./fig/watson_adjusted_south.png', transparent=True, bbox_inches='ti
 * README                                                :noexport:
 
 #+BEGIN_SRC org :tangle ./freshwater/README.txt :mkdirp ./freshwater :eval no
-README for "Greenland liquid water runoff from 1958 through 2019"
+README for "Greenland liquid water runoff from 1950 through September 2021"
 
 Data DOI: doi:10.22008/promice/freshwater
 Source: https://github.com/mankoff/freshwater
