@@ -3944,20 +3944,32 @@ r.mapcalc "z_s = if(mask_o_l_i == 1, null(), z_s_ocean)"
 :PROPERTIES:
 :CUSTOM_ID: import_BM4
 :END:
+
+BedMachine v4 no longer in EPSG:3413 format. Now in EPSG:3411. Extract from NetCDF to GeoTIFF and convert with the following:
+
+#+BEGIN_SRC bash :tangle no
+vars=$(cdo showname BedMachineGreenland-2021-04-20.nc)
+mkdir -p BMv4_3411 BMv4_3413
+parallel --bar "gdal_translate -co COMPRESS=DEFLATE NetCDF:BedMachineGreenland-2021-04-20.nc:{1} ./BMv4_3411/{1}.tif" ::: ${vars}
+parallel --bar "gdalwarp -co COMPRESS=DEFLATE -t_srs EPSG:3413 ./BMv4_3411/{1}.tif ./BMv4_3413/{1}.tif" ::: ${vars}
+#+END_SRC
+
+
 #+BEGIN_SRC bash :results verbatim
 log_info "Importing BedMachine"
 g.mapset -c BedMachine
 
 ROOT=${DATADIR}/Morlighem_2017
-cdo sinfon ${ROOT}/BedMachineGreenland-2021-04-20.nc
-g.region n=-632600 s=-3384500 w=-653000 e=879700 res=150 -p
-r.external -o source=netCDF:${ROOT}/BedMachineGreenland-2021-04-20.nc:bed output=z_b
-r.external -o source=netCDF:${ROOT}/BedMachineGreenland-2021-04-20.nc:surface output=z_s
-r.external -o source=netCDF:${ROOT}/BedMachineGreenland-2021-04-20.nc:mask output=mask
-r.external -o source=netCDF:${ROOT}/BedMachineGreenland-2021-04-20.nc:thickness output=thickness
-r.external -o source=netCDF:${ROOT}/BedMachineGreenland-2021-04-20.nc:errbed output=errbed
-r.external -o source=netCDF:${ROOT}/BedMachineGreenland-2021-04-20.nc:geoid output=geoid
-r.external -o source=netCDF:${ROOT}/BedMachineGreenland-2021-04-20.nc:source output=source
+
+for var in mask surface thickness bed errbed geoid source; do
+  echo $var
+  r.external source=${DATADIR}/Morlighem_2017/BMv4_3413/${var}.tif output=${var}
+done
+g.rename raster=surface,z_s
+g.rename raster=bed,z_b
+
+g.region raster=z_s
+g.region res=150 -pa
 #+END_SRC
 
 *** NSIDC 0713 Basemap
