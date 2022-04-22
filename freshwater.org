@@ -2491,11 +2491,11 @@ ds["time"].attrs["axis"] = "T"
 
 # gridsize = 100 x 100
 CONV = 1E-3 * 100 * 100 / 86400
-ds["runoff"] = (("station", "time"), df.values.T*CONV)
-ds["runoff"].attrs["long_name"] = RCM + " runoff"
-ds["runoff"].attrs["standard_name"] = "water_volume_transport_in_river_channel"
-ds["runoff"].attrs["units"] = "m3 s-1"
-ds["runoff"].attrs["coordinates"] = "lat lon alt station"
+ds["discharge"] = (("station", "time"), df.values.T*CONV)
+ds["discharge"].attrs["long_name"] = RCM + " discharge"
+ds["discharge"].attrs["standard_name"] = "water_volume_transport_in_river_channel"
+ds["discharge"].attrs["units"] = "m3 s-1"
+ds["discharge"].attrs["coordinates"] = "lat lon alt station"
 
 ds["lat"] = (("station"), meta.loc['lat'].astype(np.float32))
 #ds["lat"].attrs["coordinates"] = "station"
@@ -2544,9 +2544,9 @@ if 'ice' in BSVFILE:
     ds["coast_alt"].attrs["axis"] = "Z"
 
 ds.attrs["featureType"] = "timeSeries"
-ds.attrs["title"] = "Greenland runoff"
-ds.attrs["summary"] = "Greenland RCM runoff at basin outlets"
-ds.attrs["keywords"] = "Hydrology; Greenland; Runoff; Freshwater"
+ds.attrs["title"] = "Greenland discharge"
+ds.attrs["summary"] = "Greenland RCM discharge at basin outlets"
+ds.attrs["keywords"] = "Hydrology; Greenland; Runoff; Discharge; Freshwater"
 ds.attrs["Conventions"] = "CF-1.7"
 ds.attrs["source"] = "git commit: " + \
     subprocess.check_output(["git", "describe", "--always"]).strip().decode('UTF-8')
@@ -2584,8 +2584,8 @@ RCM, var, domain, year, k = os.path.basename(os.path.splitext(f)[0]).split("_")
 #MAR runoff ice   2000 100
 
 # Set up output folder and file name
-OUTDIR = "./freshwater/" + domain + "_" + k + "/runoff" # ./freshwater_90 or ./freshwater_80
-# if k == '100': OUTDIR = "./freshwater/" + domain + "/runoff" # ./freshwater/
+OUTDIR = "./freshwater/" + domain + "_" + k + "/discharge" # ./freshwater_90 or ./freshwater_80
+# if k == '100': OUTDIR = "./freshwater/" + domain + "/discharge" # ./freshwater/
 if not os.path.exists(OUTDIR):
   os.makedirs(OUTDIR, exist_ok=True)
 OUTBASE = RCM + "_" + year
@@ -2598,10 +2598,10 @@ BSVFILE=f
 # load and apply coverage scaling
 cf = "coverage_" + RCM + "_" + domain +"_" + k + ".nc"
 c = xr.open_dataset("./tmp/"+cf)
-c = c.where(c.runoff != 0, np.nan, drop=False)
-ds.runoff.values = ds.runoff/c.runoff # apply coverage
+c = c.where(c['runoff'] != 0, np.nan, drop=False)
+ds['discharge'].values = ds['discharge']/c['runoff'] # apply coverage
 
-ds.to_netcdf(OUTFILE, unlimited_dims='time', encoding={'runoff': {'zlib': True, 'complevel': 2}}, engine='netcdf4', mode='w')
+ds.to_netcdf(OUTFILE, unlimited_dims='time', encoding={'discharge': {'zlib': True, 'complevel': 2}}, engine='netcdf4', mode='w')
 #+END_SRC
 
 #+RESULTS:

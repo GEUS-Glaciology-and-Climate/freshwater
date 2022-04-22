@@ -138,9 +138,9 @@ class discharge(object):
             r,d = key.split("_")
             self.msg("    Loading %s" % key)
             # file_list = self._base + "/" + d+"_"+k + "/discharge/" + r + "_*.nc"
-            file_list = self._base + "/" + d + "/runoff/" + r + "_*.nc"
+            file_list = self._base + "/" + d + "/discharge/" + r + "_*.nc"
             # load all discharge at all outlets
-            self._discharge[key] = xr.open_mfdataset(file_list, combine="by_coords").rename({"runoff": key})
+            self._discharge[key] = xr.open_mfdataset(file_list, combine="by_coords").rename({"discharge": key})
 
         self.outlets()           # load outlets, and subset them to ROI
         self.discharge_at_outlets() # subset discharge to these outlets (also populate _discharge_u)
