@@ -186,6 +186,8 @@ This is captured programatically by [[workflow-update]]
 
 The discussion of quality control and land runoff with depth < 0 as invalid has been updated. Land runoff with depth << 0 is possible and occurs when land-source runoff enters the subglacial system and discharges subglacially at depth from a marine terminating glacier. This occurs often when runoff is sourced from nunatuks. This scenario also generates land outlets that exist outside of land basins.
 
+Additional metadata now includes the citet:mouginot_2019_data basins and regions and the citet:zwally_2012_data sector nearest to each outlet. This should be used with caution - some peripheral ice cap outlets may be assigned to the ice sheet, or land-terminating outlets may be nearest to an ice basin that does not overlap with hydrological basin.
+
 * Introduction                                            :ignore:
 
 \introduction
@@ -1029,10 +1031,23 @@ if [[ ${domain} == "ice" ]]; then # processing ice domain.
    db.execute sql='UPDATE outlets SET coast_y=(SELECT y from oland WHERE outlets.coast_id=oland.cat)'
 fi
 
+
+# Nearest upstream Zwally sector or Mouginot basin/region for each hydro outlet
+v.db.addcolumn map=outlets columns="Z2012_sector INT"
+v.distance from=outlets to=sectors@Zwally_2012 upload=to_attr column=Z2012_sector to_column=cat_
+
+v.db.addcolumn map=outlets columns="M2019_ID INT"
+v.db.addcolumn map=outlets columns="M2019_basin CHAR(99)"
+v.db.addcolumn map=outlets columns="M2019_region CHAR(99)"
+v.distance from=outlets to=basins@Mouginot_2019 upload=to_attr column=M2019_ID to_column=cat output=connection
+v.distance from=outlets to=basins@Mouginot_2019 upload=to_attr column=M2019_basin to_column=NAME
+v.distance from=outlets to=basins@Mouginot_2019 upload=to_attr column=M2019_region to_column=SUBREGION1
+
+
 ###
 ### basins
 ###
-# v.db.addcolumn map=basins column="area DOUBLE PRECISION"
+# area of basin
 v.to.db map=basins option=area column=area
 #+END_SRC
 
@@ -3976,6 +3991,32 @@ g.mapset -c NSIDC_0713
 g.region -d
 r.external -o input=${DATADIR}/GIMP/0713/RGB.vrt output=rgb
 #+END_SRC
+
+*** Mouginot 2019
+
+#+NAME: import_mouginot
+#+BEGIN_SRC bash
+
+log_info "Loading Mouginot 2019"
+
+g.mapset -c Mouginot_2019
+v.import input=${DATADIR}/Mouginot_2019/Greenland_Basins_PS_v1.4.2.shp output=basins snap=1
+# v.to.rast input=basins output=basins use=cat label_column=NAME
+# v.to.rast input=basins output=regions use=cat label_column=SUBREGION1
+#+END_SRC
+
+*** Zwally 2012
+
+#+NAME: import_zwally
+#+BEGIN_SRC bash
+
+log_info "Loading Zwally 2012"
+
+g.mapset -c Zwally_2012
+v.import input=${DATADIR}/Zwally_2012/sectors output=sectors snap=1
+# v.to.rast input=sectors output=sectors use=attr column=cat_
+#+END_SRC
+
 
 *** Other
 
