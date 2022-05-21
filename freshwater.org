@@ -1201,7 +1201,7 @@ else
   v.mkgrid map=grid position=region type=point
 
   v.out.ascii grid | m.proj input=- -od | cut -d"|" -f1,2 | tr '|' ' ' > ./tmp/distortion_ll.txt
-  PROJSTR=$(g.proj -j)
+  PROJSTR=$(g.proj -j | grep -v 'crs')
   echo $PROJSTR
   cat ./tmp/distortion_ll.txt \
     | proj -VS ${PROJSTR} \
@@ -1354,7 +1354,7 @@ import numpy as np
 import xarray as xr
 
 <<get_DATADIR>>
-ds = xr.open_dataset(DATADIR+"/MAR/3.12-freshwater/MARv3.12-daily-ERA-2000.nc")
+ds = xr.open_dataset(DATADIR+"/MAR/3.12-freshwater/MARv3.12-daily-ERA5-2000.nc")
 
 lon = ds['LON'].values.flatten()
 lat = ds['LAT'].values.flatten()
@@ -1467,7 +1467,7 @@ log_info "2D Area Error for ${MAPSET}"
 v.mkgrid map=grid position=region type=point
 
 v.out.ascii grid | m.proj input=- -od | cut -d"|" -f1,2 | tr '|' ' ' > ./tmp/distortion_ll_${MAPSET}.txt
-PROJSTR=$(g.proj -j)
+PROJSTR=$(g.proj -j | grep -v 'crs')
 echo $PROJSTR
 cat ./tmp/distortion_ll_${MAPSET}.txt \
   | proj -VS ${PROJSTR} \
@@ -1584,7 +1584,9 @@ for y in years:
     if os.path.exists(outfile):
         continue
 
-    ds = xr.open_mfdataset(ROOT+"/MARv3.12-daily-ERA5-" + y + ".nc", 
+    infile = ROOT+"/MARv3.12-daily-ERA5-" + y + ".nc"
+    print("infile: ", infile, "outfile: ", outfile)
+    ds = xr.open_mfdataset(infile, 
                            chunks={'time': 30}, 
                            combine='by_coords')
     da = (ds['RUcorr'] * (ds['MSK'] == 2) * area['Band1'].values)   # runoff over ice
@@ -1599,7 +1601,9 @@ for y in years:
     if os.path.exists(outfile):
         continue
 
-    ds = xr.open_mfdataset(ROOT+"/MARv3.12-daily-ERA5-" + y + ".nc", 
+    infile = ROOT+"/MARv3.12-daily-ERA5-" + y + ".nc"
+    print("infile: ", infile, "outfile: ", outfile)
+    ds = xr.open_mfdataset(infile, 
                            chunks={'time': 30},
                            combine='by_coords')
     da = ds['RU2'] * (ds['MSK'] == 1) * area['Band1'].values       # runoff over land
@@ -1709,6 +1713,7 @@ for i,y in enumerate(tqdm(years)):
         continue
 
     filelist_year = [_ for _ in filelist if str(y) in _]
+    print("infile: ", filelist_year, "outfile: ", outfile)
     ds = xr.open_mfdataset(filelist_year,
                            chunks={'time': 30},
                            combine='by_coords')
@@ -1745,6 +1750,7 @@ for i,y in enumerate(tqdm(years)):
     if os.path.exists(outfile):
         continue
 
+    print("infile: ", filelist[i], "outfile: ", outfile)
     ds = xr.open_mfdataset(filelist[i], chunks={'time': 30}, combine='by_coords')
     
     da = ds['runoff'] * (msk['Tundra']) * area['Band1'].values       # runoff over land
@@ -2062,7 +2068,7 @@ r.univar -t map=model zones=basins@land_${k_pct} \
 
 log_info "Using EXTRA GNU parallel options via \${PARALLEL}: ${PARALLEL:-Not set}"
 
-for y in $(seq 1979 2019); do
+for y in $(seq 1950 2021); do
   for k_pct in 100 90 80; do
     file_base=MAR_runoff_ice_${y}
     infile=${file_base}.nc
@@ -2130,7 +2136,7 @@ print(isum/osum)
 log_info "Using EXTRA GNU parallel options via \${PARALLEL}: ${PARALLEL:-Not set}"
 
 k_pct=100
-for y in $(seq 1979 2019); do
+for y in $(seq 1950 2021); do
   file_base=MAR_runoff_land_${y}
   infile=${file_base}.nc
   outfile=${file_base}_${k_pct}.bsv
@@ -2197,7 +2203,7 @@ for y in $(seq 1958 2021); do
       T0=$(ncdump -v time ./tmp/${infile} | grep -A 100000 "^ time =" | tr -dc [0-9,] | cut -d, -f1)
       T1=$(ncdump -v time ./tmp/${infile} | grep -A 100000 "^ time =" | tr -dc [0-9,] | rev | cut -d, -f1 | rev)
       seq ${T0} ${T1} \
-        | parallel --nice 9 --keep-order --bar basin_partition {#} {%} basins@ice_${k_pct} "${infile}:runoff" RACMO@RACMO \
+1        | parallel --nice 9 --keep-order --bar basin_partition {#} {%} basins@ice_${k_pct} "${infile}:runoff" RACMO@RACMO \
              >> ./dat/${outfile}
     fi
   done
@@ -2205,7 +2211,7 @@ done
 
 # land
 k_pct=100
-for y in $(seq 1950 2021); do
+for y in $(seq 1958 2021); do
   file_base=RACMO_runoff_land_${y}
   infile=${file_base}.nc
   outfile=${file_base}_${k_pct}.bsv
