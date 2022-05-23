@@ -45,7 +45,7 @@
 #+RESULTS: workflow-update
 
 #+BEGIN_EXPORT LaTeX
-\title{Greenland liquid water discharge from 1950 through September 2021}
+\title{Greenland liquid water discharge from 1950 through December 2021}
 \Author[1]{Kenneth D.}{Mankoff}
 \Author[2]{Brice}{Noël}
 \Author[3]{Xavier}{Fettweis}
@@ -79,7 +79,7 @@
 #+END_EXPORT
 
 #+BEGIN_abstract
-Greenland runoff, from ice mass loss and rainfall, is increasing. That runoff, as discharge, impacts the physical, chemical, and biological properties of the adjacent fjords. However, where and when the discharge occurs is not readily available in an open database. Here we provide data sets of high-resolution Greenland hydrologic outlets, basins, and streams, as well as a daily 1950 through September 2021 time series of Greenland liquid water discharge for each outlet. The data include src_bash{cat ./freshwater/ice/basins.csv | grep -v "^cat" |wc -l} {{{results(=24507=)}}} ice marginal outlets and upstream basins, and src_bash{cat ./freshwater/land/basins.csv | grep -v "^cat" |wc -l} {{{results(=29635=)}}} land coast outlets and upstream basins, derived from the 100 m ArcticDEM and 150 m BedMachine. At each outlet there are daily discharge data for src_jupyter-python[:eval no :session export]{import xarray as xr; ds = xr.open_mfdataset("./freshwater/land/runoff/*.nc", combine='nested', concat_dim='time'); (ds.time.max() - ds.time.min()).values.astype('timedelta64[D]').tolist().days+1} {{{results(=22645=)}}} days - ice sheet runoff routed subglacially to ice margin outlets, and land runoff routed to coast outlets - from two regional climate models (RCMs; MAR and RACMO).
+Greenland runoff, from ice mass loss and rainfall, is increasing. That runoff, as discharge, impacts the physical, chemical, and biological properties of the adjacent fjords. However, where and when the discharge occurs is not readily available in an open database. Here we provide data sets of high-resolution Greenland hydrologic outlets, basins, and streams, as well as a daily 1950 through December 2021 time series of Greenland liquid water discharge for each outlet. The data include src_bash{cat ./freshwater/ice/basins.csv | grep -v "^cat" |wc -l} {{{results(=24507=)}}} ice marginal outlets and upstream basins, and src_bash{cat ./freshwater/land/basins.csv | grep -v "^cat" |wc -l} {{{results(=29635=)}}} land coast outlets and upstream basins, derived from the 100 m ArcticDEM and 150 m BedMachine. At each outlet there are daily discharge data for src_jupyter-python[:eval no :session export]{import xarray as xr; ds = xr.open_mfdataset("./freshwater/land/runoff/*.nc", combine='nested', concat_dim='time'); (ds.time.max() - ds.time.min()).values.astype('timedelta64[D]').tolist().days+1} {{{results(=22645=)}}} days - ice sheet runoff routed subglacially to ice margin outlets, and land runoff routed to coast outlets - from two regional climate models (RCMs; MAR and RACMO).
 Our sensitivity study of how outlet location changes for every inland cell based on subglacial routing assumptions, shows that most inland cells where runoff occurs are not highly sensitive to those routing assumptions, and outflow location does not move far. We compare RCM results with 10 gauges from streams with discharge rates spanning 4 orders of magnitude. Results show that for daily discharge at the individual basin scale the 5 to 95 % prediction interval between modeled discharge and observations generally falls within plus or minus a factor of 5 (half an order of magnitude, or +500%/-80%). Results from this study are available at
 doi:10.22008/promice/freshwater citep:GEUS_freshwater_paper and code is available at https://github.com/GEUS-Glaciology-and-Climate/freshwater citep:github_freshwater.
 #+END_abstract
@@ -183,10 +183,15 @@ To recreate this work
 This is captured programatically by [[workflow-update]]
 
 * New in this version
+:PROPERTIES:
+:ID: sec_new_this_version
+:END:
 
 The discussion of quality control and land runoff with depth < 0 as invalid has been updated. Land runoff with depth << 0 is possible and occurs when land-source runoff enters the subglacial system and discharges subglacially at depth from a marine terminating glacier. This occurs often when runoff is sourced from nunatuks. This scenario also generates land outlets that exist outside of land basins.
 
-Various input data products have been upgraded. BedMachine has been upgraded from v3 to v4. MAR has been upgraded from version 3.11 to 3.12, and the simulation period has been extended from 1979 through September 2019, to 1950 through September 2021. The RACMO simulation period has been extended from 1958 through September 2019 to 1958 through September 2021. Both the MAR and RACMO domain boundaries have been corrected, fixing a small alignment error in the initial version.
+Various input data products have been upgraded. BedMachine has been upgraded from v3 to v4. MAR has been upgraded from version 3.11 to 3.12, and the simulation period has been extended from 1979 through September 2019, to 1950 through September 2021. The RACMO simulation period has been extended from 1958 through September 2019 to 1958 through December 2021. Prior to 1990, the RACMO data is unchanged (6-hourly ERA-Interim forcing). From 1990 onward, we now use 3-hourly ERA5 forcing. Both the MAR and RACMO domain boundaries have been corrected, fixing a small alignment error in the initial version.
+
+Additional metadata now includes the citet:mouginot_2019_data basins and regions and the citet:zwally_2012_data sector nearest to each outlet. This should be used with caution - some peripheral ice cap outlets may be assigned to the ice sheet, or land-terminating outlets may be nearest to an ice basin that does not overlap with hydrological basin. We also include the nearest citet:mankoff_2020_solid gate and distance to gate. Because citet:mankoff_2020_solid is a continually updating product, and gate locations and IDs may change in the future, we note here that we use gates V3 (file: https://doi.org/10.22008/promice/data/ice_discharge/gates/v02/GSEWLR) that are associated with discharge V55. The gate IDs used here are also valid with many previous ice discharge versions, and likely to be valid with many following ice discharge versions.
 
 * Introduction                                            :ignore:
 
@@ -615,7 +620,7 @@ Below, we discuss the known uncertainties, ranging from least to most uncertain.
 
 The basins presented here are static approximations based on the 100 m DEM of a dynamic system. Land basin boundaries are likely to be more precise and accurate than ice basins because the land surface is better resolved, has larger surface slopes, has negligible subsurface flow, and is less dynamic than the ice surface. Even if basins and outlets seem visually correct from the 100 m product, the basin outline still has uncertainty on the order of hundreds of meters and will therefore include many minor errors and nonphysical properties, such as drainage basin boundaries bisecting lakes. However, all artifacts we did find are significantly smaller than the 1 km^{2} grid of the RCM inputs. We do not show but note that when doing the same work with the 150 m BedMachine land surface DEM, some basins change their outlet locations significantly - draining on the opposite side of a spit or isthmus and into a different fjord than the streams do when observed in satellite imagery. We have not observed these errors in streams and basins derived from the 100 m ArcticDEM in a visual comparison with Google Earth, although they may still exist.
 
-Moving from land basins to subglacial ice basins, the uncertainty increases because subglacial routing is highly dynamic on timescales from minutes to seasons (e.g., citet:werder_2013). This dynamic system may introduce large spatial changes in outflow location (water or basin "piracy", citet:ahlstrom_2002,lindback_2015 and citet:chu_2016_rerouting), but citet:stevens_2018 suggests basins switching outlet locations may not be as common as earlier work suggests, and our sensitivity analysis suggests that near the margin where the majority of runoff occurs, outlet location often changes by less than 10 km under different routing assumptions (Fig. [[fig:k_basin_change]]). The largest (> 100 km) changes in outlet location in Fig. [[fig:k_basin_change]] occur when the continental or ice flow divides move, and one or two of the \(k\) scenario(s) drain cells to an entirely different coast or sector of the ice sheet.
+Moving from land basins to subglacial ice basins, the uncertainty increases because subglacial routing is highly dynamic on timescales from minutes to seasons (e.g., citet:werder_2013). This dynamic system may introduce large spatial changes in outflow location (water or basin "piracy", citet:ahlstrom_2002,lindback_2015 and citet:chu_2016_rerouting), but citet:stevens_2018 suggests basins switching outlet locations may not be as common as earlier work suggests, and our sensitivity analysis suggests that near the margin where the majority of runoff occurs, outlet location often changes by less than 10 km under different routing assumptions (Fig. [[fig:k_basin_change]]). The largest (> 100 km) changes in outlet location in Fig. [[fig:k_basin_change]] occur when the continental or ice flow divides move, and one or two of the \(k\) scenario(s) drain cells to an entirely different coast or sector of the ice sheet. Finally, in some locations water is routed supraglacially, not subglacially (c.f. 10.1016/j.jag.2021.102647).
 
 The regions near the domain edges - both the land coast and the ice margin - are covered by many small basins, and in this work basins < 1 km^{2} are absorbed into their largest neighbor (see Methods section). By definition these basins are now hydraulically incorrect. An example can be seen in the Zackenberg basin (Fig. [[fig:Z]]a, southwest corner of the basin), where one small basin on the southern side of a hydraulic divide was absorbed into the large Zackenberg basin that should be defined by and limited to the northern side of the mountain range. 
 
@@ -1031,10 +1036,29 @@ if [[ ${domain} == "ice" ]]; then # processing ice domain.
    db.execute sql='UPDATE outlets SET coast_y=(SELECT y from oland WHERE outlets.coast_id=oland.cat)'
 fi
 
+
+# Nearest upstream Zwally sector or Mouginot basin/region for each hydro outlet
+v.db.addcolumn map=outlets columns="Z2012_sector INT"
+v.distance from=outlets to=sectors@Zwally_2012 upload=to_attr column=Z2012_sector to_column=cat_
+
+v.db.addcolumn map=outlets columns="M2019_ID INT"
+v.db.addcolumn map=outlets columns="M2019_basin CHAR(99)"
+v.db.addcolumn map=outlets columns="M2019_region CHAR(99)"
+v.distance from=outlets to=basins@Mouginot_2019 upload=to_attr column=M2019_ID to_column=cat output=connection
+v.distance from=outlets to=basins@Mouginot_2019 upload=to_attr column=M2019_basin to_column=NAME
+v.distance from=outlets to=basins@Mouginot_2019 upload=to_attr column=M2019_region to_column=SUBREGION1
+
+# Nearest Mankoff 2020 gate and distance to gate
+v.db.addcolumn map=outlets columns="M2020_gate INT"
+v.db.addcolumn map=outlets columns="M2020_gate_dist INT"
+v.distance from=outlets to=gates@Mankoff_2020 upload=to_attr column=M2020_gate to_column=gate
+v.distance from=outlets to=gates@Mankoff_2020 upload=dist column=M2020_gate_dist
+
+
 ###
 ### basins
 ###
-# v.db.addcolumn map=basins column="area DOUBLE PRECISION"
+# area of basin
 v.to.db map=basins option=area column=area
 #+END_SRC
 
@@ -1201,7 +1225,7 @@ else
   v.mkgrid map=grid position=region type=point
 
   v.out.ascii grid | m.proj input=- -od | cut -d"|" -f1,2 | tr '|' ' ' > ./tmp/distortion_ll.txt
-  PROJSTR=$(g.proj -j)
+  PROJSTR=$(g.proj -j | grep -v 'crs')
   echo $PROJSTR
   cat ./tmp/distortion_ll.txt \
     | proj -VS ${PROJSTR} \
@@ -1354,7 +1378,7 @@ import numpy as np
 import xarray as xr
 
 <<get_DATADIR>>
-ds = xr.open_dataset(DATADIR+"/MAR/3.12-freshwater/MARv3.12-daily-ERA-2000.nc")
+ds = xr.open_dataset(DATADIR+"/MAR/3.12-freshwater/MARv3.12-daily-ERA5-2000.nc")
 
 lon = ds['LON'].values.flatten()
 lat = ds['LAT'].values.flatten()
@@ -1467,7 +1491,7 @@ log_info "2D Area Error for ${MAPSET}"
 v.mkgrid map=grid position=region type=point
 
 v.out.ascii grid | m.proj input=- -od | cut -d"|" -f1,2 | tr '|' ' ' > ./tmp/distortion_ll_${MAPSET}.txt
-PROJSTR=$(g.proj -j)
+PROJSTR=$(g.proj -j | grep -v 'crs')
 echo $PROJSTR
 cat ./tmp/distortion_ll_${MAPSET}.txt \
   | proj -VS ${PROJSTR} \
@@ -1584,7 +1608,9 @@ for y in years:
     if os.path.exists(outfile):
         continue
 
-    ds = xr.open_mfdataset(ROOT+"/MARv3.12-daily-ERA5-" + y + ".nc", 
+    infile = ROOT+"/MARv3.12-daily-ERA5-" + y + ".nc"
+    print("infile: ", infile, "outfile: ", outfile)
+    ds = xr.open_mfdataset(infile, 
                            chunks={'time': 30}, 
                            combine='by_coords')
     da = (ds['RUcorr'] * (ds['MSK'] == 2) * area['Band1'].values)   # runoff over ice
@@ -1599,7 +1625,9 @@ for y in years:
     if os.path.exists(outfile):
         continue
 
-    ds = xr.open_mfdataset(ROOT+"/MARv3.12-daily-ERA5-" + y + ".nc", 
+    infile = ROOT+"/MARv3.12-daily-ERA5-" + y + ".nc"
+    print("infile: ", infile, "outfile: ", outfile)
+    ds = xr.open_mfdataset(infile, 
                            chunks={'time': 30},
                            combine='by_coords')
     da = ds['RU2'] * (ds['MSK'] == 1) * area['Band1'].values       # runoff over land
@@ -1709,6 +1737,7 @@ for i,y in enumerate(tqdm(years)):
         continue
 
     filelist_year = [_ for _ in filelist if str(y) in _]
+    print("infile: ", filelist_year, "outfile: ", outfile)
     ds = xr.open_mfdataset(filelist_year,
                            chunks={'time': 30},
                            combine='by_coords')
@@ -1745,6 +1774,7 @@ for i,y in enumerate(tqdm(years)):
     if os.path.exists(outfile):
         continue
 
+    print("infile: ", filelist[i], "outfile: ", outfile)
     ds = xr.open_mfdataset(filelist[i], chunks={'time': 30}, combine='by_coords')
     
     da = ds['runoff'] * (msk['Tundra']) * area['Band1'].values       # runoff over land
@@ -2197,7 +2227,7 @@ for y in $(seq 1958 2021); do
       T0=$(ncdump -v time ./tmp/${infile} | grep -A 100000 "^ time =" | tr -dc [0-9,] | cut -d, -f1)
       T1=$(ncdump -v time ./tmp/${infile} | grep -A 100000 "^ time =" | tr -dc [0-9,] | rev | cut -d, -f1 | rev)
       seq ${T0} ${T1} \
-        | parallel --nice 9 --keep-order --bar basin_partition {#} {%} basins@ice_${k_pct} "${infile}:runoff" RACMO@RACMO \
+1        | parallel --nice 9 --keep-order --bar basin_partition {#} {%} basins@ice_${k_pct} "${infile}:runoff" RACMO@RACMO \
              >> ./dat/${outfile}
     fi
   done
@@ -2205,7 +2235,7 @@ done
 
 # land
 k_pct=100
-for y in $(seq 1950 2021); do
+for y in $(seq 1958 2021); do
   file_base=RACMO_runoff_land_${y}
   infile=${file_base}.nc
   outfile=${file_base}_${k_pct}.bsv
@@ -2519,6 +2549,17 @@ ds["alt"].attrs["standard_name"] = "altitude"
 ds["alt"].attrs["units"] = "m"
 ds["alt"].attrs["positive"] = "up"
 ds["alt"].attrs["axis"] = "Z"
+
+ds["Z2012_sector"] = (("station"), meta.loc["Z2012_sector"].replace(np.nan, value=-1).astype(np.uint32))
+ds["Z2012_sector"].attrs["long_name"] = "Zwally (2012) sector nearest outlet"
+ds["M2019_basin"] = (("station"), meta.loc["M2019_basin"].replace(np.nan, value=-1).astype(np.uint32))
+ds["M2019_basin"].attrs["long_name"] = "Mouginot (2019) basin nearest outlet"
+ds["M2019_region"] = (("station"), meta.loc["M2019_region"]
+ds["M2019_region"].attrs["long_name"] = "Mouginot (2019) region nearest outlet"
+ds["M2020_gate"] = (("station"), meta.loc["M2020_gate"].replace(np.nan, value=-1).astype(np.uint32))
+ds["M2020_gate"].attrs["long_name"] = "Mankoff (2020) gate nearest outlet"
+ds["M2020_gate_dist"] = (("station"), meta.loc["M2020_gate_dist"].replace(np.nan, value=-1).astype(np.uint32))
+ds["M2020_gate_dist"].attrs["long_name"] = "Distance from Mankoff (2020) gate to nearest outlet"
 
 if 'ice' in BSVFILE:
     ds["coast_id"] = (("station"), meta.loc["coast_id"].replace(np.nan, value=-1).astype(np.uint32))
@@ -4077,7 +4118,52 @@ g.region -d
 r.external -o input=${DATADIR}/GIMP/0713/RGB.vrt output=rgb
 #+END_SRC
 
+*** Mouginot 2019
+
+#+NAME: import_mouginot
+#+BEGIN_SRC bash
+
+log_info "Loading Mouginot 2019"
+
+g.mapset -c Mouginot_2019
+v.import input=${DATADIR}/Mouginot_2019/Greenland_Basins_PS_v1.4.2.shp output=basins snap=1
+# v.to.rast input=basins output=basins use=cat label_column=NAME
+# v.to.rast input=basins output=regions use=cat label_column=SUBREGION1
+#+END_SRC
+
+*** Zwally 2012
+
+#+NAME: import_zwally
+#+BEGIN_SRC bash
+
+log_info "Loading Zwally 2012"
+
+g.mapset -c Zwally_2012
+v.import input=${DATADIR}/Zwally_2012/sectors output=sectors snap=1
+# v.to.rast input=sectors output=sectors use=attr column=cat_
+#+END_SRC
+
+
 *** Other
+**** Mankoff 2020 gates
+
++ According to "[[id:sec_new_this_version][New in this version]]" section, use [[https://dataverse01.geus.dk/api/access/datafile/:persistentId?persistentId=doi:10.22008/promice/data/ice_discharge/gates/v02/GSEWLR][doi: 10.22008/promice/data/ice_discharge/gates/v02/GSEWLR]]
+
+#+BEGIN_SRC bash
+g.mapset -c Mankoff_2020
+log_info "Importing Mankoff 2020 gates"
+
+mkdir -p tmp/Mankoff_2020_gates
+
+wget https://dataverse01.geus.dk/api/access/datafile/:persistentId?persistentId=doi:10.22008/promice/data/ice_discharge/gates/v02/GSEWLR -O ./tmp/Mankoff_2020_gates/gates.pgk
+
+md5sum ./tmp/Mankoff_2020_gates/*
+# 437249095c2c9c0bd362dcb2860eb763  ./tmp/Mankoff_2020_gates/gates.pgk
+
+v.in.ogr input=./tmp/Mankoff_2020_gates/gates.pgk output=gates
+v.db.select map=gates|head
+#+END_SRC
+
 
 **** x and y in permanent mapset
 #+BEGIN_SRC bash :results verbatim
