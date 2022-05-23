@@ -1039,12 +1039,16 @@ fi
 
 # Nearest upstream Zwally sector or Mouginot basin/region for each hydro outlet
 v.db.addcolumn map=outlets columns="Z2012_sector INT"
+v.db.addcolumn map=outlets columns="Z2012_sector_dist INT"
 v.distance from=outlets to=sectors@Zwally_2012 upload=to_attr column=Z2012_sector to_column=cat_
+v.distance from=outlets to=sectors@Zwally_2012 upload=dist column=Z2012_sector_dist
 
 v.db.addcolumn map=outlets columns="M2019_ID INT"
+v.db.addcolumn map=outlets columns="M2019_ID_dist INT"
 v.db.addcolumn map=outlets columns="M2019_basin CHAR(99)"
 v.db.addcolumn map=outlets columns="M2019_region CHAR(99)"
 v.distance from=outlets to=basins@Mouginot_2019 upload=to_attr column=M2019_ID to_column=cat output=connection
+v.distance from=outlets to=basins@Mouginot_2019 upload=dist column=M2019_ID_dist
 v.distance from=outlets to=basins@Mouginot_2019 upload=to_attr column=M2019_basin to_column=NAME
 v.distance from=outlets to=basins@Mouginot_2019 upload=to_attr column=M2019_region to_column=SUBREGION1
 
@@ -2552,14 +2556,22 @@ ds["alt"].attrs["axis"] = "Z"
 
 ds["Z2012_sector"] = (("station"), meta.loc["Z2012_sector"].replace(np.nan, value=-1).astype(np.uint32))
 ds["Z2012_sector"].attrs["long_name"] = "Zwally (2012) sector nearest outlet"
-ds["M2019_basin"] = (("station"), meta.loc["M2019_basin"].replace(np.nan, value=-1).astype(np.uint32))
-ds["M2019_basin"].attrs["long_name"] = "Mouginot (2019) basin nearest outlet"
+ds["Z2020_sector_dist"] = (("station"), meta.loc["Z2020_sector_dist"].replace(np.nan, value=-1).astype(np.uint32))
+ds["Z2020_sector_dist"].attrs["long_name"] = "Zwally (2012) sector nearest outlet distance"
+
+ds["M2019_ID"] = (("station"), meta.loc["M2019_ID"].replace(np.nan, value=-1).astype(np.uint32))
+ds["M2019_ID"].attrs["long_name"] = "Mouginot (2019) basin nearest outlet ID"
+ds["M2019_ID_dist"] = (("station"), meta.loc["M2019_ID_dist"].replace(np.nan, value=-1).astype(np.uint32))
+ds["M2019_ID_dist"].attrs["long_name"] = "Mouginot (2019) basin nearest outlet ID distance"
+ds["M2019_basin"] = (("station"), meta.loc["M2019_basin"]
+ds["M2019_basin"].attrs["long_name"] = "Mouginot (2019) basin nearest outlet name"
 ds["M2019_region"] = (("station"), meta.loc["M2019_region"]
 ds["M2019_region"].attrs["long_name"] = "Mouginot (2019) region nearest outlet"
+
 ds["M2020_gate"] = (("station"), meta.loc["M2020_gate"].replace(np.nan, value=-1).astype(np.uint32))
 ds["M2020_gate"].attrs["long_name"] = "Mankoff (2020) gate nearest outlet"
 ds["M2020_gate_dist"] = (("station"), meta.loc["M2020_gate_dist"].replace(np.nan, value=-1).astype(np.uint32))
-ds["M2020_gate_dist"].attrs["long_name"] = "Distance from Mankoff (2020) gate to nearest outlet"
+ds["M2020_gate_dist"].attrs["long_name"] = "Mankoff (2020) gate nearest outlet distance"
 
 if 'ice' in BSVFILE:
     ds["coast_id"] = (("station"), meta.loc["coast_id"].replace(np.nan, value=-1).astype(np.uint32))
