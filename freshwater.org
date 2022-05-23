@@ -183,10 +183,15 @@ To recreate this work
 This is captured programatically by [[workflow-update]]
 
 * New in this version
+:PROPERTIES:
+:ID: sec_new_this_version
+:END:
 
 The discussion of quality control and land runoff with depth < 0 as invalid has been updated. Land runoff with depth << 0 is possible and occurs when land-source runoff enters the subglacial system and discharges subglacially at depth from a marine terminating glacier. This occurs often when runoff is sourced from nunatuks. This scenario also generates land outlets that exist outside of land basins.
 
 Various input data products have been upgraded. BedMachine has been upgraded from v3 to v4. MAR has been upgraded from version 3.11 to 3.12, and the simulation period has been extended from 1979 through September 2019, to 1950 through September 2021. The RACMO simulation period has been extended from 1958 through September 2019 to 1958 through September 2021. Both the MAR and RACMO domain boundaries have been corrected, fixing a small alignment error in the initial version.
+
+Additional metadata now includes the citet:mouginot_2019_data basins and regions and the citet:zwally_2012_data sector nearest to each outlet. This should be used with caution - some peripheral ice cap outlets may be assigned to the ice sheet, or land-terminating outlets may be nearest to an ice basin that does not overlap with hydrological basin. We also include the nearest citet:mankoff_2020_solid gate and distance to gate. Because citet:mankoff_2020_solid is a continually updating product, and gate locations and IDs may change in the future, we note here that we use gates V3 (file: https://doi.org/10.22008/promice/data/ice_discharge/gates/v02/GSEWLR) that are associated with discharge V55. The gate IDs used here are also valid with many previous ice discharge versions, and likely to be valid with many following ice discharge versions.
 
 * Introduction                                            :ignore:
 
@@ -1031,10 +1036,29 @@ if [[ ${domain} == "ice" ]]; then # processing ice domain.
    db.execute sql='UPDATE outlets SET coast_y=(SELECT y from oland WHERE outlets.coast_id=oland.cat)'
 fi
 
+
+# Nearest upstream Zwally sector or Mouginot basin/region for each hydro outlet
+v.db.addcolumn map=outlets columns="Z2012_sector INT"
+v.distance from=outlets to=sectors@Zwally_2012 upload=to_attr column=Z2012_sector to_column=cat_
+
+v.db.addcolumn map=outlets columns="M2019_ID INT"
+v.db.addcolumn map=outlets columns="M2019_basin CHAR(99)"
+v.db.addcolumn map=outlets columns="M2019_region CHAR(99)"
+v.distance from=outlets to=basins@Mouginot_2019 upload=to_attr column=M2019_ID to_column=cat output=connection
+v.distance from=outlets to=basins@Mouginot_2019 upload=to_attr column=M2019_basin to_column=NAME
+v.distance from=outlets to=basins@Mouginot_2019 upload=to_attr column=M2019_region to_column=SUBREGION1
+
+# Nearest Mankoff 2020 gate and distance to gate
+v.db.addcolumn map=outlets columns="M2020_gate INT"
+v.db.addcolumn map=outlets columns="M2020_gate_dist INT"
+v.distance from=outlets to=gates@Mankoff_2020 upload=to_attr column=M2020_gate to_column=gate
+v.distance from=outlets to=gates@Mankoff_2020 upload=dist column=M2020_gate_dist
+
+
 ###
 ### basins
 ###
-# v.db.addcolumn map=basins column="area DOUBLE PRECISION"
+# area of basin
 v.to.db map=basins option=area column=area
 #+END_SRC
 
@@ -2520,6 +2544,17 @@ ds["alt"].attrs["units"] = "m"
 ds["alt"].attrs["positive"] = "up"
 ds["alt"].attrs["axis"] = "Z"
 
+ds["Z2012_sector"] = (("station"), meta.loc["Z2012_sector"].replace(np.nan, value=-1).astype(np.uint32))
+ds["Z2012_sector"].attrs["long_name"] = "Zwally (2012) sector nearest outlet"
+ds["M2019_basin"] = (("station"), meta.loc["M2019_basin"].replace(np.nan, value=-1).astype(np.uint32))
+ds["M2019_basin"].attrs["long_name"] = "Mouginot (2019) basin nearest outlet"
+ds["M2019_region"] = (("station"), meta.loc["M2019_region"]
+ds["M2019_region"].attrs["long_name"] = "Mouginot (2019) region nearest outlet"
+ds["M2020_gate"] = (("station"), meta.loc["M2020_gate"].replace(np.nan, value=-1).astype(np.uint32))
+ds["M2020_gate"].attrs["long_name"] = "Mankoff (2020) gate nearest outlet"
+ds["M2020_gate_dist"] = (("station"), meta.loc["M2020_gate_dist"].replace(np.nan, value=-1).astype(np.uint32))
+ds["M2020_gate_dist"].attrs["long_name"] = "Distance from Mankoff (2020) gate to nearest outlet"
+
 if 'ice' in BSVFILE:
     ds["coast_id"] = (("station"), meta.loc["coast_id"].replace(np.nan, value=-1).astype(np.uint32))
     ds["coast_id"].attrs["long_name"] = "ID of coastal outlet"
@@ -3981,7 +4016,52 @@ g.region -d
 r.external -o input=${DATADIR}/GIMP/0713/RGB.vrt output=rgb
 #+END_SRC
 
+*** Mouginot 2019
+
+#+NAME: import_mouginot
+#+BEGIN_SRC bash
+
+log_info "Loading Mouginot 2019"
+
+g.mapset -c Mouginot_2019
+v.import input=${DATADIR}/Mouginot_2019/Greenland_Basins_PS_v1.4.2.shp output=basins snap=1
+# v.to.rast input=basins output=basins use=cat label_column=NAME
+# v.to.rast input=basins output=regions use=cat label_column=SUBREGION1
+#+END_SRC
+
+*** Zwally 2012
+
+#+NAME: import_zwally
+#+BEGIN_SRC bash
+
+log_info "Loading Zwally 2012"
+
+g.mapset -c Zwally_2012
+v.import input=${DATADIR}/Zwally_2012/sectors output=sectors snap=1
+# v.to.rast input=sectors output=sectors use=attr column=cat_
+#+END_SRC
+
+
 *** Other
+**** Mankoff 2020 gates
+
++ According to "[[id:sec_new_this_version][New in this version]]" section, use [[https://dataverse01.geus.dk/api/access/datafile/:persistentId?persistentId=doi:10.22008/promice/data/ice_discharge/gates/v02/GSEWLR][doi: 10.22008/promice/data/ice_discharge/gates/v02/GSEWLR]]
+
+#+BEGIN_SRC bash
+g.mapset -c Mankoff_2020
+log_info "Importing Mankoff 2020 gates"
+
+mkdir -p tmp/Mankoff_2020_gates
+
+wget https://dataverse01.geus.dk/api/access/datafile/:persistentId?persistentId=doi:10.22008/promice/data/ice_discharge/gates/v02/GSEWLR -O ./tmp/Mankoff_2020_gates/gates.pgk
+
+md5sum ./tmp/Mankoff_2020_gates/*
+# 437249095c2c9c0bd362dcb2860eb763  ./tmp/Mankoff_2020_gates/gates.pgk
+
+v.in.ogr input=./tmp/Mankoff_2020_gates/gates.pgk output=gates
+v.db.select map=gates|head
+#+END_SRC
+
 
 **** x and y in permanent mapset
 #+BEGIN_SRC bash :results verbatim
