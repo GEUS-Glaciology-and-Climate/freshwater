@@ -183,10 +183,13 @@ To recreate this work
 This is captured programatically by [[workflow-update]]
 
 * New in this version
+:PROPERTIES:
+:ID: sec_new_this_version
+:END:
 
 The discussion of quality control and land runoff with depth < 0 as invalid has been updated. Land runoff with depth << 0 is possible and occurs when land-source runoff enters the subglacial system and discharges subglacially at depth from a marine terminating glacier. This occurs often when runoff is sourced from nunatuks. This scenario also generates land outlets that exist outside of land basins.
 
-Additional metadata now includes the citet:mouginot_2019_data basins and regions and the citet:zwally_2012_data sector nearest to each outlet. This should be used with caution - some peripheral ice cap outlets may be assigned to the ice sheet, or land-terminating outlets may be nearest to an ice basin that does not overlap with hydrological basin.
+Additional metadata now includes the citet:mouginot_2019_data basins and regions and the citet:zwally_2012_data sector nearest to each outlet. This should be used with caution - some peripheral ice cap outlets may be assigned to the ice sheet, or land-terminating outlets may be nearest to an ice basin that does not overlap with hydrological basin. We also include the nearest citet:mankoff_2020_solid gate and distance to gate. Because citet:mankoff_2020_solid is a continually updating product, and gate locations and IDs may change in the future, we note here that we use gates V3 (file: https://doi.org/10.22008/promice/data/ice_discharge/gates/v02/GSEWLR) that are associated with discharge V55. The gate IDs used here are also valid with many previous ice discharge versions, and likely to be valid with many following ice discharge versions.
 
 * Introduction                                            :ignore:
 
@@ -1042,6 +1045,12 @@ v.db.addcolumn map=outlets columns="M2019_region CHAR(99)"
 v.distance from=outlets to=basins@Mouginot_2019 upload=to_attr column=M2019_ID to_column=cat output=connection
 v.distance from=outlets to=basins@Mouginot_2019 upload=to_attr column=M2019_basin to_column=NAME
 v.distance from=outlets to=basins@Mouginot_2019 upload=to_attr column=M2019_region to_column=SUBREGION1
+
+# Nearest Mankoff 2020 gate and distance to gate
+v.db.addcolumn map=outlets columns="M2020_gate INT"
+v.db.addcolumn map=outlets columns="M2020_gate_dist INT"
+v.distance from=outlets to=gates@Mankoff_2020 upload=to_attr column=M2020_gate to_column=gate
+v.distance from=outlets to=gates@Mankoff_2020 upload=dist column=M2020_gate_dist
 
 
 ###
@@ -4019,6 +4028,25 @@ v.import input=${DATADIR}/Zwally_2012/sectors output=sectors snap=1
 
 
 *** Other
+**** Mankoff 2020 gates
+
++ According to "[[id:sec_new_this_version][New in this version]]" section, use [[https://dataverse01.geus.dk/api/access/datafile/:persistentId?persistentId=doi:10.22008/promice/data/ice_discharge/gates/v02/GSEWLR][doi: 10.22008/promice/data/ice_discharge/gates/v02/GSEWLR]]
+
+#+BEGIN_SRC bash
+g.mapset -c Mankoff_2020
+log_info "Importing Mankoff 2020 gates"
+
+mkdir -p tmp/Mankoff_2020_gates
+
+wget https://dataverse01.geus.dk/api/access/datafile/:persistentId?persistentId=doi:10.22008/promice/data/ice_discharge/gates/v02/GSEWLR -O ./tmp/Mankoff_2020_gates/gates.pgk
+
+md5sum ./tmp/Mankoff_2020_gates/*
+# 437249095c2c9c0bd362dcb2860eb763  ./tmp/Mankoff_2020_gates/gates.pgk
+
+v.in.ogr input=./tmp/Mankoff_2020_gates/gates.pgk output=gates
+v.db.select map=gates|head
+#+END_SRC
+
 
 **** x and y in permanent mapset
 #+BEGIN_SRC bash :results verbatim
