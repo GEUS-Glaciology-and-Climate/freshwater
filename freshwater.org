@@ -2542,6 +2542,17 @@ ds["alt"].attrs["units"] = "m"
 ds["alt"].attrs["positive"] = "up"
 ds["alt"].attrs["axis"] = "Z"
 
+ds["Z2012_sector"] = (("station"), meta.loc["Z2012_sector"].replace(np.nan, value=-1).astype(np.uint32))
+ds["Z2012_sector"].attrs["long_name"] = "Zwally (2012) sector nearest outlet"
+ds["M2019_basin"] = (("station"), meta.loc["M2019_basin"].replace(np.nan, value=-1).astype(np.uint32))
+ds["M2019_basin"].attrs["long_name"] = "Mouginot (2019) basin nearest outlet"
+ds["M2019_region"] = (("station"), meta.loc["M2019_region"]
+ds["M2019_region"].attrs["long_name"] = "Mouginot (2019) region nearest outlet"
+ds["M2020_gate"] = (("station"), meta.loc["M2020_gate"].replace(np.nan, value=-1).astype(np.uint32))
+ds["M2020_gate"].attrs["long_name"] = "Mankoff (2020) gate nearest outlet"
+ds["M2020_gate_dist"] = (("station"), meta.loc["M2020_gate_dist"].replace(np.nan, value=-1).astype(np.uint32))
+ds["M2020_gate_dist"].attrs["long_name"] = "Distance from Mankoff (2020) gate to nearest outlet"
+
 if 'ice' in BSVFILE:
     ds["coast_id"] = (("station"), meta.loc["coast_id"].replace(np.nan, value=-1).astype(np.uint32))
     ds["coast_id"].attrs["long_name"] = "ID of coastal outlet"
