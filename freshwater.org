@@ -4167,10 +4167,10 @@ log_info "Importing Mankoff 2020 gates"
 
 mkdir -p tmp/Mankoff_2020_gates
 
-wget https://dataverse01.geus.dk/api/access/datafile/:persistentId?persistentId=doi:10.22008/promice/data/ice_discharge/gates/v02/GSEWLR -O ./tmp/Mankoff_2020_gates/gates.pgk
+wget "https://dataverse01.geus.dk/api/access/datafile/:persistentId?persistentId=doi:10.22008/promice/data/ice_discharge/gates/v02/2MXYRO" -O ./tmp/Mankoff_2020_gates/gates.pgk
 
 md5sum ./tmp/Mankoff_2020_gates/*
-# 437249095c2c9c0bd362dcb2860eb763  ./tmp/Mankoff_2020_gates/gates.pgk
+# d28f4a1c4c72490dc83893c18352f579  ./tmp/Mankoff_2020_gates/gates.pgk
 
 v.in.ogr input=./tmp/Mankoff_2020_gates/gates.pgk output=gates
 v.db.select map=gates|head
