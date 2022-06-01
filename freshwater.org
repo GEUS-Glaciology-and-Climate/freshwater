@@ -2231,7 +2231,7 @@ for y in $(seq 1958 2021); do
       T0=$(ncdump -v time ./tmp/${infile} | grep -A 100000 "^ time =" | tr -dc [0-9,] | cut -d, -f1)
       T1=$(ncdump -v time ./tmp/${infile} | grep -A 100000 "^ time =" | tr -dc [0-9,] | rev | cut -d, -f1 | rev)
       seq ${T0} ${T1} \
-1        | parallel --nice 9 --keep-order --bar basin_partition {#} {%} basins@ice_${k_pct} "${infile}:runoff" RACMO@RACMO \
+        | parallel --nice 9 --keep-order --bar basin_partition {#} {%} basins@ice_${k_pct} "${infile}:runoff" RACMO@RACMO \
              >> ./dat/${outfile}
     fi
   done
