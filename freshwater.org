@@ -1772,7 +1772,7 @@ ROOT_REGRID = ROOT + "/runoff_land_1km_regrid"
 msk = xr.open_dataset(ROOT_REGRID+"/Tundra_Mask_1km.nc")
 
 filelist = np.sort(glob.glob(ROOT_REGRID + "/out/runoff*.nc"))
-years = np.unique([_.split(".")[2].split(".")[0] for _ in filelist])
+years = np.unique([_.split(".")[1] for _ in filelist])
 for i,y in enumerate(tqdm(years)):
     outfile = "./tmp/RACMO_runoff_land_" + y + ".nc"
     if os.path.exists(outfile):
