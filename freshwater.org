@@ -2556,16 +2556,16 @@ ds["alt"].attrs["axis"] = "Z"
 
 ds["Z2012_sector"] = (("station"), meta.loc["Z2012_sector"].replace(np.nan, value=-1).astype(np.uint32))
 ds["Z2012_sector"].attrs["long_name"] = "Zwally (2012) sector nearest outlet"
-ds["Z2020_sector_dist"] = (("station"), meta.loc["Z2020_sector_dist"].replace(np.nan, value=-1).astype(np.uint32))
-ds["Z2020_sector_dist"].attrs["long_name"] = "Zwally (2012) sector nearest outlet distance"
+ds["Z2012_sector_dist"] = (("station"), meta.loc["Z2012_sector_dist"].replace(np.nan, value=-1).astype(np.uint32))
+ds["Z2012_sector_dist"].attrs["long_name"] = "Zwally (2012) sector nearest outlet distance"
 
 ds["M2019_ID"] = (("station"), meta.loc["M2019_ID"].replace(np.nan, value=-1).astype(np.uint32))
 ds["M2019_ID"].attrs["long_name"] = "Mouginot (2019) basin nearest outlet ID"
 ds["M2019_ID_dist"] = (("station"), meta.loc["M2019_ID_dist"].replace(np.nan, value=-1).astype(np.uint32))
 ds["M2019_ID_dist"].attrs["long_name"] = "Mouginot (2019) basin nearest outlet ID distance"
-ds["M2019_basin"] = (("station"), meta.loc["M2019_basin"]
+ds["M2019_basin"] = (("station"), meta.loc["M2019_basin"])
 ds["M2019_basin"].attrs["long_name"] = "Mouginot (2019) basin nearest outlet name"
-ds["M2019_region"] = (("station"), meta.loc["M2019_region"]
+ds["M2019_region"] = (("station"), meta.loc["M2019_region"])
 ds["M2019_region"].attrs["long_name"] = "Mouginot (2019) region nearest outlet"
 
 ds["M2020_gate"] = (("station"), meta.loc["M2020_gate"].replace(np.nan, value=-1).astype(np.uint32))
