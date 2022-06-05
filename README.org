@@ -109,10 +109,10 @@ The folder structure required is a =root= folder (named =freshwater= in the exam
 Example:
 
 #+BEGIN_SRC bash :results verbatim :exports results
-find ./freshwater/land/ -maxdepth 1
+find ./freshwater/land/ -maxdepth 1 | sort
 echo "./freshwater/land/discharge/MAR_<yyyy>.nc"
 echo "./freshwater/land/discharge/RACMO_<yyyy>.nc"
-find ./freshwater/ice/ -maxdepth 1
+find ./freshwater/ice/ -maxdepth 1 | sort
 echo "./freshwater/ice/discharge/MAR_<yyyy>.nc"
 echo "./freshwater/ice/discharge/RACMO_<yyyy>.nc"
 #+END_SRC
@@ -120,25 +120,25 @@ echo "./freshwater/ice/discharge/RACMO_<yyyy>.nc"
 #+RESULTS:
 #+begin_example
 ./freshwater/land/
-./freshwater/land/outlets.csv
 ./freshwater/land/basins.csv
+./freshwater/land/basins_filled.gpkg
+./freshwater/land/basins.gpkg
+./freshwater/land/discharge
+./freshwater/land/outlets.csv
+./freshwater/land/outlets.gpkg
 ./freshwater/land/streams.csv
 ./freshwater/land/streams.gpkg
-./freshwater/land/outlets.gpkg
-./freshwater/land/basins.gpkg
-./freshwater/land/basins_filled.gpkg
-./freshwater/land/discharge
 ./freshwater/land/discharge/MAR_<yyyy>.nc
 ./freshwater/land/discharge/RACMO_<yyyy>.nc
 ./freshwater/ice/
-./freshwater/ice/outlets.csv
 ./freshwater/ice/basins.csv
+./freshwater/ice/basins_filled.gpkg
+./freshwater/ice/basins.gpkg
+./freshwater/ice/discharge
+./freshwater/ice/outlets.csv
+./freshwater/ice/outlets.gpkg
 ./freshwater/ice/streams.csv
 ./freshwater/ice/streams.gpkg
-./freshwater/ice/outlets.gpkg
-./freshwater/ice/basins.gpkg
-./freshwater/ice/basins_filled.gpkg
-./freshwater/ice/discharge
 ./freshwater/ice/discharge/MAR_<yyyy>.nc
 ./freshwater/ice/discharge/RACMO_<yyyy>.nc
 #+end_example
