@@ -55,7 +55,7 @@ v3 of the data has the following changes (see GitHub diff above for more details
 
 * WARNING
 
-Bugs may exist in this data or the [[./discharge.py]] access script. All known bugs will be documented at [[https://github.com/GEUS-PROMICE/freshwater/issues]]. Before using this software or finalizing results, you should check if any [[https://github.com/mankoff/freshwater/issues][open issues]] impact your results, or if any issue have been [[https://github.com/mankoff/freshwater/issues?q=is%3Aissue+is%3Aclosed][closed]] since you  downloaded the data or script.
++ Bugs may exist in this data or the [[./discharge.py]] access script. All known bugs will be documented at [[https://github.com/GEUS-PROMICE/freshwater/issues]]. Before using this software or finalizing results, you should check if any [[https://github.com/mankoff/freshwater/issues][open issues]] impact your results, or if any issue have been [[https://github.com/mankoff/freshwater/issues?q=is%3Aissue+is%3Aclosed][closed]] since you downloaded the data or script.
 
 * Related Work  
 
@@ -98,6 +98,8 @@ The ROI coordinate units can be either EPSG:4326 (lon,lat) or EPSG:3413. The uni
 When the script is run from the command line, CSV data is written to =stdout= and can be redirected to a file. When the API is accessed from within Python, if the script is used to access outlets, a =GeoPandas= =GeoDataFrame= is returned and can be used for further analysis within Python, or written to any file format supported by =GeoPandas= or =Pandas=, for example =CSV=, or =GeoPackage= for =QGIS=. If the script is used to access discharge, an =xarray= =Dataset= is returned, and can be used for further analysis within Python, or written to any file format supported by =xarray=, for example =CSV= or =NetCDF=.
 
 *** Database Format
+
++ The =cat= column in the CSVs file links to the =station= vector in the NetCDF.
 
 This script queries two database:
  
@@ -156,6 +158,10 @@ echo "./freshwater/ice/discharge/RACMO_<yyyy>.nc"
 + Due to bash command-line parsing behavior, the syntax =--roi -60,60= does not work. Use ~--roi=-60,06~.
 
 + Longitude is expected in degrees East, and should therefore probably be negative.
+
++ The =cat= column in the CSVs file links to the =station= vector in the NetCDF.
+
++ If possible, avoid using index-based lookups, and query based on location or =station=.
 
 *** Requirements
 :PROPERTIES:
