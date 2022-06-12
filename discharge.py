@@ -119,9 +119,9 @@ class discharge(object):
                     # otmp["domain"], otmp["k"], otmp["upstream"] = d,k,True
                     otmp["domain"], otmp["upstream"] = key,True
                     o = o.append(otmp)
-        o['coast_id'] = o['coast_id'].fillna(-1).astype(np.int)
-        o['coast_x'] = o['coast_x'].fillna(-1).astype(np.int)
-        o['coast_y'] = o['coast_y'].fillna(-1).astype(np.int)
+        o['coast_id'] = o['coast_id'].fillna(-1).astype(int)
+        o['coast_x'] = o['coast_x'].fillna(-1).astype(int)
+        o['coast_y'] = o['coast_y'].fillna(-1).astype(int)
 
         o = o.reset_index().drop(columns="index").rename(columns={"cat":"id"})
         o.index.name = "index"
@@ -247,8 +247,8 @@ class discharge(object):
             if gs.shape[0] != 1:
                 self.msg("Error: Multiple geometries in ", roi)
         else: # "x,y" OR "x,y x,y ..." or "lon,lat" or "lon,lat lon,lat"
-            roi_x_or_lon = np.array([_.split(",")[0] for _ in roi.split(" ")]).astype(np.float)
-            roi_y_or_lat = np.array([_.split(",")[1] for _ in roi.split(" ")]).astype(np.float)
+            roi_x_or_lon = np.array([_.split(",")[0] for _ in roi.split(" ")]).astype(float)
+            roi_y_or_lat = np.array([_.split(",")[1] for _ in roi.split(" ")]).astype(float)
             if all((roi_x_or_lon > -360) & (roi_x_or_lon < 360) & \
                    (roi_y_or_lat > -90) & (roi_y_or_lat < 90)):
                 if (roi_x_or_lon.size == 1):
