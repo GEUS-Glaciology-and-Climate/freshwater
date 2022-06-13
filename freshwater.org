@@ -79,7 +79,7 @@
 #+END_EXPORT
 
 #+BEGIN_abstract
-Greenland runoff, from ice mass loss and rainfall, is increasing. That runoff, as discharge, impacts the physical, chemical, and biological properties of the adjacent fjords. However, where and when the discharge occurs is not readily available in an open database. Here we provide data sets of high-resolution Greenland hydrologic outlets, basins, and streams, as well as a daily 1950 through December 2021 time series of Greenland liquid water discharge for each outlet. The data include src_bash{cat ./freshwater/ice/basins.csv | grep -v "^cat" |wc -l} {{{results(=24507=)}}} ice marginal outlets and upstream basins, and src_bash{cat ./freshwater/land/basins.csv | grep -v "^cat" |wc -l} {{{results(=29635=)}}} land coast outlets and upstream basins, derived from the 100 m ArcticDEM and 150 m BedMachine. At each outlet there are daily discharge data for src_jupyter-python[:eval no :session export]{import xarray as xr; ds = xr.open_mfdataset("./freshwater/land/runoff/*.nc", combine='nested', concat_dim='time'); (ds.time.max() - ds.time.min()).values.astype('timedelta64[D]').tolist().days+1} {{{results(=22645=)}}} days - ice sheet runoff routed subglacially to ice margin outlets, and land runoff routed to coast outlets - from two regional climate models (RCMs; MAR and RACMO).
+Greenland runoff, from ice mass loss and rainfall, is increasing. That runoff, as discharge, impacts the physical, chemical, and biological properties of the adjacent fjords. However, where and when the discharge occurs is not readily available in an open database. Here we provide data sets of high-resolution Greenland hydrologic outlets, basins, and streams, as well as a daily 1950 through December 2021 time series of Greenland liquid water discharge for each outlet. The data include src_bash{cat ./freshwater/ice/basins.csv | grep -v "^cat" |wc -l} {{{results(=24500=)}}} ice marginal outlets and upstream basins, and src_bash{cat ./freshwater/land/basins.csv | grep -v "^cat" |wc -l} {{{results(=29638=)}}} land coast outlets and upstream basins, derived from the 100 m ArcticDEM and 150 m BedMachine. At each outlet there are daily discharge data for src_jupyter-python[:eval no :session export]{import xarray as xr; ds = xr.open_mfdataset("./freshwater/land/discharge/*.nc", combine='nested', concat_dim='time'); (ds.time.max() - ds.time.min()).values.astype('timedelta64[D]').tolist().days+1} {{{results(=26298=)}}} days - ice sheet runoff routed subglacially to ice margin outlets, and land runoff routed to coast outlets - from two regional climate models (RCMs; MAR and RACMO).
 Our sensitivity study of how outlet location changes for every inland cell based on subglacial routing assumptions, shows that most inland cells where runoff occurs are not highly sensitive to those routing assumptions, and outflow location does not move far. We compare RCM results with 10 gauges from streams with discharge rates spanning 4 orders of magnitude. Results show that for daily discharge at the individual basin scale the 5 to 95 % prediction interval between modeled discharge and observations generally falls within plus or minus a factor of 5 (half an order of magnitude, or +500%/-80%). Results from this study are available at
 doi:10.22008/promice/freshwater citep:GEUS_freshwater_paper and code is available at https://github.com/GEUS-Glaciology-and-Climate/freshwater citep:github_freshwater.
 #+END_abstract
@@ -191,7 +191,7 @@ The discussion of quality control and land runoff with depth < 0 as invalid has 
 
 Various input data products have been upgraded. BedMachine has been upgraded from v3 to v4. MAR has been upgraded from version 3.11 to 3.12, and the simulation period has been extended from 1979 through September 2019, to 1950 through September 2021. The RACMO simulation period has been extended from 1958 through September 2019 to 1958 through December 2021. Prior to 1990, the RACMO data is unchanged (6-hourly ERA-Interim forcing). From 1990 onward, we now use 3-hourly ERA5 forcing. Both the MAR and RACMO domain boundaries have been corrected, fixing a small alignment error in the initial version.
 
-Additional metadata now includes the citet:mouginot_2019_data basins and regions and the citet:zwally_2012_data sector nearest to each outlet. This should be used with caution - some peripheral ice cap outlets may be assigned to the ice sheet, or land-terminating outlets may be nearest to an ice basin that does not overlap with hydrological basin. We also include the nearest citet:mankoff_2020_solid gate and distance to gate. Because citet:mankoff_2020_solid is a continually updating product, and gate locations and IDs may change in the future, we note here that we use gates V3 (file: https://doi.org/10.22008/promice/data/ice_discharge/gates/v02/GSEWLR) that are associated with discharge V55. The gate IDs used here are also valid with many previous ice discharge versions, and likely to be valid with many following ice discharge versions.
+Additional metadata now includes the citet:mouginot_2019_data basins and regions and the citet:zwally_2012_data sector nearest to each outlet, and shortest distance between the outlet and the basin, region, or sector boundary. This should be used with caution - some peripheral ice cap outlets may be assigned to the ice sheet, or land-terminating outlets may be nearest to an ice basin that does not overlap with hydrological basin. The distance can be used as a filter. We also include the nearest named glacier from citet:bjork_2015, and distance to the citet:bjork_2015 point. We also include the nearest citet:mankoff_2020_solid gate and distance to gate. Because citet:mankoff_2020_solid is a continually updating product, and gate locations and IDs may change in the future, we note here that we use gates V3 (file: https://doi.org/10.22008/promice/data/ice_discharge/gates/v02/GSEWLR) that are associated with discharge V55. The gate IDs used here are also valid with many previous ice discharge versions, and likely to be valid with many following ice discharge versions.
 
 * Introduction                                            :ignore:
 
@@ -1057,6 +1057,12 @@ v.db.addcolumn map=outlets columns="M2020_gate INT"
 v.db.addcolumn map=outlets columns="M2020_gate_dist INT"
 v.distance from=outlets to=gates@Mankoff_2020 upload=to_attr column=M2020_gate to_column=gate
 v.distance from=outlets to=gates@Mankoff_2020 upload=dist column=M2020_gate_dist
+
+# Nearest Bjørk 2015d name and distance to point
+v.db.addcolumn map=outlets columns="B2015_name CHAR(99)"
+v.db.addcolumn map=outlets columns="B2015_dist INT"
+v.distance from=outlets to=names@Bjork_2015 upload=to_attr column=B2015_name to_column=Official_n
+v.distance from=outlets to=names@Bjork_2015 upload=dist column=B2015_dist
 
 
 ###
@@ -2572,6 +2578,11 @@ ds["M2020_gate"] = (("station"), meta.loc["M2020_gate"].replace(np.nan, value=-1
 ds["M2020_gate"].attrs["long_name"] = "Mankoff (2020) gate nearest outlet"
 ds["M2020_gate_dist"] = (("station"), meta.loc["M2020_gate_dist"].replace(np.nan, value=-1).astype(np.uint32))
 ds["M2020_gate_dist"].attrs["long_name"] = "Mankoff (2020) gate nearest outlet distance"
+
+ds["B2015_name"] = (("station"), meta.loc["B2015_name"].replace(np.nan, value=-1).astype(np.uint32))
+ds["B2015_name"].attrs["long_name"] = "Bjørk (2015) Official Name gate nearest outlet"
+ds["B2015_dist"] = (("station"), meta.loc["B2015_dist"].replace(np.nan, value=-1).astype(np.uint32))
+ds["B2015_dist"].attrs["long_name"] = "Bjørk (2015) Official Name point distance"
 
 if 'ice' in BSVFILE:
     ds["coast_id"] = (("station"), meta.loc["coast_id"].replace(np.nan, value=-1).astype(np.uint32))
@@ -4175,6 +4186,26 @@ md5sum ./tmp/Mankoff_2020_gates/*
 v.in.ogr input=./tmp/Mankoff_2020_gates/gates.pgk output=gates
 v.db.select map=gates|head
 #+END_SRC
+
+
+**** Bjørk 2015 names
+
+#+BEGIN_SRC bash
+g.mapset -c Bjork_2015
+log_info "Importing Bjørk 2015 names"
+
+v.import input=${DATADIR}/Bjørk_2015/GreenlandGlacierNames_GGNv01_WGS84.shp output=names
+v.db.select map=names|head
+#+END_SRC
+
+#+RESULTS:
+| cat | ID      |     LAT |      LON | New_Greenl            | Old_Greenl              | Foreign_na | Official_n            | Alternativ | RGI_ID         | GLIMS_ID       |  RGI_LON | RGI_LAT | Type |
+|   1 | GGN0001 | 60.1166 |   -43.37 | Sermeq Kujalleq       | Sermeq Kujatdleq        |            | Sermeq Kujalleq       |            | RGI40-05.04361 | G316578E60159N | -43.4217 | 60.1593 | LGIC |
+|   2 | GGN0002 | 60.1349 | -43.5125 | Sermeq Avannarleq     | Sermeq Avangnardleq     |            | Sermeq Avannarleq     |            | RGI40-05.04363 | G316482E60158N | -43.5182 | 60.1584 | LGIC |
+|   3 | GGN0003 | 60.1627 | -43.7278 | Sermikasik Avannarleq | Sermikasik Avangnardleq |            | Sermikasik Avannarleq |            | RGI40-05.04356 | G316285E60178N | -43.7154 | 60.1779 | LGIC |
+|   4 | GGN0004 | 60.1639 | -43.7038 | Sermikasik Kujalleq   | Sermikasik Kujatdleq    |            | Sermikasik Kujalleq   |            | RGI40-05.04356 | G316285E60178N | -43.7154 | 60.1779 | LGIC |
+|   5 | GGN0005 | 60.2171 |  -43.337 | Sermeq Avannarleq     | Sermeq Avangnardleq     |            | Sermeq Avannarleq     |            | RGI40-05.04332 | G316577E60220N | -43.4229 | 60.2199 | LGIC |
+|   6 | GGN0006 | 60.2352 | -43.2644 | Sermeq Qeqqarleq      | Sermeq Qerqardleq       |            | Sermeq Qeqqarleq      |            | RGI40-05.04331 | G316702E60261N |  -43.298 | 60.2613 | LGIC |
 
 
 **** x and y in permanent mapset
