@@ -4170,7 +4170,7 @@ v.import input=${DATADIR}/Zwally_2012/sectors output=sectors snap=1
 *** Other
 **** Mankoff 2020 gates
 
-+ According to "[[id:sec_new_this_version][New in this version]]" section, use [[https://dataverse01.geus.dk/api/access/datafile/:persistentId?persistentId=doi:10.22008/promice/data/ice_discharge/gates/v02/GSEWLR][doi: 10.22008/promice/data/ice_discharge/gates/v02/GSEWLR]]
++ According to "[[id:sec_new_this_version][New in this version]]" section, use doi:10.22008/promice/data/ice_discharge/gates/v02/UFW2WY 
 
 #+BEGIN_SRC bash
 g.mapset -c Mankoff_2020
@@ -4178,7 +4178,7 @@ log_info "Importing Mankoff 2020 gates"
 
 mkdir -p tmp/Mankoff_2020_gates
 
-wget "https://dataverse01.geus.dk/api/access/datafile/:persistentId?persistentId=doi:10.22008/promice/data/ice_discharge/gates/v02/2MXYRO" -O ./tmp/Mankoff_2020_gates/gates.pgk
+wget "https://dataverse.geus.dk/api/access/datafile/:persistentId?persistentId=doi:10.22008/promice/data/ice_discharge/gates/v02/UFW2WY" -O ./tmp/Mankoff_2020_gates/gates.pgk
 
 md5sum ./tmp/Mankoff_2020_gates/*
 # d28f4a1c4c72490dc83893c18352f579  ./tmp/Mankoff_2020_gates/gates.pgk
