@@ -2175,7 +2175,7 @@ for y in $(seq 1950 2021); do
   infile=${file_base}.nc
   outfile=${file_base}_${k_pct}.bsv
 
-  log_info "Calculating MAR ice runoff at land outlets: ${outfile}"
+  log_info "Calculating MAR land runoff at land outlets: ${outfile}"
 
   if [[ -e ./dat/${outfile} ]]; then
     log_warn "Output file ${outfile} exists. Skipping..."
@@ -2250,7 +2250,7 @@ for y in $(seq 1958 2021); do
   infile=${file_base}.nc
   outfile=${file_base}_${k_pct}.bsv
   
-  log_info "Calculating RACMO ice runoff at land outlets: ${outfile}"
+  log_info "Calculating RACMO land runoff at land outlets: ${outfile}"
   
   if [[ -e ./dat/${outfile} ]]; then
     log_warn "Output file ${outfile} exists. Skipping..."
