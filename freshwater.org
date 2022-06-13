@@ -4194,7 +4194,8 @@ v.db.select map=gates|head
 g.mapset -c Bjork_2015
 log_info "Importing Bjørk 2015 names"
 
-v.import input=${DATADIR}/Bjørk_2015/GreenlandGlacierNames_GGNv01_WGS84.shp output=names
+# ogr2ogr -f "ESRI Shapefile" -t_srs EPSG:3413 EPSG_3413 GreenlandGlacierNames_GGNv01_WGS84.shp 
+v.in.ogr input=${DATADIR}/Bjørk_2015/EPSG_3413/ output=names
 v.db.select map=names|head
 #+END_SRC
 
