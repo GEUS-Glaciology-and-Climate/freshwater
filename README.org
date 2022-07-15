@@ -106,7 +106,7 @@ This script queries two database:
 + land :: The land coast outlets and land basins.
 + ice :: ice margin outlets and ice basins.
 
-The folder structure required is a =root= folder (named =freshwater= in the examples below, but can be anything) and then a =land= and =ice= sub-folder. The geospatial files for =land= and =ice= must be in these folders (i.e. the k=1.0 Streams, Outlets, and Basins dataset from https://dataverse01.geus.dk/dataverse/freshwater). Then, each of the =land= and =ice= folders must contain a =discharge= folder with the appropriate (MAR & RACMO) yearly discharge NetCDF files
+The folder structure required is a =root= folder (named =freshwater= in the examples below, but can be anything) and then a =land= and =ice= sub-folder. The geospatial files for =land= and =ice= must be in these folders (i.e. the k=1.0 Streams, Outlets, and Basins dataset from https://dataverse.geus.dk/dataverse/freshwater). Then, each of the =land= and =ice= folders must contain a =discharge= folder with the appropriate (MAR & RACMO) yearly discharge NetCDF files
 
 Example:
 
