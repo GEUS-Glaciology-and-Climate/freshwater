@@ -2579,9 +2579,9 @@ ds["M2020_gate"].attrs["long_name"] = "Mankoff (2020) gate nearest outlet"
 ds["M2020_gate_dist"] = (("station"), meta.loc["M2020_gate_dist"].replace(np.nan, value=-1).astype(np.uint32))
 ds["M2020_gate_dist"].attrs["long_name"] = "Mankoff (2020) gate nearest outlet distance"
 
-ds["B2015_name"] = (("station"), meta.loc["B2015_name"].replace(np.nan, value=-1).astype(np.uint32))
+ds["B2015_name"] = (("station"), meta.loc["B2015_name"])
 ds["B2015_name"].attrs["long_name"] = "Bjørk (2015) Official Name gate nearest outlet"
-ds["B2015_dist"] = (("station"), meta.loc["B2015_dist"].replace(np.nan, value=-1).astype(np.uint32))
+ds["B2015_dist"] = (("station"), meta.loc["B2015_dist"])
 ds["B2015_dist"].attrs["long_name"] = "Bjørk (2015) Official Name point distance"
 
 if 'ice' in BSVFILE:
