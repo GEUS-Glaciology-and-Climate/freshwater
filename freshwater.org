@@ -5602,7 +5602,7 @@ for line in $(cat ./tmp/obs_loc.bsv); do
   echo $line
   IFS="|" read x y abb <<< ${line[@]}
   echo $abb $x $y
-  python ./runoff.py --base ./freshwater --roi=${x},${y} -u -r > ./dat/runoff/${abb}.csv
+  python ./discharge.py --base ./freshwater --roi=${x},${y} -u -d > ./dat/runoff/${abb}.csv
 done
 #+END_SRC
 
@@ -6114,16 +6114,6 @@ for k in obs.keys():
 
     plt.savefig("./fig/" + k + "_tukey_scatter.png", bbox_inches='tight', dpi=300)
 #+END_SRC
-
-#+RESULTS:
-: /home/kdm/local/miniconda3/envs/freshwater/lib/python3.8/site-packages/seaborn/distributions.py:434: UserWarning: The following kwargs were not used by contour: 'linewidth'
-:   cset = contour_func(xx, yy, z, n_levels, **kwargs)
-: <ipython-input-43-041ea3bb733d>:275: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
-:   plt.savefig("./fig/" + k + "_tukey_scatter.png", bbox_inches='tight', dpi=300)
-: <ipython-input-43-041ea3bb733d>:97: RuntimeWarning: invalid value encountered in log10
-:   df = np.log10(df)
-: <ipython-input-43-041ea3bb733d>:182: RuntimeWarning: invalid value encountered in log10
-:   df = np.log10(df)
 
 *** Stack
 
