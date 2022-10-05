@@ -2,6 +2,8 @@
 * Table of contents                               :toc_5:noexport:
 - [[#greenland-liquid-water-discharge-from-1950-through-2021][Greenland liquid water discharge from 1950 through 2021]]
   - [[#updates-since-last-publication][Updates since last publication]]
+    - [[#v-2022-10][v 2022-10]]
+    - [[#v-2022-08][v 2022-08]]
 - [[#warning][WARNING]]
 - [[#related-work][Related Work]]
 - [[#citation][Citation]]
@@ -47,7 +49,20 @@ The source for this work is hosted on GitHub at https://github.com/GEUS-PROMICE/
 
 ** Updates since last publication
 
-v3 of the data has the following changes (see GitHub diff above for more details):
+*** v 2022-10
+
+v 2022-10 has the following changes:
++ No change to the data values
++ Data product has been reformatted to 4 NetCDF files: One per RCM (2) and domain (2), each containing all years of data
+  + E.g., MAR_ice, MAR_land, RACMO_ice, RACMO_Land
++ Data files are now part of the dataset that contains the Geopackages of streams, outlets, and basins, rather than their own dataset on the dataverse
+  + DOI: .... has been Deaccesioned
+  + DOI: .... now contains the discharge data
++ The README has been updated to show some additional examples using the metadata added in v3
+
+*** v 2022-08
+
+v 2022-08 has the following changes (see GitHub diff above for more details):
 + Update from BedMachine v3 to v4
 + Data now spans 1950 through 2021, instead of 1958 through 2019
 + Internal NetCDF variable renamed from 'runoff' to 'discharge'
@@ -92,7 +107,7 @@ v3 of the data has the following changes (see GitHub diff above for more details
 * Accessing this data
 ** Introduction
 
-NOTE: Data can be accessed directly from the NetCDF files. Querying the NetCDF files directly allows more advanced queries on the metadata, for example, `all outlets with Jakobshavn Isbræ as the nearest basin, excluding outlets more than 5 km away`. The `5 km` filter removes  stream discharge from Disko Island which has Jakobshavn Isbræ as the nearest basin, but should not be counted as discharge from that basin.
+NOTE: Data can be accessed directly from the NetCDF files. Querying the NetCDF files directly allows more advanced queries on the metadata, for example, `all outlets with Jakobshavn Isbræ as the nearest discharge gate, excluding outlets more than 5 km away`. The `5 km` filter removes  stream discharge from Disko Island which has Jakobshavn Isbræ as the nearest discharge gate, but should not be counted as discharge from that basin.
 
 If you prefer to not access the NetCDF files directly, after the data have been downloaded the =discharge.py= script allows access to outlets, basins, and their discharge within a region of interest (ROI). The ROI can be a point, a list describing a polygon, or a file. Optionally, upstream outlets, basins, and discharge from any land outlet(s) can be included. The script can be called from the command line (CLI) or within Python.
 
@@ -109,43 +124,36 @@ This script queries two database:
 + land :: The land coast outlets and land basins.
 + ice :: ice margin outlets and ice basins.
 
-The folder structure required is a =root= folder (named =freshwater= in the examples below, but can be anything) and then a =land= and =ice= sub-folder. The geospatial files for =land= and =ice= must be in these folders (i.e. the k=1.0 Streams, Outlets, and Basins dataset from https://dataverse.geus.dk/dataverse/freshwater). Then, each of the =land= and =ice= folders must contain a =discharge= folder with the appropriate (MAR & RACMO) yearly discharge NetCDF files.
+The folder structure required is a =root= folder (named =freshwater= in the examples below, but can be anything) and then a =land= and =ice= sub-folder. The geospatial files for =land= and =ice= must be in these folders (i.e. the k=1.0 Streams, Outlets, and Basins dataset from https://dataverse.geus.dk/dataverse/freshwater), along with a =MAR.nc= and =RACMO.nc= in each of the =land= and =ice= folders.
 
 Example:
 
 #+BEGIN_SRC bash :results verbatim :exports results
-find ./freshwater/land/ -maxdepth 1 | sort
-echo "./freshwater/land/discharge/MAR_<yyyy>.nc"
-echo "./freshwater/land/discharge/RACMO_<yyyy>.nc"
-find ./freshwater/ice/ -maxdepth 1 | sort
-echo "./freshwater/ice/discharge/MAR_<yyyy>.nc"
-echo "./freshwater/ice/discharge/RACMO_<yyyy>.nc"
+find ./freshwater/land/ ./freshwater/ice/ -maxdepth 1 | sort
 #+END_SRC
 
 #+RESULTS:
 #+begin_example
-./freshwater/land/
-./freshwater/land/basins.csv
-./freshwater/land/basins_filled.gpkg
-./freshwater/land/basins.gpkg
-./freshwater/land/discharge
-./freshwater/land/outlets.csv
-./freshwater/land/outlets.gpkg
-./freshwater/land/streams.csv
-./freshwater/land/streams.gpkg
-./freshwater/land/discharge/MAR_<yyyy>.nc
-./freshwater/land/discharge/RACMO_<yyyy>.nc
 ./freshwater/ice/
 ./freshwater/ice/basins.csv
 ./freshwater/ice/basins_filled.gpkg
 ./freshwater/ice/basins.gpkg
-./freshwater/ice/discharge
+./freshwater/ice/MAR.nc
 ./freshwater/ice/outlets.csv
 ./freshwater/ice/outlets.gpkg
+./freshwater/ice/RACMO.nc
 ./freshwater/ice/streams.csv
 ./freshwater/ice/streams.gpkg
-./freshwater/ice/discharge/MAR_<yyyy>.nc
-./freshwater/ice/discharge/RACMO_<yyyy>.nc
+./freshwater/land/
+./freshwater/land/basins.csv
+./freshwater/land/basins_filled.gpkg
+./freshwater/land/basins.gpkg
+./freshwater/land/MAR.nc
+./freshwater/land/outlets.csv
+./freshwater/land/outlets.gpkg
+./freshwater/land/RACMO.nc
+./freshwater/land/streams.csv
+./freshwater/land/streams.gpkg
 #+end_example
 
 *** Warnings
@@ -174,14 +182,14 @@ echo "./freshwater/ice/discharge/RACMO_<yyyy>.nc"
 See =environment.yml= file in Git repository, or
 
 #+BEGIN_SRC bash
-conda create -n freshwater_user python=3.7 xarray=0.15.1 fiona=1.8.13 shapely=1.7.0 geopandas=0.7.0 netcdf4=1.5.3 dask=2.15.0
+conda create -n freshwater_user python=3.7 xarray=0.20.2 fiona=1.8.21 shapely=1.8.2 geopandas=0.7.0 netcdf4=1.6.0 dask=2.15.0
 conda activate freshwater_user
 #+END_SRC
 
 ** Examples
 :PROPERTIES:
 :header-args:jupyter-python: :kernel freshwater :session using :eval no-export :exports both
-:header-args:bash: :eval no-export :session "*freshwater-shell*" :results verbatim :exports both
+:header-args:bash: :eval no-export :session "*freshwater-shell*" :results verbatim :exports both :prologue conda activate freshwater_user
 :END:
 
 *** Command line interface
@@ -478,8 +486,6 @@ ds = discharge(base="./freshwater", roi="-51.50,66.93 -51.21,66.74 -49.44,66.91 
 #+END_SRC
 
 #+RESULTS:
-: /home/kdm/local/miniconda3/envs/freshwater/lib/python3.7/site-packages/xarray/core/alignment.py:304: FutureWarning: Index.__or__ operating as a set operation is deprecated, in the future this will be a logical operation matching Series.__or__.  Use index.union(other) instead
-:   index = joiner(matching_indexes)
 
 What are the dimensions (i.e. how many outlets in each domain?)
 

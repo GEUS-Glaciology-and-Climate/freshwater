@@ -126,7 +126,7 @@ class discharge(object):
         o = o.reset_index().drop(columns="index").rename(columns={"cat":"id"})
         o.index.name = "index"
         o = gp.GeoDataFrame(o, crs="EPSG:3413").set_geometry("basin") # GeoPandas 0.7
-        # o = gp.GeoDataFrame(o).to_crs("EPSG:3413").set_geometry("basin") # GeoPandas 0.8
+        # o = gp.GeoDataFrame(o).set_geometry("basin").to_crs("EPSG:3413") # GeoPandas 0.8
         return o
 
 
@@ -134,13 +134,11 @@ class discharge(object):
         """Load discharge within ROI. Return this object to the end-user."""
         self.msg("Loading discharge data...")
         for key in self._discharge.keys():
-            # r,d,k = key.split("_")
             r,d = key.split("_")
             self.msg("    Loading %s" % key)
-            # file_list = self._base + "/" + d+"_"+k + "/discharge/" + r + "_*.nc"
-            file_list = self._base + "/" + d + "/discharge/" + r + "_*.nc"
             # load all discharge at all outlets
-            self._discharge[key] = xr.open_mfdataset(file_list, combine="by_coords").rename({"discharge": key})
+            fname = self._base + "/" + d + "/" + r + ".nc"
+            self._discharge[key] = xr.open_mfdataset(fname, engine='netcdf4').rename({"discharge": key})
 
         self.outlets()           # load outlets, and subset them to ROI
         self.discharge_at_outlets() # subset discharge to these outlets (also populate _discharge_u)

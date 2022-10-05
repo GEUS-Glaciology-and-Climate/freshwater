@@ -2670,6 +2670,47 @@ ds.to_netcdf(OUTFILE, unlimited_dims='time', encoding={'discharge': {'zlib': Tru
 
 #+RESULTS:
 
+*** Combine NetCDF 
+
+#+BEGIN_SRC jupyter-python :tangle netcdf_combine.py
+import xarray as xr
+
+for d in ['ice','land']:
+    for r in ['RACMO','MAR']:
+        print(d,r)
+        ds = xr.open_mfdataset('./freshwater/'+d+'/discharge/'+r+'_*.nc', combine='by_coords')
+
+        for v in ['Z2012_sector', 'Z2012_sector_dist',
+                  'M2019_ID','M2019_ID_dist','M2019_region','M2019_basin',
+                  'M2020_gate','M2020_gate_dist',
+                  'B2015_name','B2015_dist']:
+            ds[v] = ds[v].isel({'time':1}).squeeze()
+            
+        if d == 'ice':
+            for v in ['coast_id','coast_lat','coast_lon','coast_alt']:
+                ds[v] = ds[v].isel({'time':1}).squeeze()
+            
+        for v in ['M2019_basin','M2019_region','B2015_name']:
+            ds[v] = ds[v].astype(str)
+
+        for v in ['B2015_dist','M2020_gate_dist','M2020_gate',
+                  'M2019_ID_dist','M2019_ID','Z2012_sector_dist']:
+            ds[v] = ds[v].astype(np.uint32)
+        
+        ds.to_netcdf('./freshwater/'+d+'/'+r+'.nc',
+                     unlimited_dims='time', 
+                     encoding={'discharge': {'zlib': True, 'complevel': 2},
+                               'Z2012_sector': {'zlib': True, 'complevel': 2},
+                               'M2019_ID': {'zlib': True, 'complevel': 2},
+                               'M2019_basin': {'zlib': True, 'complevel': 2},
+                               'M2019_region': {'zlib': True, 'complevel': 2},
+                               'B2015_name': {'zlib': True, 'complevel': 2},
+                               'M2020_gate': {'zlib': True, 'complevel': 2},
+                               }, 
+                     engine='netcdf4', mode='w')
+        
+#+END_SRC
+
 ** Makefile
 :PROPERTIES:
 :CUSTOM_ID: sec:makefile
@@ -2706,6 +2747,7 @@ run: FORCE
 	
 	# create end-user data product
 	parallel --bar "python bsv2netcdf.py {}" ::: $$(ls dat/*_runoff_*.bsv)
+	python netcdf_combine.py
 
 dist: freshwater.zip
 	zip -r freshwater.zip freshwater
