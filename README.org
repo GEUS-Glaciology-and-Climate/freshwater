@@ -39,6 +39,8 @@ This is the source for "Greenland liquid water discharge from 1958 through 2019"
   + Publication: [[https://doi.org/10.5194/essd-12-1367-2020][doi:10.5194/essd-12-1367-2020]]
   + Source: https://github.com/GEUS-PROMICE/ice_discharge/
   + Data: [[https://doi.org/10.22008/promice/data/ice_discharge][doi:10.22008/promice/data/ice_discharge]]
+    + Contains basins for [[https://doi.org/10.22008/FK2/KIDYD1][k=0.8]] (ice only), [[https://doi.org/10.22008/FK2/TARK8O][0.9]] (ice only), and [[https://doi.org/10.22008/FK2/XKQVL7][1.0]] (ice and land) scenarios
+    + Discharge data is included in the [[https://doi.org/10.22008/FK2/XKQVL7][Streams, Outlets, and Basins [k=1.0]]]
 
 
 The source for this work is hosted on GitHub at https://github.com/GEUS-PROMICE/freshwater. GitHub [[https://github.com/mankoff/freshwater/issues?utf8=%E2%9C%93&q=is%3Aissue][issues]] are used to collect suggested improvements to the paper or problems that made it through review. The work may be under be under active development, including updating data (and therefore tables) within the source document.
@@ -108,6 +110,26 @@ v 2022-08 has the following changes (see GitHub diff above for more details):
 ** Introduction
 
 NOTE: Data can be accessed directly from the NetCDF files. Querying the NetCDF files directly allows more advanced queries on the metadata, for example, `all outlets with Jakobshavn Isbræ as the nearest discharge gate, excluding outlets more than 5 km away`. The `5 km` filter removes  stream discharge from Disko Island which has Jakobshavn Isbræ as the nearest discharge gate, but should not be counted as discharge from that basin.
+
+As an example, it is easiest to begin working with the outlets, save subsetted data, visually check in QGIS, and then when your algorithm appears to work, apply the same query to the discharge NetCDF files. Example:
+
+#+BEGIN_SRC jupyter-python :exports code
+import pandas as pd
+import geopandas as gpd
+
+df = pd.read_csv('./freshwater/ice/outlets.csv', index_col=0)
+gdf = gp.GeoDataFrame(df, geometry=gp.points_from_xy(df['lon'],df['lat']))
+
+# select subglacial discharge within 2.5 km of basins
+gdf = gdf[(gdf['elev'] < -10) &
+          (gdf['M2019_ID_dist'] < 2500)]
+
+gdf.to_file("foo.gpkg", driver="GPKG")
+#+END_SRC
+
+Similar queries might include:
++ Pandas =groupby= to combine outlets per gate, basin, sector, or region
++ Examining the ice outlet location, and the downstream coastal outlet location. If the two are the same, then the outlet is marine terminating. This may give better results than querying based on the BedMachine provided =elev= metadata.
 
 If you prefer to not access the NetCDF files directly, after the data have been downloaded the =discharge.py= script allows access to outlets, basins, and their discharge within a region of interest (ROI). The ROI can be a point, a list describing a polygon, or a file. Optionally, upstream outlets, basins, and discharge from any land outlet(s) can be included. The script can be called from the command line (CLI) or within Python.
 
