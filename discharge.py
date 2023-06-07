@@ -10,6 +10,7 @@ from shapely.geometry import Point, Polygon
 from argparse import ArgumentParser
 import fiona
 
+fiona.drvsupport.supported_drivers["KML"] = "rw" # https://gis.stackexchange.com/a/258370/609
 fiona.drvsupport.supported_drivers["LIBKML"] = "rw" # https://gis.stackexchange.com/a/258370/609
 
 class discharge(object):
@@ -85,8 +86,8 @@ class discharge(object):
         # df.groupby('id').first() solves this, except for the basin column that needs a custom aggregate fuction.
         # except we need to aggregate the 'basin' column to convert to multipolygon
         def p2mp(da): # polygon to multipolygon
-            from shapely.ops import cascaded_union
-            return cascaded_union(da)  # https://stackoverflow.com/questions/36774049/
+            from shapely.ops import unary_union # cascaded_union deprecated, replace with unary_union
+            return unary_union(da)  # https://stackoverflow.com/questions/36774049/
             
         for key in self._outlets.keys():
             if self._outlets[key] is not None:
@@ -110,7 +111,7 @@ class discharge(object):
                 otmp = self._outlets[key].reset_index()
                 # otmp["domain"], otmp["k"], otmp["upstream"] = d,k,False
                 otmp["domain"], otmp["upstream"] = key,False
-                o = o.append(otmp)
+                o = pd.concat([o, otmp]) # .append() deprecated
         if self._upstream: 
             for key in self._outlets_u.keys():
                 if self._outlets_u[key] is not None:
@@ -118,15 +119,16 @@ class discharge(object):
                     otmp = self._outlets_u[key].reset_index()
                     # otmp["domain"], otmp["k"], otmp["upstream"] = d,k,True
                     otmp["domain"], otmp["upstream"] = key,True
-                    o = o.append(otmp)
+                    o = pd.concat([o, otmp]) # .append() deprecated
         o['coast_id'] = o['coast_id'].fillna(-1).astype(int)
         o['coast_x'] = o['coast_x'].fillna(-1).astype(int)
         o['coast_y'] = o['coast_y'].fillna(-1).astype(int)
 
         o = o.reset_index().drop(columns="index").rename(columns={"cat":"id"})
         o.index.name = "index"
-        o = gp.GeoDataFrame(o, crs="EPSG:3413").set_geometry("basin") # GeoPandas 0.7
+        # o = gp.GeoDataFrame(o, crs="EPSG:3413").set_geometry("basin") # GeoPandas 0.7
         # o = gp.GeoDataFrame(o).set_geometry("basin").to_crs("EPSG:3413") # GeoPandas 0.8
+        o = gp.GeoDataFrame(o, crs="EPSG:3413", geometry="basin") # GeoPandas 0.9
         return o
 
 
