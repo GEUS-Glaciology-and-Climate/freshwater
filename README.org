@@ -204,8 +204,8 @@ find ./freshwater/land/ ./freshwater/ice/ -maxdepth 1 | sort
 See =environment.yml= file in Git repository, or
 
 #+BEGIN_SRC bash
-conda create -n freshwater_user python=3.7 xarray=0.20.2 fiona=1.8.21 shapely=1.8.2 geopandas=0.7.0 netcdf4=1.6.0 dask=2.15.0
-conda activate freshwater_user
+mamba create -n freshwater_user python=3.7 xarray=0.20.2 fiona=1.8.21 shapely=1.8.2 geopandas=0.7.0 netcdf4=1.6.0 dask=2.15.0
+mamba activate freshwater_user
 #+END_SRC
 
 ** Examples
