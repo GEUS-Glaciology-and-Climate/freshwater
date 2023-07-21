@@ -2930,34 +2930,34 @@ Band 1 Block=16620x1 Type=Int16, ColorInterp=Gray
 #+end_example
 
 
-*** BedMachine v4
+*** BedMachine v5
 
 #+NAME: BM4_md5sum_ncdump
 #+BEGIN_SRC bash :results verbatim :exports both
-md5sum ${DATADIR}/Morlighem_2017/BedMachineGreenland-2021-04-20.nc
+md5sum ${DATADIR}/Morlighem_2017/BedMachineGreenland-v5.nc
 echo ""
-ncdump -chs ${DATADIR}/Morlighem_2017/BedMachineGreenland-2021-04-20.nc
+ncdump -chs ${DATADIR}/Morlighem_2017/BedMachineGreenland-v5.nc
 #+END_SRC
 
 #+RESULTS: BM4_md5sum_ncdump
 #+begin_example
-11f50b15079b4a8eb06ec98c142ff4bf  /home/kdm/data/Morlighem_2017/BedMachineGreenland-2021-04-20.nc
+7387182a059dd8cad66ce7638eb0d7cd  /home/kdm/data/Morlighem_2017/BedMachineGreenland-v5.nc
 
-netcdf BedMachineGreenland-2021-04-20 {
+netcdf BedMachineGreenland-v5 {
 dimensions:
 	x = 10218 ;
 	y = 18346 ;
 variables:
 	char mapping ;
-		mapping:geoid = "eigen-6c4" ;
 		mapping:grid_mapping_name = "polar_stereographic" ;
 		mapping:latitude_of_projection_origin = 90. ;
 		mapping:standard_parallel = 70. ;
 		mapping:straight_vertical_longitude_from_pole = -45. ;
-		mapping:semi_major_axis = 6378273. ;
-		mapping:inverse_flattening = 298.27940504282 ;
 		mapping:false_easting = 0. ;
 		mapping:false_northing = 0. ;
+		mapping:proj4text = "+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs" ;
+		mapping:crs_wkt = "PROJCS[\"WGS 84 / NSIDC Sea Ice Polar Stereographic North\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",70],PARAMETER[\"central_meridian\",-45],PARAMETER[\"scale_factor\",1],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"X\",EAST],AXIS[\"Y\",NORTH],AUTHORITY[\"EPSG\",\"3413\"]]" ;
+		mapping:_Storage = "contiguous" ;
 	int x(x) ;
 		x:long_name = "Cartesian x-coordinate" ;
 		x:standard_name = "projection_x_coordinate" ;
@@ -2976,14 +2976,14 @@ variables:
 		mask:valid_range = 0b, 4b ;
 		mask:flag_values = 0b, 1b, 2b, 3b, 4b ;
 		mask:flag_meanings = "ocean ice_free_land grounded_ice floating_ice non_greenland_land" ;
-		mask:source = "gimpmask v2.0 (http://bprc.osu.edu/GDG/icemask.php) combined with coastline from Jeremie Mouginot" ;
+		mask:source = "gimpmask v2.0 (https://byrd.osu.edu/research/groups/glacier-dynamics/data/icemask) combined with coastline from Jeremie Mouginot" ;
 		mask:_Storage = "contiguous" ;
 	float surface(y, x) ;
 		surface:long_name = "ice surface elevation" ;
 		surface:standard_name = "surface_altitude" ;
 		surface:units = "meters" ;
 		surface:grid_mapping = "mapping" ;
-		surface:source = "gimpdem v2.1 (http://bprc.osu.edu/GDG/gimpdem.php)" ;
+		surface:source = "gimpdem v2.1 (https://byrd.osu.edu/research/groups/glacier-dynamics/data/gimpdem)" ;
 		surface:_Storage = "contiguous" ;
 		surface:_Endianness = "little" ;
 	float thickness(y, x) ;
@@ -3010,17 +3010,17 @@ variables:
 		errbed:source = "Mathieu Morlighem" ;
 		errbed:_FillValue = -9999s ;
 		errbed:_Storage = "chunked" ;
-		errbed:_ChunkSizes = 1835, 1022 ;
+		errbed:_ChunkSizes = 3670, 2044 ;
 		errbed:_DeflateLevel = 2 ;
 		errbed:_Shuffle = "true" ;
 		errbed:_Endianness = "little" ;
 	byte source(y, x) ;
-		source:long_name = "data source (0 = none, 1 = gimpdem, 2 = Mass conservation, 3 = synthetic, 4 = interpolation, 5 = hydrostatic equilibrium, 6 = kriging, 7 = RTOPO-2, 8 = gravity inversion, 10+ = bathymetry data)" ;
+		source:long_name = "data source (0 = none, 1 = gimpdem, 2 = Mass conservation, 3 = synthetic, 4 = interpolation, 5 = hydrostatic equilibrium, 6 = kriging, 7 = RTOPO-2, 8 = gravity inversion, 9 = Millan et al. 2021, 10+ = bathymetry data)" ;
 		source:grid_mapping = "mapping" ;
-		source:valid_range = 0b, 46b ;
-		source:flag_values = 0b, 1b, 2b, 3b, 4b, 5b, 6b, 7b, 8b, 10b, 11b, 12b, 13b, 14b, 15b, 16b, 17b, 18b, 19b, 20b, 21b, 22b, 23b, 24b, 25b, 26b, 27b, 28b, 29b, 30b, 31b, 32b, 33b, 34b, 35b, 36b, 37b, 38b, 39b, 40b, 41b, 42b, 43b, 44b, 45b, 46b ;
-		source:flag_meanings = "none gimpdem mass_conservation synthetic interpolation hydrodstatic_equilibrium kriging RTopo_2 gravity_inversion bathymetry1 bathymetry2 bathymetry3 bathymetry4 bathymetry5 bathymetry6 bathymetry7 bathymetry8 bathymetry9 bathymetry10 bathymetry11 bathymetry12 bathymetry13 bathymetry14 bathymetry15 bathymetry16 bathymetry17 bathymetry18 bathymetry19 bathymetry20 bathymetry21 bathymetry22 bathymetry23 bathymetry24 bathymetry25 bathymetry26 bathymetry27 bathymetry28 bathymetry29 bathymetry30 bathymetry31 bathymetry32 bathymetry33 bathymetry34 bathymetry35 bathymetry36 bathymetry37" ;
-		source:source = "Mathieu Morlighem, RTOPO-2" ;
+		source:valid_range = 0b, 50b ;
+		source:flag_values = 0b, 1b, 2b, 3b, 4b, 5b, 6b, 7b, 8b, 9b, 10b, 11b, 12b, 13b, 14b, 15b, 16b, 17b, 18b, 19b, 20b, 21b, 22b, 23b, 24b, 25b, 26b, 27b, 28b, 29b, 30b, 31b, 32b, 33b, 34b, 35b, 36b, 37b, 38b, 39b, 40b, 41b, 42b, 43b, 44b, 45b, 46b, 47b, 48b, 49b, 50b ;
+		source:flag_meanings = "none gimpdem mass_conservation synthetic interpolation hydrodstatic_equilibrium kriging RTopo_2 gravity_inversion millan_etal_2021 bathymetry1 bathymetry2 bathymetry3 bathymetry4 bathymetry5 bathymetry6 bathymetry7 bathymetry8 bathymetry9 bathymetry10 bathymetry11 bathymetry12 bathymetry13 bathymetry14 bathymetry15 bathymetry16 bathymetry17 bathymetry18 bathymetry19 bathymetry20 bathymetry21 bathymetry22 bathymetry23 bathymetry24 bathymetry25 bathymetry26 bathymetry27 bathymetry28 bathymetry29 bathymetry30 bathymetry31 bathymetry32 bathymetry33 bathymetry34 bathymetry35 bathymetry36 bathymetry37 bathymetry38 bathymetry39 bathymetry40 bathymetry41" ;
+		source:source = "Mathieu Morlighem" ;
 		source:_Storage = "contiguous" ;
 	byte dataid(y, x) ;
 		dataid:long_name = "data id" ;
@@ -3030,17 +3030,17 @@ variables:
 		dataid:flag_meanings = "GIMPdem Radar seismic multibeam" ;
 		dataid:source = "Mathieu Morlighem" ;
 		dataid:_Storage = "chunked" ;
-		dataid:_ChunkSizes = 2621, 1460 ;
+		dataid:_ChunkSizes = 4587, 2555 ;
 		dataid:_DeflateLevel = 1 ;
 		dataid:_Shuffle = "true" ;
 	short geoid(y, x) ;
-		geoid:long_name = "EIGEN-EC4 Geoid - WGS84 Ellipsoid difference" ;
+		geoid:long_name = "EIGEN-6C4 Geoid - WGS84 Ellipsoid difference" ;
 		geoid:standard_name = "geoid_height_above_reference_ellipsoid" ;
 		geoid:units = "meters" ;
 		geoid:grid_mapping = "mapping" ;
 		geoid:geoid = "eigen-6c4 (Forste et al 2014)" ;
 		geoid:_Storage = "chunked" ;
-		geoid:_ChunkSizes = 1835, 1022 ;
+		geoid:_ChunkSizes = 3670, 2044 ;
 		geoid:_DeflateLevel = 2 ;
 		geoid:_Shuffle = "true" ;
 		geoid:_Endianness = "little" ;
@@ -3049,7 +3049,7 @@ variables:
 		:Conventions = "CF-1.7" ;
 		:Title = "BedMachine Greenland" ;
 		:Author = "Mathieu Morlighem" ;
-		:version = "20-Apr-2021 (v4.10)" ;
+		:version = "28-Jul-2022 (v5.5)" ;
 		:nx = 10218. ;
 		:ny = 18346. ;
 		:Projection = "Polar Stereographic North (70N, 45W)" ;
@@ -3062,8 +3062,9 @@ variables:
 		:no_data = -9999. ;
 		:license = "No restrictions on access or use" ;
 		:Data_citation = "Morlighem M. et al., (2017), BedMachine v3: Complete bed topography and ocean bathymetry mapping of Greenland from multi-beam echo sounding combined with mass conservation, Geophys. Res. Lett., 44, doi:10.1002/2017GL074954. (http://onlinelibrary.wiley.com/doi/10.1002/2017GL074954/full)" ;
-		:_SuperblockVersion = 2 ;
-		:_IsNetcdf4 = 1 ;
+		:_NCProperties = "version=2,netcdf=4.7.4,hdf5=1.8.12" ;
+		:_SuperblockVersion = 0 ;
+		:_IsNetcdf4 = 0 ;
 		:_Format = "netCDF-4 classic model" ;
 }
 #+end_example
@@ -4142,20 +4143,10 @@ r.mapcalc "z_s = if(mask_o_l_i == 1, null(), z_s_ocean)"
 #+END_SRC
 
 
-*** BedMachine v4
+*** BedMachine v5
 :PROPERTIES:
-:CUSTOM_ID: import_BM4
+:CUSTOM_ID: import_BM5
 :END:
-
-BedMachine v4 no longer in EPSG:3413 format. Now in EPSG:3411. Extract from NetCDF to GeoTIFF and convert with the following:
-
-#+BEGIN_SRC bash :tangle no
-vars=$(cdo showname BedMachineGreenland-2021-04-20.nc)
-mkdir -p BMv4_3411 BMv4_3413
-parallel --bar "gdal_translate -co COMPRESS=DEFLATE NetCDF:BedMachineGreenland-2021-04-20.nc:{1} ./BMv4_3411/{1}.tif" ::: ${vars}
-parallel --bar "gdalwarp -co COMPRESS=DEFLATE -t_srs EPSG:3413 ./BMv4_3411/{1}.tif ./BMv4_3413/{1}.tif" ::: ${vars}
-#+END_SRC
-
 
 #+BEGIN_SRC bash :results verbatim
 log_info "Importing BedMachine"
@@ -4165,7 +4156,7 @@ ROOT=${DATADIR}/Morlighem_2017
 
 for var in mask surface thickness bed errbed geoid source; do
   echo $var
-  r.external source=${DATADIR}/Morlighem_2017/BMv4_3413/${var}.tif output=${var}
+  r.in.gdal -o input="NetCDF:${DATADIR}/Morlighem_2017/BedMachineGreenland-v5.nc:"${var} output=${var}
 done
 g.rename raster=surface,z_s
 g.rename raster=bed,z_b

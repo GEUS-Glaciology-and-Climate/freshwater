@@ -2,6 +2,7 @@
 * Table of contents                               :toc_5:noexport:
 - [[#greenland-liquid-water-discharge-from-1950-through-2021][Greenland liquid water discharge from 1950 through 2021]]
   - [[#updates-since-last-publication][Updates since last publication]]
+    - [[#v-2023][v 2023]]
     - [[#v-2022-10][v 2022-10]]
     - [[#v-2022-08][v 2022-08]]
 - [[#warning][WARNING]]
@@ -50,6 +51,12 @@ The source for this work is hosted on GitHub at https://github.com/GEUS-PROMICE/
 + The source for the published paper can be viewed at https://github.com/GEUS-PROMICE/freshwater/tree/10.5194/essd-12-2811-2020
 
 ** Updates since last publication
+
+*** v 2023
+
+v 2023 has the following changes from v2022-10. See 2023 Milestone and git log for more details
++ BedMachine updated to v5 from v4
++ 
 
 *** v 2022-10
 
