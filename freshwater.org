@@ -218,7 +218,7 @@ The time series product (daily discharge) is derived from daily runoff estimates
 R = ME + RA - RT - RF.
 \end{equation}
 
-In Eq. \ref{eq:runoff}, \(ME\) is melt, \(RA\) is rainfall, \(RT\) is retention, and \(RF\) is refreezing. In RACMO, retention occurs only when firn is present (not with bare ice). MAR does have a delay for bare ice runoff. Neither have a delay for land runoff. Both RCM outputs were provided regridded to the same 1 km grid using an offline statistical downscaling technique based on the local vertical runoff gradient applied to the subgrid topography citep:noel_2016,fettweis_2020. MAR (v 3.12; citet:delhasse_2020) ran with 7.5 km resolution and ERA5 6 h forcing. RACMO (v 2.3p2; citet:noel_2018,noel_2019) ran with 5.5 km resolution and ERA-Interim 6-hour forcing. Runoff is assigned an uncertainty of \pm15 % (Sect. \ref{sec:uncertain:RCM}).
+In Eq. \ref{eq:runoff}, \(ME\) is melt, \(RA\) is rainfall, \(RT\) is retention, and \(RF\) is refreezing. In RACMO, retention occurs only when firn is present (not with bare ice). MAR does have a delay for bare ice runoff. Neither have a delay for land runoff. Both RCM outputs were provided regridded to the same 1 km grid using an offline statistical downscaling technique based on the local vertical runoff gradient applied to the subgrid topography citep:noel_2016,fettweis_2020. MAR (v 3.13; citet:delhasse_2020) ran with 7.5 km resolution and ERA5 6 h forcing. RACMO (v 2.3p2; citet:noel_2018,noel_2019) ran with 5.5 km resolution and ERA-Interim 6-hour forcing. Runoff is assigned an uncertainty of \pm15 % (Sect. \ref{sec:uncertain:RCM}).
 
 ** River discharge observations
 
@@ -1388,7 +1388,7 @@ import numpy as np
 import xarray as xr
 
 <<get_DATADIR>>
-ds = xr.open_dataset(DATADIR+"/MAR/3.12-freshwater/MARv3.12-daily-ERA5-2000.nc")
+ds = xr.open_dataset(DATADIR+"/MAR/3.13-freshwater/MARv3.13-daily-ERA5-2000.nc")
 
 lon = ds['LON'].values.flatten()
 lat = ds['LAT'].values.flatten()
@@ -1609,16 +1609,16 @@ Over sea, you can use RF+SF
 
 area = xr.open_dataset("./tmp/err_2D_area_MAR.nc")
 
-ROOT=DATADIR+"/MAR/3.12-freshwater"
+ROOT=DATADIR+"/MAR/3.13-freshwater"
 
-filelist = np.sort(glob.glob(ROOT+"/MARv3.12-daily-ERA5-????.nc"))
+filelist = np.sort(glob.glob(ROOT+"/MARv3.13-daily-ERA5-????.nc"))
 years = [_.split("-")[-1].split(".")[0] for _ in filelist]
 for y in years:
     outfile = "./tmp/MAR_runoff_ice_" + y + ".nc"
     if os.path.exists(outfile):
         continue
 
-    infile = ROOT+"/MARv3.12-daily-ERA5-" + y + ".nc"
+    infile = ROOT+"/MARv3.13-daily-ERA5-" + y + ".nc"
     print("infile: ", infile, "outfile: ", outfile)
     ds = xr.open_mfdataset(infile, 
                            chunks={'time': 30}, 
@@ -1635,7 +1635,7 @@ for y in years:
     if os.path.exists(outfile):
         continue
 
-    infile = ROOT+"/MARv3.12-daily-ERA5-" + y + ".nc"
+    infile = ROOT+"/MARv3.13-daily-ERA5-" + y + ".nc"
     print("infile: ", infile, "outfile: ", outfile)
     ds = xr.open_mfdataset(infile, 
                            chunks={'time': 30},
@@ -1962,7 +1962,7 @@ r.mapcalc "mask_land_basin = if(not(isnull(basins@land_100)) & isnull(mask_ice_b
 r.mapcalc "mask_ice_land_basin = if(not(isnull(basins_filled@land_100)), 1, null())"
 
 g.region MAR@MAR -p
-r.in.gdal -o input="NetCDF:${DATADIR}/MAR/3.12-freshwater/MARv3.12-daily-ERA5-2000.nc:MSK" output=MSK
+r.in.gdal -o input="NetCDF:${DATADIR}/MAR/3.13-freshwater/MARv3.13-daily-ERA5-2000.nc:MSK" output=MSK
 r.region map=MSK region=MAR@MAR
 r.mapcalc "mask_ice_MAR = if((MSK == 2) & mask_ice_land_basin, 1, null())"
 r.mapcalc "mask_land_MAR = if((MSK == 1) & mask_ice_land_basin, 1, null())"
@@ -2135,7 +2135,7 @@ import xarray as xr
 import numpy as np
 
 <<get_DATADIR>>
-mask = xr.open_dataset(DATADIR+"/MAR/3.12-freshwater/MARv3.12-daily-ERA5-2000.nc")['MSK']
+mask = xr.open_dataset(DATADIR+"/MAR/3.13-freshwater/MARv3.13-daily-ERA5-2000.nc")['MSK']
 
 # First day match?   # convert mm/grid cell to m^3
 o = pd.read_csv('./dat/runoff_ice2margin_MAR.bsv', sep="|", index_col=0, nrows=1) * 1E-3 * 100 * 100
@@ -3075,34 +3075,34 @@ variables:
 + WARNING :: May be stale. Using pre-computed md5sum because it takes so long to calculate.
 
 #+BEGIN_SRC bash :results verbatim :exports both :session
-ROOT=${DATADIR}/MAR/3.12-freshwater
+ROOT=${DATADIR}/MAR/3.13-freshwater
 LIST=$(cd ${ROOT}; ls *.nc | { tee >(head -n4 >&3; cat >/dev/null) | tail -n4; } 3>&1  ) # first and last four files
 parallel --keep-order md5sum ${ROOT}/{} ::: ${LIST}
 #+END_SRC
 
 #+RESULTS:
-: f678065481615c0d74078dacf0350457  /home/kdm/data/MAR/3.12-freshwater/MARv3.12-daily-ERA5-2000.nc
-: ae0e868b79f0a9554779d85c0260115e  /home/kdm/data/MAR/3.12-freshwater/MARv3.12-daily-ERA5-2001.nc
-: 792b2794f606127aa3f00b215d641859  /home/kdm/data/MAR/3.12-freshwater/MARv3.12-daily-ERA5-2002.nc
-: 19ad04f82cce52403533582c4df236cf  /home/kdm/data/MAR/3.12-freshwater/MARv3.12-daily-ERA5-2003.nc
-: f678065481615c0d74078dacf0350457  /home/kdm/data/MAR/3.12-freshwater/MARv3.12-daily-ERA5-2000.nc
-: ae0e868b79f0a9554779d85c0260115e  /home/kdm/data/MAR/3.12-freshwater/MARv3.12-daily-ERA5-2001.nc
-: 792b2794f606127aa3f00b215d641859  /home/kdm/data/MAR/3.12-freshwater/MARv3.12-daily-ERA5-2002.nc
-: 19ad04f82cce52403533582c4df236cf  /home/kdm/data/MAR/3.12-freshwater/MARv3.12-daily-ERA5-2003.nc
+: 7daa88bfe68f36cf2bb3d12764bfadad  /home/kdm/data/MAR/3.13-freshwater/MARv3.13-daily-ERA5-1950.nc
+: 50cc1900742779e805e5324579ec7870  /home/kdm/data/MAR/3.13-freshwater/MARv3.13-daily-ERA5-1951.nc
+: 8ac7f5a937319cb543f87aee8777029e  /home/kdm/data/MAR/3.13-freshwater/MARv3.13-daily-ERA5-1952.nc
+: b9922ce8774366a7f30d12a521e0b20d  /home/kdm/data/MAR/3.13-freshwater/MARv3.13-daily-ERA5-1953.nc
+: f4b5e6b752efcd9eec004dc75cd912bc  /home/kdm/data/MAR/3.13-freshwater/MARv3.13-daily-ERA5-2019.nc
+: 64f2a047f794b04e38937f36ac98fbd6  /home/kdm/data/MAR/3.13-freshwater/MARv3.13-daily-ERA5-2020.nc
+: ef67efc9d87b4c2970b4ecaa493fd063  /home/kdm/data/MAR/3.13-freshwater/MARv3.13-daily-ERA5-2021.nc
+: e9d574a1bab385523d80f1e448378c6d  /home/kdm/data/MAR/3.13-freshwater/MARv3.13-daily-ERA5-2022.nc
 
 
 **** ncdump
 
 #+NAME: MAR_QC_ncdump
 #+BEGIN_SRC bash :results verbatim :exports both
-ROOT=${DATADIR}/MAR/3.12-freshwater
-ncdump -chs ${ROOT}/MARv3.12-daily-ERA5-2000.nc
+ROOT=${DATADIR}/MAR/3.13-freshwater
+ncdump -chs ${ROOT}/MARv3.13-daily-ERA5-2000.nc
 #+END_SRC
 
 #+RESULTS: MAR_QC_ncdump
 #+begin_example
 
-netcdf MARv3.12-daily-ERA5-2000 {
+netcdf MARv3.13-daily-ERA5-2000 {
 dimensions:
 	y = 2700 ;
 	x = 1496 ;
@@ -3130,6 +3130,17 @@ variables:
 		LON:_DeflateLevel = 6 ;
 		LON:_Shuffle = "true" ;
 		LON:_Endianness = "little" ;
+	float MEcorr(time, y, x) ;
+		MEcorr:units = "mmWE/day" ;
+		MEcorr:long_name = "Total melting (sub-pixel 1)" ;
+		MEcorr:standard_name = "Total_melting__sub-pixel_1_" ;
+		MEcorr:_FillValue = 9.96921e+36f ;
+		MEcorr:missing_value = 9.96921e+36f ;
+		MEcorr:_Storage = "chunked" ;
+		MEcorr:_ChunkSizes = 100, 2700, 1496 ;
+		MEcorr:_DeflateLevel = 6 ;
+		MEcorr:_Shuffle = "true" ;
+		MEcorr:_Endianness = "little" ;
 	float MSK(y, x) ;
 		MSK:units = "-" ;
 		MSK:long_name = "Land/Ice Mask" ;
@@ -3143,8 +3154,8 @@ variables:
 		MSK:_Endianness = "little" ;
 	float MSK_MAR(y, x) ;
 		MSK_MAR:units = "-" ;
-		MSK_MAR:long_name = "Original MAR 10x10km2 Ice Mask" ;
-		MSK_MAR:standard_name = "Original_MAR_10x10km2_Ice_Mask" ;
+		MSK_MAR:long_name = "Original MAR  5x 5km2 Ice Mask" ;
+		MSK_MAR:standard_name = "Original_MAR__5x_5km2_Ice_Mask" ;
 		MSK_MAR:_FillValue = 9.96921e+36f ;
 		MSK_MAR:missing_value = 9.96921e+36f ;
 		MSK_MAR:_Storage = "chunked" ;
@@ -3152,17 +3163,6 @@ variables:
 		MSK_MAR:_DeflateLevel = 6 ;
 		MSK_MAR:_Shuffle = "true" ;
 		MSK_MAR:_Endianness = "little" ;
-	float RU2(time, y, x) ;
-		RU2:units = "mmWE/day" ;
-		RU2:long_name = "Water run-off (sub-pixel 2)" ;
-		RU2:standard_name = "Water_run-off__sub-pixel_2_" ;
-		RU2:_FillValue = 9.96921e+36f ;
-		RU2:missing_value = 9.96921e+36f ;
-		RU2:_Storage = "chunked" ;
-		RU2:_ChunkSizes = 100, 2700, 1496 ;
-		RU2:_DeflateLevel = 6 ;
-		RU2:_Shuffle = "true" ;
-		RU2:_Endianness = "little" ;
 	float RUcorr(time, y, x) ;
 		RUcorr:units = "mmWEday" ;
 		RUcorr:long_name = "Water run-off (sub-pixel 1)" ;
@@ -3174,17 +3174,6 @@ variables:
 		RUcorr:_DeflateLevel = 6 ;
 		RUcorr:_Shuffle = "true" ;
 		RUcorr:_Endianness = "little" ;
-	float SMB2(time, y, x) ;
-		SMB2:units = "mmWE/day" ;
-		SMB2:long_name = "Surface Mass Balance (sub-pixel 2)" ;
-		SMB2:standard_name = "Surface_Mass_Balance__sub-pixel_2_" ;
-		SMB2:_FillValue = 9.96921e+36f ;
-		SMB2:missing_value = 9.96921e+36f ;
-		SMB2:_Storage = "chunked" ;
-		SMB2:_ChunkSizes = 100, 2700, 1496 ;
-		SMB2:_DeflateLevel = 6 ;
-		SMB2:_Shuffle = "true" ;
-		SMB2:_Endianness = "little" ;
 	float SMBcorr(time, y, x) ;
 		SMBcorr:units = "mmWE/day" ;
 		SMBcorr:long_name = "Surface Mass Balance (sub-pixel 1)" ;
@@ -3209,8 +3198,8 @@ variables:
 		SRF:_Endianness = "little" ;
 	float SRF_MAR(y, x) ;
 		SRF_MAR:units = "m" ;
-		SRF_MAR:long_name = "Original MAR 10x10km2 Surface height" ;
-		SRF_MAR:standard_name = "Original_MAR_10x10km2_Surface_height" ;
+		SRF_MAR:long_name = "Original MAR  5x 5km2 Surface height" ;
+		SRF_MAR:standard_name = "Original_MAR__5x_5km2_Surface_height" ;
 		SRF_MAR:_FillValue = 9.96921e+36f ;
 		SRF_MAR:missing_value = 9.96921e+36f ;
 		SRF_MAR:_Storage = "chunked" ;
@@ -3218,6 +3207,17 @@ variables:
 		SRF_MAR:_DeflateLevel = 6 ;
 		SRF_MAR:_Shuffle = "true" ;
 		SRF_MAR:_Endianness = "little" ;
+	float TTcorr(time, y, x) ;
+		TTcorr:units = "degC" ;
+		TTcorr:long_name = "2m-Temperature" ;
+		TTcorr:standard_name = "2m-Temperature" ;
+		TTcorr:_FillValue = 9.96921e+36f ;
+		TTcorr:missing_value = 9.96921e+36f ;
+		TTcorr:_Storage = "chunked" ;
+		TTcorr:_ChunkSizes = 100, 2700, 1496 ;
+		TTcorr:_DeflateLevel = 6 ;
+		TTcorr:_Shuffle = "true" ;
+		TTcorr:_Endianness = "little" ;
 	float time(time) ;
 		time:units = "DAYS since 2000-01-01 12:00:00" ;
 		time:long_name = "time" ;
@@ -3247,17 +3247,17 @@ variables:
 		y:_Endianness = "little" ;
 
 // global attributes:
-		:title = "Daily MARv3.12 outputs in 2000 interpolated on the 1x1km^2 grid from Noel et al. using ERA5" ;
+		:title = "Daily MARv3.13 outputs (5km) in 2000 interpolated on the 1x1km^2 grid from Noel et al. using ERA5" ;
 		:institution = "University of Liège (Belgium)" ;
 		:contact = "xavier.fettweis@uliege.be" ;
 		:institute = "University of Liège (Belgium)" ;
-		:model = "regional climate model MARv3.12.0" ;
+		:model = "regional climate model MARv3.13.0" ;
 		:forcing = "ERA5" ;
-		:creation_date = "2021-11-18-T114559Z" ;
-		:history = "Thu Nov 18 11:45:59 2021: ncks --cnk_dmn time,100 -L 6 MARv3.12-daily-ERA5-2000.nc MARv3.12-daily-ERA5-2000.nc4" ;
-		:NCO = "netCDF Operators version 4.8.1 (Homepage = http://nco.sf.net, Code = http://github.com/nco/nco)" ;
-		:_NCProperties = "version=2,netcdf=4.7.3,hdf5=1.10.5," ;
-		:_SuperblockVersion = 0 ;
+		:creation_date = "2023-07-13-T005156Z" ;
+		:history = "Thu Jul 13 00:51:56 2023: ncks --cnk_dmn time,100 -L 6 MARv3.13-daily-ERA5-2000.nc MARv3.13-daily-ERA5-2000.nc4" ;
+		:NCO = "netCDF Operators version 5.0.6 (Homepage = http://nco.sf.net, Code = http://github.com/nco/nco)" ;
+		:_NCProperties = "version=2,netcdf=4.8.1,hdf5=1.10.8" ;
+		:_SuperblockVersion = 2 ;
 		:_IsNetcdf4 = 1 ;
 		:_Format = "netCDF-4" ;
 }
