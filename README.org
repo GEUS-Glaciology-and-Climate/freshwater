@@ -122,6 +122,21 @@ v 2022-08 has the following changes (see GitHub diff above for more details):
 | 2022 --      | GEUS         | PROMICE                                   | Distribution (data hosting)            |
 | 2018 -- 2022 | GEUS         | PROMICE                                   | Development; publication; distribution |
 
+
+#+BEGIN_HTML
+<br><br>
+<table><tr>
+<td>
+<img src="https://github.com/GEUS-Glaciology-and-Climate/.github/blob/main/PROMICE.png" width="300px">
+</td>
+<td>
+<img src="https://raw.githubusercontent.com/NASA-GISS/.github/main/profile/nasa-logo-web-rgb.png" width="300 px">
+</td>
+</tr></table>
+<br><br>
+#+END_HTML
+
+
 * Accessing this data
 ** Introduction
 
