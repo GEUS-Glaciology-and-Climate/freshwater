@@ -1598,6 +1598,8 @@ Over land you can use RUcorr and RU2 in fct of MSK_GIMP
 Over sea, you can use RF+SF
 #+END_QUOTE
 
++ It appears this is now called 'MEcorr' as of MAR v3.13
+
 **** Extract MAR vars
 :PROPERTIES:
 :ID:       d698cc04-c4d7-4812-a274-fca1a83ee0eb
@@ -1640,7 +1642,7 @@ for y in years:
     ds = xr.open_mfdataset(infile, 
                            chunks={'time': 30},
                            combine='by_coords')
-    da = ds['RU2'] * (ds['MSK'] == 1) * area['Band1'].values       # runoff over land
+    da = ds['MEcorr'] * (ds['MSK'] == 1) * area['Band1'].values       # runoff over land
     da.variable.attrs = {'units':'mmWE/day','long_name':'Water runoff','standard_name':'Water runoff'}
     ds_sub = da.to_dataset(name='runoff')
     delayed_obj = ds_sub.to_netcdf(outfile, compute=False)
