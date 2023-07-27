@@ -6539,17 +6539,17 @@ for tool in gdal-bin parallel sed gawk netcdf-bin proj-bin nco cdo bash grass-gu
 #+END_SRC
 
 #+RESULTS:
-| bash       | 5.0-6ubuntu1.1      |
-| cdo        | 1.9.9~rc1-1         |
-| datamash   | 1.4-1               |
-| gawk       | 1:5.0.1+dfsg-1      |
-| gdal-bin   | 3.1.3+dfsg-1~focal0 |
-| grass-gui  | 7.8.4-1~focal1      |
-| nco        | 4.9.1-1build2       |
-| netcdf-bin | 1:4.7.3-1           |
-| parallel   | 20161222-1.1        |
-| proj-bin   | 7.1.1-1~focal0      |
-| sed        | 4.7-1               |
+| bash       |       5.1-6ubuntu1 |
+| cdo        |            2.0.4-1 |
+| datamash   |              1.7-2 |
+| gawk       |    1:5.1.0-1build3 |
+| gdal-bin   | 3.4.1+dfsg-1build4 |
+| grass-gui  |            7.8.7-1 |
+| nco        |            5.0.6-1 |
+| netcdf-bin |          1:4.8.1-1 |
+| parallel   |      20210822+ds-2 |
+| proj-bin   |            8.2.1-1 |
+| sed        |       4.8-1ubuntu2 |
 
 
 *** Org Mode
@@ -6558,11 +6558,11 @@ for tool in gdal-bin parallel sed gawk netcdf-bin proj-bin nco cdo bash grass-gu
 #+END_SRC
 
 #+RESULTS:
-: Org mode version 9.4 (9.4-19-gb1de0c-elpaplus @ /home/kdm/.emacs.d/elpa/org-plus-contrib-20201019/)
+: Org mode version 9.5.5 (release_9.5.5 @ /home/kdm/local/src/org-mode/lisp/)
 
 *** Python
 
-The code below produces [[./environment.yml]] when this file is exported. If that file exists, then =conda env create= and =source activate PROJECTNAME= will install all the python packages used in this document.
+The code below produces [[./environment.yml]] when this file is exported. If that file exists, then ~mamba env create -f environment.yml~ and ~mamba activate freshwater~ will install all the python packages used in this document.
 
 #+NAME: conda_env 
 #+BEGIN_SRC bash :cmdline -i :results verbatim :eval no-export :exports both
