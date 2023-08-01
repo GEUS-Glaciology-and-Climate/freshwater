@@ -2776,7 +2776,7 @@ clean_sob:
 
 #+NAME: ArcticDEM_provenance
 #+BEGIN_SRC bash :results verbatim :exports both
-file=${DATADIR}/ArcticDEM/arcticdem_mosaic_100m_v3.0.tif
+file=${DATADIR}/ArcticDEM/arcticdem_mosaic_100m_v4.1_dem.tif
 md5sum ${file}
 echo ""
 gdalinfo ${file}
@@ -2785,21 +2785,29 @@ gdalinfo ${file}
 #+RESULTS: ArcticDEM_provenance
 #+begin_example
 
-53f6024b12f216c8d965ffe428289f20  /home/kdm/data/ArcticDEM/arcticdem_mosaic_100m_v3.0.tif
+be66611e17eb925404daa080e690522a  /home/kdm/data/ArcticDEM/arcticdem_mosaic_100m_v4.1_dem.tif
 
 Driver: GTiff/GeoTIFF
-Files: /home/kdm/data/ArcticDEM/arcticdem_mosaic_100m_v3.0.tif
-Size is 74000, 75000
+Files: /home/kdm/data/ArcticDEM/arcticdem_mosaic_100m_v4.1_dem.tif
+Size is 74002, 75002
 Coordinate System is:
-PROJCRS["unnamed",
+PROJCRS["WGS 84 / NSIDC Sea Ice Polar Stereographic North",
     BASEGEOGCRS["WGS 84",
-        DATUM["World Geodetic System 1984",
+        ENSEMBLE["World Geodetic System 1984 ensemble",
+            MEMBER["World Geodetic System 1984 (Transit)"],
+            MEMBER["World Geodetic System 1984 (G730)"],
+            MEMBER["World Geodetic System 1984 (G873)"],
+            MEMBER["World Geodetic System 1984 (G1150)"],
+            MEMBER["World Geodetic System 1984 (G1674)"],
+            MEMBER["World Geodetic System 1984 (G1762)"],
+            MEMBER["World Geodetic System 1984 (G2139)"],
             ELLIPSOID["WGS 84",6378137,298.257223563,
-                LENGTHUNIT["metre",1]]],
+                LENGTHUNIT["metre",1]],
+            ENSEMBLEACCURACY[2.0]],
         PRIMEM["Greenwich",0,
             ANGLEUNIT["degree",0.0174532925199433]],
         ID["EPSG",4326]],
-    CONVERSION["Polar Stereographic (variant B)",
+    CONVERSION["US NSIDC Sea Ice polar stereographic north",
         METHOD["Polar Stereographic (variant B)",
             ID["EPSG",9829]],
         PARAMETER["Latitude of standard parallel",70,
@@ -2815,34 +2823,40 @@ PROJCRS["unnamed",
             LENGTHUNIT["metre",1],
             ID["EPSG",8807]]],
     CS[Cartesian,2],
-        AXIS["(E)",south,
-            MERIDIAN[90,
-                ANGLEUNIT["degree",0.0174532925199433,
-                    ID["EPSG",9122]]],
+        AXIS["easting (X)",south,
+            MERIDIAN[45,
+                ANGLEUNIT["degree",0.0174532925199433]],
             ORDER[1],
             LENGTHUNIT["metre",1]],
-        AXIS["(N)",south,
-            MERIDIAN[180,
-                ANGLEUNIT["degree",0.0174532925199433,
-                    ID["EPSG",9122]]],
+        AXIS["northing (Y)",south,
+            MERIDIAN[135,
+                ANGLEUNIT["degree",0.0174532925199433]],
             ORDER[2],
-            LENGTHUNIT["metre",1]]]
+            LENGTHUNIT["metre",1]],
+    USAGE[
+        SCOPE["Polar research."],
+        AREA["Northern hemisphere - north of 60°N onshore and offshore, including Arctic."],
+        BBOX[60,-180,90,180]],
+    ID["EPSG",3413]]
 Data axis to CRS axis mapping: 1,2
-Origin = (-4000000.000000000000000,4100000.000000000000000)
+Origin = (-4000100.000000000000000,4100100.000000000000000)
 Pixel Size = (100.000000000000000,-100.000000000000000)
 Metadata:
   AREA_OR_POINT=Area
 Image Structure Metadata:
   COMPRESSION=LZW
   INTERLEAVE=BAND
+  LAYOUT=COG
+  PREDICTOR=3
 Corner Coordinates:
-Upper Left  (-4000000.000, 4100000.000) (179d17'33.65"E, 40d21'21.16"N)
-Lower Left  (-4000000.000,-3400000.000) ( 94d38' 7.67"W, 44d 4' 3.58"N)
-Upper Right ( 3400000.000, 4100000.000) ( 95d19'55.77"E, 43d27'58.63"N)
-Lower Right ( 3400000.000,-3400000.000) (  0d 0' 0.01"E, 47d35' 3.32"N)
+Upper Left  (-4000100.000, 4100100.000) (179d17'33.71"E, 40d21'17.26"N)
+Lower Left  (-4000100.000,-3400100.000) ( 94d38' 7.22"W, 44d 3'59.59"N)
+Upper Right ( 3400100.000, 4100100.000) ( 95d19'55.26"E, 43d27'54.66"N)
+Lower Right ( 3400100.000,-3400100.000) (  0d 0' 0.01"E, 47d34'59.22"N)
 Center      ( -300000.000,  350000.000) (175d36' 4.66"E, 85d44'47.27"N)
-Band 1 Block=256x256 Type=Float32, ColorInterp=Gray
+Band 1 Block=512x512 Type=Float32, ColorInterp=Gray
   NoData Value=-9999
+  Overviews: 37001x37501, 18500x18750, 9250x9375, 4625x4687, 2312x2343, 1156x1171, 578x585, 289x292
 #+end_example
 
 *** Citterio 2013
@@ -4121,7 +4135,7 @@ r.null mask_ice null=0
 log_info "Importing ArcticDEM"
 g.mapset -c ArcticDEM
 
-r.external source=${DATADIR}/ArcticDEM/arcticdem_mosaic_100m_v3.0.tif output=arctic_raw # all arctic
+r.external source=${DATADIR}/ArcticDEM/arcticdem_mosaic_100m_v4.1_dem.tif output=arctic_raw # all arctic
 
 g.region raster=mask_ocean@GIMP_0714 align=arctic_raw
 
