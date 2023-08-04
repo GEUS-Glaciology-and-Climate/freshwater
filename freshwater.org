@@ -45,7 +45,7 @@
 #+RESULTS: workflow-update
 
 #+BEGIN_EXPORT LaTeX
-\title{Greenland liquid water discharge from 1950 through December 2021}
+\title{Greenland liquid water discharge from 1950 through December 2022}
 \Author[1]{Kenneth D.}{Mankoff}
 \Author[2]{Brice}{Noël}
 \Author[3]{Xavier}{Fettweis}
@@ -79,7 +79,7 @@
 #+END_EXPORT
 
 #+BEGIN_abstract
-Greenland runoff, from ice mass loss and rainfall, is increasing. That runoff, as discharge, impacts the physical, chemical, and biological properties of the adjacent fjords. However, where and when the discharge occurs is not readily available in an open database. Here we provide data sets of high-resolution Greenland hydrologic outlets, basins, and streams, as well as a daily 1950 through December 2021 time series of Greenland liquid water discharge for each outlet. The data include src_bash{cat ./freshwater/ice/basins.csv | grep -v "^cat" |wc -l} {{{results(=24500=)}}} ice marginal outlets and upstream basins, and src_bash{cat ./freshwater/land/basins.csv | grep -v "^cat" |wc -l} {{{results(=29638=)}}} land coast outlets and upstream basins, derived from the 100 m ArcticDEM and 150 m BedMachine. At each outlet there are daily discharge data for src_jupyter-python[:eval no :session export]{import xarray as xr; ds = xr.open_mfdataset("./freshwater/land/discharge/*.nc", combine='nested', concat_dim='time'); (ds.time.max() - ds.time.min()).values.astype('timedelta64[D]').tolist().days+1} {{{results(=26298=)}}} days - ice sheet runoff routed subglacially to ice margin outlets, and land runoff routed to coast outlets - from two regional climate models (RCMs; MAR and RACMO).
+Greenland runoff, from ice mass loss and rainfall, is increasing. That runoff, as discharge, impacts the physical, chemical, and biological properties of the adjacent fjords. However, where and when the discharge occurs is not readily available in an open database. Here we provide data sets of high-resolution Greenland hydrologic outlets, basins, and streams, as well as a daily 1950 through December 2022 time series of Greenland liquid water discharge for each outlet. The data include src_bash{cat ./freshwater/ice/basins.csv | grep -v "^cat" |wc -l} {{{results(=24500=)}}} ice marginal outlets and upstream basins, and src_bash{cat ./freshwater/land/basins.csv | grep -v "^cat" |wc -l} {{{results(=29638=)}}} land coast outlets and upstream basins, derived from the 100 m ArcticDEM and 150 m BedMachine. At each outlet there are daily discharge data for src_jupyter-python[:eval no :session export]{import xarray as xr; ds = xr.open_mfdataset("./freshwater/land/discharge/*.nc", combine='nested', concat_dim='time'); (ds.time.max() - ds.time.min()).values.astype('timedelta64[D]').tolist().days+1} {{{results(=26298=)}}} days - ice sheet runoff routed subglacially to ice margin outlets, and land runoff routed to coast outlets - from two regional climate models (RCMs; MAR and RACMO).
 Our sensitivity study of how outlet location changes for every inland cell based on subglacial routing assumptions, shows that most inland cells where runoff occurs are not highly sensitive to those routing assumptions, and outflow location does not move far. We compare RCM results with 10 gauges from streams with discharge rates spanning 4 orders of magnitude. Results show that for daily discharge at the individual basin scale the 5 to 95 % prediction interval between modeled discharge and observations generally falls within plus or minus a factor of 5 (half an order of magnitude, or +500%/-80%). Results from this study are available at
 doi:10.22008/promice/freshwater citep:GEUS_freshwater_paper and code is available at https://github.com/GEUS-Glaciology-and-Climate/freshwater citep:github_freshwater.
 #+END_abstract
@@ -189,7 +189,7 @@ This is captured programatically by [[workflow-update]]
 
 The discussion of quality control and land runoff with depth < 0 as invalid has been updated. Land runoff with depth << 0 is possible and occurs when land-source runoff enters the subglacial system and discharges subglacially at depth from a marine terminating glacier. This occurs often when runoff is sourced from nunatuks. This scenario also generates land outlets that exist outside of land basins.
 
-Various input data products have been upgraded. BedMachine has been upgraded from v3 to v5. MAR has been upgraded from version 3.11 to 3.12, and the simulation period has been extended from 1979 through September 2019, to 1950 through September 2021. The RACMO simulation period has been extended from 1958 through September 2019 to 1958 through December 2021. Prior to 1990, the RACMO data is unchanged (6-hourly ERA-Interim forcing). From 1990 onward, we now use 3-hourly ERA5 forcing. Both the MAR and RACMO domain boundaries have been corrected, fixing a small alignment error in the initial version.
+Various input data products have been upgraded. BedMachine has been upgraded from v3 to v5. MAR has been upgraded from version 3.11 to 3.12, and the simulation period has been extended from 1979 through September 2019, to 1950 through December 2022. The RACMO simulation period has been extended from 1958 through September 2019 to 1958 through December 2022. Prior to 1990, the RACMO data is unchanged (6-hourly ERA-Interim forcing). From 1990 onward, we now use 3-hourly ERA5 forcing. Both the MAR and RACMO domain boundaries have been corrected, fixing a small alignment error in the initial version.
 
 Additional metadata now includes the citet:mouginot_2019_data basins and regions and the citet:zwally_2012_data sector nearest to each outlet, and shortest distance between the outlet and the basin, region, or sector boundary. This should be used with caution - some peripheral ice cap outlets may be assigned to the ice sheet, or land-terminating outlets may be nearest to an ice basin that does not overlap with hydrological basin. The distance can be used as a filter. We also include the nearest named glacier from citet:bjork_2015, and distance to the citet:bjork_2015 point. We also include the nearest citet:mankoff_2020_solid gate and distance to gate. Because citet:mankoff_2020_solid is a continually updating product, and gate locations and IDs may change in the future, we note here that we use gates V3 (file: https://doi.org/10.22008/promice/data/ice_discharge/gates/v02/GSEWLR) that are associated with discharge V55. The gate IDs used here are also valid with many previous ice discharge versions, and likely to be valid with many following ice discharge versions.
 
@@ -199,7 +199,7 @@ Additional metadata now includes the citet:mouginot_2019_data basins and regions
 
 Over the past decades, liquid runoff from Greenland has increased citep:mernild_2012,bamber_2018_freshwater,trusel_2018,perner_2019 contributing to mass decrease citep:sasgen_2020. When that runoff leaves the ice sheet and discharges into fjords and coastal seas, it influences a wide range of physical citep:straneo_2011,an_2012,mortensen_2013,bendtsen_2015,cowton_2015,mankoff_2016,fried_2019,cowton_2019,beckmann_2019, chemical citep:kanna_2018,balmonte_2019, and biological citep:kamenos_2012,kanna_2018,balmonte_2019 systems citep:catania_2020. The scales of the impacts range from instantaneous at the ice--ocean boundary to decadal in the distal ocean citep:gillard_2016. The influence of freshwater on multiple domains and disciplines citep:catania_2020 is the reason several past studies have estimated runoff and discharge at various temporal and spatial scales (e.g., citet:mernild_2008,mernild_2009,mernild_2010,langen_2015,ahlstrom_2017,citterio_2017,van-as_2018,bamber_2018_freshwater,perner_2019,slater_2019).
 
-To date no product provides discharge estimates at high spatial resolution (~100 m; resolving individual streams), daily temporal resolution, for all of Greenland, covering a broad time span (1950 through September 2021), from multiple regional climate models (RCMs), and with a simple database access software to support downstream users. Here we present these data. In the following description and methods, we document the inputs, assumptions, methodologies, and results we use to estimate Greenland discharge from 1950 through September 2021.
+To date no product provides discharge estimates at high spatial resolution (~100 m; resolving individual streams), daily temporal resolution, for all of Greenland, covering a broad time span (1950 through September 2022), from multiple regional climate models (RCMs), and with a simple database access software to support downstream users. Here we present these data. In the following description and methods, we document the inputs, assumptions, methodologies, and results we use to estimate Greenland discharge from 1950 through December 2022.
 
 Freshwater discharge from Greenland primarily takes three forms: solid ice from calving at marine-terminating glaciers; submarine meltwater from ice-ocean boundary melting at marine-terminating glaciers; and liquid runoff from melted inland surface ice, rain, and condensation. A recent paper by citet:mankoff_2020_ice targets the solid ice discharge plus submarine melt budget by estimating the ice flow rate across gates 5 km upstream from all fast-flowing marine-terminating glaciers in Greenland. Complementing that paper, this paper targets Greenland's point-source liquid water discharge budget by partitioning RCM runoff estimates to all ice margin and coastal outlets. The sum of these data and citet:mankoff_2020_ice is an estimate of the majority of freshwater (in both liquid and solid form) volume flow rates into Greenland fjords. Those two terms comprise the bulk but not all freshwater - they exclude precipitation directly onto the fjord or ocean surface, as well as relatively minor contributions from evaporation and condensation, sea ice formation and melt, or subglacial basal melting. 
 
@@ -620,7 +620,7 @@ Below, we discuss the known uncertainties, ranging from least to most uncertain.
 
 The basins presented here are static approximations based on the 100 m DEM of a dynamic system. Land basin boundaries are likely to be more precise and accurate than ice basins because the land surface is better resolved, has larger surface slopes, has negligible subsurface flow, and is less dynamic than the ice surface. Even if basins and outlets seem visually correct from the 100 m product, the basin outline still has uncertainty on the order of hundreds of meters and will therefore include many minor errors and nonphysical properties, such as drainage basin boundaries bisecting lakes. However, all artifacts we did find are significantly smaller than the 1 km^{2} grid of the RCM inputs. We do not show but note that when doing the same work with the 150 m BedMachine land surface DEM, some basins change their outlet locations significantly - draining on the opposite side of a spit or isthmus and into a different fjord than the streams do when observed in satellite imagery. We have not observed these errors in streams and basins derived from the 100 m ArcticDEM in a visual comparison with Google Earth, although they may still exist.
 
-Moving from land basins to subglacial ice basins, the uncertainty increases because subglacial routing is highly dynamic on timescales from minutes to seasons (e.g., citet:werder_2013). This dynamic system may introduce large spatial changes in outflow location (water or basin "piracy", citet:ahlstrom_2002,lindback_2015 and citet:chu_2016_rerouting), but citet:stevens_2018 suggests basins switching outlet locations may not be as common as earlier work suggests, and our sensitivity analysis suggests that near the margin where the majority of runoff occurs, outlet location often changes by less than 10 km under different routing assumptions (Fig. [[fig:k_basin_change]]). The largest (> 100 km) changes in outlet location in Fig. [[fig:k_basin_change]] occur when the continental or ice flow divides move, and one or two of the \(k\) scenario(s) drain cells to an entirely different coast or sector of the ice sheet. Finally, in some locations water is routed supraglacially, not subglacially (c.f. 10.1016/j.jag.2021.102647).
+Moving from land basins to subglacial ice basins, the uncertainty increases because subglacial routing is highly dynamic on timescales from minutes to seasons (e.g., citet:werder_2013). This dynamic system may introduce large spatial changes in outflow location (water or basin "piracy", citet:ahlstrom_2002,lindback_2015 and citet:chu_2016_rerouting), but citet:stevens_2018 suggests basins switching outlet locations may not be as common as earlier work suggests, and our sensitivity analysis suggests that near the margin where the majority of runoff occurs, outlet location often changes by less than 10 km under different routing assumptions (Fig. [[fig:k_basin_change]]). The largest (> 100 km) changes in outlet location in Fig. [[fig:k_basin_change]] occur when the continental or ice flow divides move, and one or two of the \(k\) scenario(s) drain cells to an entirely different coast or sector of the ice sheet. Finally, in some locations water is routed supraglacially, not subglacially (c.f. citet:li_2022).
 
 The regions near the domain edges - both the land coast and the ice margin - are covered by many small basins, and in this work basins < 1 km^{2} are absorbed into their largest neighbor (see Methods section). By definition these basins are now hydraulically incorrect. An example can be seen in the Zackenberg basin (Fig. [[fig:Z]]a, southwest corner of the basin), where one small basin on the southern side of a hydraulic divide was absorbed into the large Zackenberg basin that should be defined by and limited to the northern side of the mountain range. 
 
@@ -773,7 +773,7 @@ If the script is accessed from within Python, then the =discharge= option return
 * Conclusions                                             :ignore:
 \conclusions
 
-We provide a 100 m spatial resolution data set of streams, outlets, and basins, and a 1 day temporal resolution data set of discharge through those outlets for the entire ice sheet area from 1950 through September 2021. Access to this database is made simple for nonspecialists with a Python script. Comparing the two RCM-derived discharge products to 10 gauged streams shows the uncertainty is approximately plus or minus a factor of 5, or half an order of magnitude, or +500%/-80%, when comparing daily discharge for single or few basins. 
+We provide a 100 m spatial resolution data set of streams, outlets, and basins, and a 1 day temporal resolution data set of discharge through those outlets for the entire ice sheet area from 1950 through December 2022. Access to this database is made simple for nonspecialists with a Python script. Comparing the two RCM-derived discharge products to 10 gauged streams shows the uncertainty is approximately plus or minus a factor of 5, or half an order of magnitude, or +500%/-80%, when comparing daily discharge for single or few basins. 
 
 Because of the high spatial (individual basins) and temporal (daily) resolution, larger uncertainty exists than when working over larger areas or time steps. These larger areas and times can be achieved through spatial and temporal aggregating or by implementing a lag function.
 
@@ -1562,7 +1562,7 @@ At this point the static work is done - we have basins, streams, and outlets for
 
 The remaining tasks are to SUM the daily model variables by each basin, and assign results to the outlet for each basin.
 
-Working with the provided NetCDF files directly is possible but accessing them is very slow (in GRASS). I believe this has to do with extracting one variable from a multi-variable file, and/or chunking and compression issues. Given that the code operates day-by-day, that means from 1950 through September 2021 there are src_bash{echo $(( ($(date -d 2021-09-30 +%s) - $(date -d 1950-01-01 +%s)) / 86400 ))} {{{results(=26204=)}}} days, if I can cut access time down by 1 second that save 6.3 hours. In reality, by pre-processing the NetCDF files access time is reduced from 10 seconds to 1 second, saving ~2.5 days of processing time (cutting processing time in half). The cost for this savings is a few dozen lines of code and a few hours of processing.
+Working with the provided NetCDF files directly is possible but accessing them is very slow (in GRASS). I believe this has to do with extracting one variable from a multi-variable file, and/or chunking and compression issues. Given that the code operates day-by-day, that means from 1950 through December 2022 there are src_bash{echo $(( ($(date -d 2022-12-31 +%s) - $(date -d 1950-01-01 +%s)) / 86400 ))} {{{results(=26662=)}}} days, if I can cut access time down by 1 second that save 6.3 hours. In reality, by pre-processing the NetCDF files access time is reduced from 10 seconds to 1 second, saving ~2.5 days of processing time (cutting processing time in half). The cost for this savings is a few dozen lines of code and a few hours of processing.
 
 + MAR: One RUNOFF variable that contains appropriate runoff for both ice and land
 + RACMO: One RUNOFF variable that contains appropriate runoff for both ice and land
@@ -2102,7 +2102,7 @@ r.univar -t map=model zones=basins@land_${k_pct} \
 
 log_info "Using EXTRA GNU parallel options via \${PARALLEL}: ${PARALLEL:-Not set}"
 
-for y in $(seq 1950 2021); do
+for y in $(seq 1950 2022); do
   for k_pct in 100 90 80; do
     file_base=MAR_runoff_ice_${y}
     infile=${file_base}.nc
@@ -2170,7 +2170,7 @@ print(isum/osum)
 log_info "Using EXTRA GNU parallel options via \${PARALLEL}: ${PARALLEL:-Not set}"
 
 k_pct=100
-for y in $(seq 1950 2021); do
+for y in $(seq 1950 2022); do
   file_base=MAR_runoff_land_${y}
   infile=${file_base}.nc
   outfile=${file_base}_${k_pct}.bsv
@@ -2221,7 +2221,7 @@ g.mapset RACMO
 log_info "Using EXTRA GNU parallel options via \${PARALLEL}: ${PARALLEL:-Not set}"
 
 # ice
-for y in $(seq 1958 2021); do
+for y in $(seq 1958 2022); do
   for k_pct in 100 90 80; do
     file_base=RACMO_runoff_ice_${y}
     infile=${file_base}.nc
@@ -2245,7 +2245,7 @@ done
 
 # land
 k_pct=100
-for y in $(seq 1958 2021); do
+for y in $(seq 1958 2022); do
   file_base=RACMO_runoff_land_${y}
   infile=${file_base}.nc
   outfile=${file_base}_${k_pct}.bsv
@@ -3287,386 +3287,66 @@ variables:
 echo 'ice'
 (cd ${DATADIR}/RACMO/freshwater/runoff_ice_1km; find . -type f -name "*.nc" | LC_ALL=C sort | head -n8 | parallel --keep-order md5sum)
 (cd ${DATADIR}/RACMO/freshwater/runoff_ice_1km; find . -type f -name "*.nc" | LC_ALL=C sort | tail -n8 | parallel --keep-order md5sum)
-echo 'land'
+echo 'land_5.5_km'
 (cd ${DATADIR}/RACMO/freshwater/runoff_land_5.5km; find . -type f -name "*.nc" | LC_ALL=C sort | head -n8 | parallel --keep-order md5sum)
 (cd ${DATADIR}/RACMO/freshwater/runoff_land_5.5km; find . -type f -name "*.nc" | LC_ALL=C sort | tail -n8 | parallel --keep-order md5sum)
+echo 'land_1_km'
+(cd ${DATADIR}/RACMO/freshwater/runoff_land_1km_regrid; find . -type f -name "*.nc" | LC_ALL=C sort | head -n8 | parallel --keep-order md5sum)
+(cd ${DATADIR}/RACMO/freshwater/runoff_land_1km_regrid; find . -type f -name "*.nc" | LC_ALL=C sort | tail -n8 | parallel --keep-order md5sum)
 #+END_SRC
 
 #+RESULTS: RACMO_QC_md5sum
-| ice                              |                                                           |
-| 219834ba9f1bc98e0a87ab37ea88863d | ./runoff.1990_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc |
-| 7bde9226e0651e2cfbb8082424ba5181 | ./runoff.1990_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc |
-| 76d77c3ac9881521825d93c1c43af7d5 | ./runoff.1990_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc |
-| 17dd60fa5964af322624e72d9b58ea7c | ./runoff.1990_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc |
-| fcdd6121b4c1c94d1fe5018966deacac | ./runoff.1991_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc |
-| 48c894ad8d7c95b5521892c18183ea41 | ./runoff.1991_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc |
-| d405a62f91a201e3b7be931c12e1f678 | ./runoff.1991_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc |
-| bcaadbf2e742b533a612417f748dd5f0 | ./runoff.1991_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc |
-| acf9b55165baf20b613067383ea3d1fc | ./runoff_WJB_int.1988_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc |
-| 08d48cb9b85912742785fc089a8462bb | ./runoff_WJB_int.1988_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc |
-| 9c26be97b007d967bdcc48c34ad1c3ea | ./runoff_WJB_int.1988_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc |
-| 0673a072bd62d2957f01d5ca6c6cf570 | ./runoff_WJB_int.1988_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc |
-| c9d47dea1a7fe5317447734ac19b7faa | ./runoff_WJB_int.1989_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc |
-| 46b5f01a3dce922eee06f48f415ec9fb | ./runoff_WJB_int.1989_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc |
-| dbfdf673dc82d957b5109b34724db0a6 | ./runoff_WJB_int.1989_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc |
-| af207835fe80b60d58e06b5f6035bf18 | ./runoff_WJB_int.1989_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc |
-| land                             |                                                           |
-| f60e7505e75e58133e82d381db5caa43 | ./runoff.1957.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc         |
-| 7b2de3637a9b79647aa600c8da7d2990 | ./runoff.1958.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc         |
-| cf60a1b81f84975ee741b483ddedb46c | ./runoff.1959.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc         |
-| fd74c2d30a0d6589303b8ccbc4679694 | ./runoff.1960.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc         |
-| d364c5db102ee36981d55e0b46277673 | ./runoff.1961.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc         |
-| fcb4b8154fce45145ba468c7b0c2a1e6 | ./runoff.1962.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc         |
-| b87dfb7d13426080a58745d9a917de2b | ./runoff.1963.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc         |
-| 3d055d1d9c0ddacae46acad23a421a9e | ./runoff.1964.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc         |
-| 32e7fa643ae40f346999e09c1b17a6d5 | ./runoff.2014.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc |
-| 1a6d4fdbb8dd14aa5311b3d43954c331 | ./runoff.2015.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc |
-| a5f91f7731fb2a7418a7e89e9f67fb43 | ./runoff.2016.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc |
-| 90634adf3dd1b9ee409002a29ac3e08f | ./runoff.2017.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc |
-| 906751f527cdb51f5448fd324a705a29 | ./runoff.2018.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc |
-| 0e481615b966397f0a4c50f48ba1dab9 | ./runoff.2019.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc |
-| a813eb69a66bd4c23cf15afcac592420 | ./runoff.2020.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc |
-| c5ae487f3ecc5987a17c3c06083ebd5a | ./runoff.2021.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc |
-
-**** File list and md5sums
-
-+ WARN :: May be stale
- 
-#+BEGIN_SRC bash :results verbatim :exports both
-ROOT=${DATADIR}/RACMO/freshwater/
-echo "ice"
-cat ${ROOT}/runoff_ice_1km/md5sum.txt
-echo "land"
-cat ${ROOT}/runoff_land_5.5km/md5sum.txt
-#+END_SRC
-
-#+RESULTS:
-#+begin_example
-
-ice
-219834ba9f1bc98e0a87ab37ea88863d  runoff.1990_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-7bde9226e0651e2cfbb8082424ba5181  runoff.1990_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-76d77c3ac9881521825d93c1c43af7d5  runoff.1990_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-17dd60fa5964af322624e72d9b58ea7c  runoff.1990_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-fcdd6121b4c1c94d1fe5018966deacac  runoff.1991_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-48c894ad8d7c95b5521892c18183ea41  runoff.1991_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-d405a62f91a201e3b7be931c12e1f678  runoff.1991_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-bcaadbf2e742b533a612417f748dd5f0  runoff.1991_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-bc5861da0a5bdc247fe974ca4a61d8e7  runoff.1992_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-0413e31913c1549a2f3964a6bb13d708  runoff.1992_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-bee14c9b28b2a7afac60033543e0a0f1  runoff.1992_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-0fc2ace771ecfe5c2c21745eda01d9e7  runoff.1992_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-cbf259892b64f9c4ee1cb27e331d4850  runoff.1993_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-50006792c2898ec66c0dabb1a10086f1  runoff.1993_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-5b92dee94b264f9eefb8f011306b1cd1  runoff.1993_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-d38cde6bd9bd98e2b5be4ffad0b69953  runoff.1993_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-6e4e917e514cf2da216b43b9840eee42  runoff.1994_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-8d3c9c13be4e94493ad50358a24dc986  runoff.1994_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-ecc4ee4042822c9a95bc1cb37a15a8af  runoff.1994_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-efea3f2a529be4f78203dc116832a5c3  runoff.1994_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-f312a5cd30a1d16c859ff6308a85b3ca  runoff.1995_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-c771ec797020c57570a856bcae3cb1f4  runoff.1995_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-35a4fa0d3c18f8e3ee6f69cd7e281af4  runoff.1995_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-47b1c1b1d9c23543aa6e56bb7aca0845  runoff.1995_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-480cf36f8e635a7e25dba675ed57b2b7  runoff.1996_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-ce80b7ca943f73ffe69ea25e0388cae7  runoff.1996_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-de6b6f04ad87caec15212121ae5d8d22  runoff.1996_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-79b37c995632dcd2f9bb740e66188524  runoff.1996_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-e59031096c7cb902dfc003e6572b2c42  runoff.1997_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-d40027f77fa7f4818cfb10f880c07cd5  runoff.1997_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-47a1ddbe445937cfb11578733bdfcd6b  runoff.1997_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-4f83ebbe97762f815bbf919104437132  runoff.1997_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-81f6c14ea7849916e27bc8dc759202f2  runoff.1998_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-87bcc1dd852dfb04c618c0df9d093dd9  runoff.1998_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-cccf436828b03da711695e28eaba34c3  runoff.1998_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-6ea46e7b013a3828419a543efde7c850  runoff.1998_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-57bf6228aec2875c2e75274573e8aca7  runoff.1999_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-1859a281686a239121fe589d0bd31126  runoff.1999_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-97e5d924fdbe58f387704142d81f556f  runoff.1999_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-364fbbe7cfd6275ce585c9f539dda769  runoff.1999_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-2b020d58b5e4fac8be3f7037ee32a400  runoff.2000_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-d245240adfd4b9cbd2e482b5ae6e256c  runoff.2000_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-282b521a3263de3d473ccd2900b19821  runoff.2000_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-1cb2e6721be3273e1105aba6b44faf2e  runoff.2000_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-35135dc8782d8d215b118732e72ade1b  runoff.2001_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-560929bea1db4b5a22be5f0ad5cece48  runoff.2001_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-65acfcd4e62d3a68f19fda6e47d943a4  runoff.2001_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-a378ab8b9135b0eebd572b13ea45612f  runoff.2001_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-177cd01600c37588d3bcb2b84208010a  runoff.2002_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-fee45f7319f0c293bed344739428474a  runoff.2002_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-c6360eb85a8fd8d669390dc8d595b29c  runoff.2002_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-d5d2a5ec3542969ff535a2f1c255654f  runoff.2002_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-abc6710d0884bc03fc9f10853e65d499  runoff.2003_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-1c85381acfbcc275629ec9bc0dfba5f9  runoff.2003_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-3a29fe538efa7d3f1828bbe8c1dbd039  runoff.2003_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-b9acafa6ec31a600c7a2dc47790d3a25  runoff.2003_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-778cef31ff7cf1cc16ad64715de70e4e  runoff.2004_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-ec1aa23ef7ddbbf373945a7c1864c1e9  runoff.2004_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-fdd92899ba1eb76cacabef182b76d923  runoff.2004_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-895fb68d0f29f7c510317f22ed81d31b  runoff.2004_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-e6bc2eddcfd7c6188e14bf18614e99b4  runoff.2005_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-2d0b56ff82ee34410b40da338a586835  runoff.2005_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-6a15fcd7320064bf4b37bb33beed25b1  runoff.2005_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-ff87becae9341f946be9d54dc7ac8ef5  runoff.2005_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-fdbd9297433a9f845011de11b4579ca0  runoff.2006_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-7098da43696b6a60d1565bb8ce555482  runoff.2006_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-3c7126290054d6955e7dbf552749612b  runoff.2006_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-c26513af55400904d92833d8dee086a2  runoff.2006_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-ac9f21f058e22f220267ed3db5055ed3  runoff.2007_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-163690313cb567579d87a0010a4409f4  runoff.2007_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-ce8ee4cebe528a871e762246c5cc7153  runoff.2007_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-b018be117ffe75b23ab7c13dbe95110e  runoff.2007_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-2794debe9b49b253c6dd3d5e9ec4dcda  runoff.2008_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-4186160a709d919a259e6abc50813931  runoff.2008_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-6e1e002ae77b535b2d180b3d4e848eab  runoff.2008_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-8cc4642f6934a1c6e88c1682bf8be066  runoff.2008_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-58064cac954d7123e5d0f8636bb45dc1  runoff.2009_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-61da947ec8c5f5f5a69cdc9a50c908ee  runoff.2009_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-fd4443c4495a57cd61fca40349d96ae2  runoff.2009_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-5eb250d7784c38e21a66a1838ee1341d  runoff.2009_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-7d07383807279b33dffd8534b57c1ce3  runoff.2010_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-e6a8d9f9b7f5a239517767c76a534f17  runoff.2010_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-2120ce2449ffc784e3cccf78b48bc933  runoff.2010_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-c1f6f6d1473076a8e99de6ce772c5e1d  runoff.2010_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-eb848fc163c6746eb6b7bcaaa1cef494  runoff.2011_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-4edf15c93ce3a70d9c35eff197234bca  runoff.2011_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-27abfdbdb7e472d595538e088a5d463a  runoff.2011_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-1b5024fb722d5f284ced86fa328febed  runoff.2011_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-195abccd0339a6528a2de7120c0e35d7  runoff.2012_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-73194467cde78186529826e175f7ce19  runoff.2012_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-0d30b2f5cd5e062e0d6494ceb2129d23  runoff.2012_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-2e5fb39a21eb186870971521b6adfb6c  runoff.2012_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-1a90c208c6c347c068cb7206648065e1  runoff.2013_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-af05a6592ded57d40867b2c862733c0e  runoff.2013_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-af92431c425b46731b6b8c024655793c  runoff.2013_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-0e024bdbce77cc9a242b849cf908ad47  runoff.2013_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-c51ca68b78b4f781398494bd0d6c0b73  runoff.2014_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-332b0fbb9b920e8a52bc11e2dcc3d363  runoff.2014_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-943cbf76f6e78ec6af3e8bb69c11a454  runoff.2014_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-85fd543000c25df95404c58ec6f3f4bf  runoff.2014_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-168e2583c8ed5370754c649f137ecdc3  runoff.2015_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-708d862ac66220863108fc79fd15ce98  runoff.2015_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-90bf70e990ca5de7509572676a711f5d  runoff.2015_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-838afc858615977164652ce54284691a  runoff.2015_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-0c1fe6a31cadfd6ae9dff4bfd60523cc  runoff.2016_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-a9638d3b5d5e8e20069a275fa55c92cf  runoff.2016_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-e2fcd11edb1fd101140f5f1e0e5f796d  runoff.2016_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-75802c041f6b47e64f21fd9e3ede2250  runoff.2016_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-dbf8697f05fd94c9b9a824ac8eed11f9  runoff.2017_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-a0f22c7f05c222a87c59fdc29c7f3c30  runoff.2017_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-efad52aa924a696d08d8f137c99587fb  runoff.2017_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-78ebd90d083b73e39bb5f547873ffffa  runoff.2017_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-64adf24f338579da065fdb3dbb80adf4  runoff.2018_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-c8f8dad8938bf07502113fcb4ad5706d  runoff.2018_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-5bb097ab2ea66effc911e4f135581e16  runoff.2018_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-9d0a46c805bbeaf5f608f131a873395c  runoff.2018_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-2bc27a32e353458c2a008113b37f5795  runoff.2019_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-7bd52c0f5cb2248b112b2d033f0908fb  runoff.2019_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-1f6a12dd237a7f8d0d748968bc49d547  runoff.2019_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-23576a86520b43d24d2f3a42d0074ad7  runoff.2019_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-afe7c870b4eee5863db2cc524984bf19  runoff.2020_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-21f62fc28bf0bc3e9a44d318338aa116  runoff.2020_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-6017284d7e65b577045793c8e3aadf0f  runoff.2020_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-850a1ec17dc889c85f0ec09eca3f09bf  runoff.2020_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-888d3163746c5e1b5600aaa5f46241b6  runoff.2021_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-935ac328b8d14fc4726aef8794f2dfa6  runoff.2021_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-7139dbbf975a0b6ec7ce974b32d16d82  runoff.2021_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-1e2fdc3e277dd92c6b92eacc747f041a  runoff.2021_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-64241bb54cce1e7775a9e9731a35a0e3  runoff_WJB_int.1958_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-d8095667054beaee95233abba729c8f3  runoff_WJB_int.1958_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-cd13ed09aed1c36ead164e21fe798a7c  runoff_WJB_int.1958_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-f5980b1d49a9f940a3147d592b5a6a63  runoff_WJB_int.1958_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-c2fac8a350b7d6545bbacab3bada55c8  runoff_WJB_int.1959_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-d7994ea65d0e0de229622c9d890f8527  runoff_WJB_int.1959_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-3cce52a9d80e2159058da877ea023166  runoff_WJB_int.1959_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-6db6b22ab690345d7136dc83bbc40755  runoff_WJB_int.1959_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-b9083f7f36b12affef36672903ae5edc  runoff_WJB_int.1960_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-5496276c8d2d911423343a8307833b6d  runoff_WJB_int.1960_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-a928757ebe8a42ea427adaebb1521b79  runoff_WJB_int.1960_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-7450d29c4a039fd204e1dfa3ad5e0e0e  runoff_WJB_int.1960_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-25f13169dfabf114f5c82553a97463b9  runoff_WJB_int.1961_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-1d4506af679b2693971d645b9f10d2c6  runoff_WJB_int.1961_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-6cda161df4e0a7aef5b815176e939814  runoff_WJB_int.1961_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-579ce58b7ef1afdcec7b4fcf5d68a259  runoff_WJB_int.1961_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-1293cb33af63304b75a8a1ea9833e0f3  runoff_WJB_int.1962_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-967a23bc49f290b5d0ccc70b2e637bbd  runoff_WJB_int.1962_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-86a0436c37fbee5c3ed7bc6e903d4e3a  runoff_WJB_int.1962_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-aafe5139392520feb00b0ac539ad6be9  runoff_WJB_int.1962_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-130d493137a923bb340ed0622ae6b610  runoff_WJB_int.1963_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-6058e4a9125d986814a1c00380709c54  runoff_WJB_int.1963_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-247d6009ca952b1a54afe75888acc9f4  runoff_WJB_int.1963_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-9907716998da130e1bbd47ad5509f9cf  runoff_WJB_int.1963_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-8a6210cabe5eaf33a1db3dbeb89ec0b9  runoff_WJB_int.1964_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-9bb6a19674de49fecbff614e5da58d81  runoff_WJB_int.1964_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-6c1e9138706277e99fa6132abf6bc23c  runoff_WJB_int.1964_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-84c526133edcf0209593d01eb5abcfc2  runoff_WJB_int.1964_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-4b19072820be20cdce9942100356433f  runoff_WJB_int.1965_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-52f088826e67670423e9eeca2b3541c4  runoff_WJB_int.1965_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-7b9150e24b1473089bb0ef352327ce78  runoff_WJB_int.1965_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-d348412435181e46a0424b75b595fdf9  runoff_WJB_int.1965_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-587539aa9c6dbeeb2f47825080259afa  runoff_WJB_int.1966_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-a7fbf1f79576aa06ac55ac840de01715  runoff_WJB_int.1966_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-b93280544ae32d874b8cdd4f7392f411  runoff_WJB_int.1966_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-bf15d81ad88b6ae83818c01b8e151ed3  runoff_WJB_int.1966_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-d051616fa15277fd777495d5a8963326  runoff_WJB_int.1967_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-f943c7957322a995976675038c51c2a4  runoff_WJB_int.1967_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-2d658e03ac948f348f127b390fa934bc  runoff_WJB_int.1967_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-9d05a0ff9dfdebe1abaae170d3395e24  runoff_WJB_int.1967_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-e111df9de58ecf3ea812bd465c7cab57  runoff_WJB_int.1968_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-9809ea060e1f168707faf8f8efae3334  runoff_WJB_int.1968_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-07ccbe40a8d46dc7e4157d25fb5b63e1  runoff_WJB_int.1968_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-afec5082ca706e97159d439c2522d486  runoff_WJB_int.1968_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-92d20159ab25a657d5e9c885897fb74c  runoff_WJB_int.1969_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-281d23e98426fe7b3a5824a097a36fec  runoff_WJB_int.1969_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-bab4fd1f9d8633f80a4de24e9e516a3c  runoff_WJB_int.1969_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-f0f25744a613137217d7b1226a59a3ff  runoff_WJB_int.1969_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-2491027ab1b0c401e612319ef97ae825  runoff_WJB_int.1970_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-f3e9ab96cf20aca3b7cf910be705e55c  runoff_WJB_int.1970_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-f2e8ebec4ff5a5cc35450d48f7fa94f7  runoff_WJB_int.1970_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-eecfac68ffb6de9f08a85581b8bc13a2  runoff_WJB_int.1970_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-1276ce4ab34206ee08f037c8494211cd  runoff_WJB_int.1971_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-1ff1eab6760adff8cce9b90a70c32b82  runoff_WJB_int.1971_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-c1d8941b76bf9a7a27135d990d7112c4  runoff_WJB_int.1971_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-4eb287248a0abf7df801c6be97c148e7  runoff_WJB_int.1971_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-82644e4934e7f20744cad45a7ad46eff  runoff_WJB_int.1972_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-8579ec84e2115cae36ca04ac1577c321  runoff_WJB_int.1972_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-0e68f64f04946ae804d07b0dcf5c5dc8  runoff_WJB_int.1972_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-d925a2d2df384f6939c48b88b13283f7  runoff_WJB_int.1972_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-42d89e050b1d3009f2d36082f5a9845f  runoff_WJB_int.1973_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-b0721384dad57aa0a429a1449b460815  runoff_WJB_int.1973_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-58b90739dff180d2c42ae0a7b23cbf1a  runoff_WJB_int.1973_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-fab651e9caae513a2b1089ede87912f4  runoff_WJB_int.1973_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-ecec3a5766a0f68daac74e128111ecaa  runoff_WJB_int.1974_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-8568a5b97428bacc2ca9762ef04a016e  runoff_WJB_int.1974_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-71c1735fe24b9fa2fa601ab0466004b4  runoff_WJB_int.1974_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-d228a310bf0dc0cf5f72572bd1e1e89b  runoff_WJB_int.1974_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-360026a61fcfea74ec51017ca028de99  runoff_WJB_int.1975_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-78af88f875e427d751177f03463b1680  runoff_WJB_int.1975_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-d6f9854f2dbcb863fb0ea67528cae85d  runoff_WJB_int.1975_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-1465ccc92ed69f445ec4b0175a5554e7  runoff_WJB_int.1975_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-b578c8ecffb2d3da102ceb6b31ed51f0  runoff_WJB_int.1976_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-99512f1022c704c102fd392d497497d1  runoff_WJB_int.1976_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-a6766e74f6acab6ef3a7d522107a9037  runoff_WJB_int.1976_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-ab9238cb595796f34ab0c9d8df62ea20  runoff_WJB_int.1976_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-53ffa46e73b0009a9e1d3bb9d260485f  runoff_WJB_int.1977_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-742107abd2610f131740921545e52ecb  runoff_WJB_int.1977_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-9aaa82a6a61a99777d17cc55a5c48a02  runoff_WJB_int.1977_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-9e58e57c7a2e8f12f169174c22c06412  runoff_WJB_int.1977_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-7b80f1459bd583543d2466261aa1e988  runoff_WJB_int.1978_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-7d66b47b096755ac54de8991cb5914a7  runoff_WJB_int.1978_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-7cb2251d9f29788fda0d79574740339d  runoff_WJB_int.1978_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-a250fa885a0373c25335ba2974c20282  runoff_WJB_int.1978_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-30f62e24df34cf8a6f485298db78328c  runoff_WJB_int.1979_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-c940b7b6a9f0fd16b1b1fcded14e4afc  runoff_WJB_int.1979_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-d7fd7790ed02800e946150c4c77c308e  runoff_WJB_int.1979_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-8040c5aba8151a13bbdc47231aeb12cf  runoff_WJB_int.1979_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-8127c36e479016d94c9a130e6bfb7c9e  runoff_WJB_int.1980_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-c80e971a10850c05b9339c08f82ac4c0  runoff_WJB_int.1980_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-0d10342970f563ef4fba7fded040043c  runoff_WJB_int.1980_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-04f028321ac6377b71d95469fc5afda3  runoff_WJB_int.1980_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-d2c81bfc02dc5826296e93ac2b4943ab  runoff_WJB_int.1981_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-6ae327477a36cee447c9521883c9b802  runoff_WJB_int.1981_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-e672dae3a195ef67f32361f53b0a20f2  runoff_WJB_int.1981_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-b673c4a4aa7533ef7e0eab174a245864  runoff_WJB_int.1981_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-84645c85c849717b95bd737807ae61a5  runoff_WJB_int.1982_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-821d417c4eca4cd4629762b3495e35df  runoff_WJB_int.1982_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-49670165f48cdc5c3bf543baf7048cdd  runoff_WJB_int.1982_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-e66e23aa7a289a2156e8e4535853acb0  runoff_WJB_int.1982_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-82a63249d73564abb53cf03d0186713c  runoff_WJB_int.1983_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-3cd95ed753d4057c2ab891b0b4192373  runoff_WJB_int.1983_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-f4ab3b2a6242b687a3518224f838e05b  runoff_WJB_int.1983_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-bf090db4aa9e79cf82e598a341e72f19  runoff_WJB_int.1983_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-97cc1c3b125215e5895076f922e59218  runoff_WJB_int.1984_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-85ee7c09368076acb7595a2cbda9e1d6  runoff_WJB_int.1984_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-6241db88231756b193ff8645b2e6b4b0  runoff_WJB_int.1984_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-870ce9e007e9eff6b21dec712adf78f4  runoff_WJB_int.1984_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-57de9919e9eb2fe0c0b20732777306e7  runoff_WJB_int.1985_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-e56b44157a65f50d5f3c94941effbf2b  runoff_WJB_int.1985_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-6ba91a7c176b0d9fee39baf0e81e9024  runoff_WJB_int.1985_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-41b7a38f27a940ef1dafc00108958bf9  runoff_WJB_int.1985_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-71cdac7490fa232dfe379d2b42e8db69  runoff_WJB_int.1986_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-89f9be6833a4ebfe47f4fc40b32ee48f  runoff_WJB_int.1986_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-13090054bc48ce755f58245e18a278b7  runoff_WJB_int.1986_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-949f2e303e4e3be24ed36365f8337251  runoff_WJB_int.1986_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-7af74134cceba21f175f1ebe40b1b6ef  runoff_WJB_int.1987_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-f4a407a3703b31c441b9b9a0d1c7c76b  runoff_WJB_int.1987_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-95c325eec23c5861012beff972ac993d  runoff_WJB_int.1987_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-ca9075c8262eeb7080c688bd679d45bd  runoff_WJB_int.1987_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-acf9b55165baf20b613067383ea3d1fc  runoff_WJB_int.1988_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-08d48cb9b85912742785fc089a8462bb  runoff_WJB_int.1988_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-9c26be97b007d967bdcc48c34ad1c3ea  runoff_WJB_int.1988_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-0673a072bd62d2957f01d5ca6c6cf570  runoff_WJB_int.1988_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-c9d47dea1a7fe5317447734ac19b7faa  runoff_WJB_int.1989_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-46b5f01a3dce922eee06f48f415ec9fb  runoff_WJB_int.1989_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-dbfdf673dc82d957b5109b34724db0a6  runoff_WJB_int.1989_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-af207835fe80b60d58e06b5f6035bf18  runoff_WJB_int.1989_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc
-land
-f60e7505e75e58133e82d381db5caa43  runoff.1957.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-7b2de3637a9b79647aa600c8da7d2990  runoff.1958.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-cf60a1b81f84975ee741b483ddedb46c  runoff.1959.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-fd74c2d30a0d6589303b8ccbc4679694  runoff.1960.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-d364c5db102ee36981d55e0b46277673  runoff.1961.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-fcb4b8154fce45145ba468c7b0c2a1e6  runoff.1962.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-b87dfb7d13426080a58745d9a917de2b  runoff.1963.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-3d055d1d9c0ddacae46acad23a421a9e  runoff.1964.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-34cd210d4605cae5f783efaf3693ab08  runoff.1965.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-68599e37e38e853c3eabef5e4a850dcc  runoff.1966.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-f26fad28e3c0f98f569c310bf432685f  runoff.1967.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-39e57ea7464612acc0e69ea86906cd71  runoff.1968.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-76ef376660a1d5488cee37f0175a1199  runoff.1969.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-9353dfa484674e7e0b29e56f8e4a3e60  runoff.1970.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-b3f83a6899c5eca44924397da69edb93  runoff.1971.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-160d63470feac79d0f36847855c21c1a  runoff.1972.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-cea261e3a82aa7440734792fc177ac2c  runoff.1973.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-a210aa4fc1fd1020ecca97ed06393e3d  runoff.1974.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-80829724ec47ecd898569d1531af7d05  runoff.1975.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-8b2c2766b99f3c43382069de6123d63d  runoff.1976.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-fa51c006fe7f4e77d774be263d6cfea7  runoff.1977.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-3b3affe6be5eb98c8fc7cd3d50efeada  runoff.1978.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-ac60e8f76ec7ec1db4e9a70293b642d1  runoff.1979.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-272ab8f4fc965c852791da6b7465e4b6  runoff.1980.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-2cc00a0aeb1c7a9e1dde19015b1e5639  runoff.1981.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-26342b06440529f95a411e199cac1986  runoff.1982.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-d66c9b61598ffe3715788ecbcdcb0540  runoff.1983.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-90670c85d5a75c1cadb2461d1ca4d517  runoff.1984.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-9b89dbe49058b979917df136842acfc4  runoff.1985.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-1cb9dccb2693ded7d18d231146e101ca  runoff.1986.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-e648743c13293bd51ded7125372cc2f6  runoff.1987.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-35d13edff77eb5d8cea9060cf769c5c6  runoff.1988.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-98054422c2d6c210b5e6289003636fbf  runoff.1989.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc
-460483acd554576412840500930fd9e2  runoff.1990.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-05b66fd95807cb85b575c815a92ad500  runoff.1991.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-d983d8475391cb832356653c46e3f646  runoff.1992.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-a8aff8eee53d50e534baaa0f5135f8d7  runoff.1993.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-bf6118ab0f3e3d72003f6c968d90a054  runoff.1994.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-1cac73ffc6bcfb7483200ac2a799d6e5  runoff.1995.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-28bd9dd37706d7a025a6354f412d281b  runoff.1996.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-90ed41ef2db3413f7d887accc5ec9ed0  runoff.1997.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-1e323bf43d1c7567d0968c312ac0a55e  runoff.1998.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-497d5574e476102f2b11b390ca50dbc0  runoff.1999.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-fa1f0b4e5f609036b310bfbd82c31191  runoff.2000.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-9bc0b9162858e28a8cfbad39e8369a18  runoff.2001.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-b1f0f262536e6db671f4700bf9fd5177  runoff.2002.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-4766d63995d6b8f5bfc0a052305ce6cb  runoff.2003.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-91fe6559990db744899cb61f85f38e86  runoff.2004.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-8af3b5737185719d75c773fcb2b4ae4b  runoff.2005.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-f043647a503bc2d570f20dea16b421af  runoff.2006.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-6a4916af4fec372070cf803eca98427c  runoff.2007.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-4c3ba06503f05727f104791ca473b4a8  runoff.2008.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-6e1716d041ab12e44d6d7380332812c9  runoff.2009.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-4f49d488ad5008f01e06a37ec94bd97e  runoff.2010.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-876bf352205330672d12c9b8d2404d23  runoff.2011.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-debd90a6dd11aee77277c9b55f4b218b  runoff.2012.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-df30979211a95cf4bea2d283f582c61f  runoff.2013.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-32e7fa643ae40f346999e09c1b17a6d5  runoff.2014.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-1a6d4fdbb8dd14aa5311b3d43954c331  runoff.2015.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-a5f91f7731fb2a7418a7e89e9f67fb43  runoff.2016.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-90634adf3dd1b9ee409002a29ac3e08f  runoff.2017.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-906751f527cdb51f5448fd324a705a29  runoff.2018.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-0e481615b966397f0a4c50f48ba1dab9  runoff.2019.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-a813eb69a66bd4c23cf15afcac592420  runoff.2020.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-c5ae487f3ecc5987a17c3c06083ebd5a  runoff.2021.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc
-#+end_example
+| ice                              |                                                                            |
+| 219834ba9f1bc98e0a87ab37ea88863d | ./runoff.1990_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                  |
+| 7bde9226e0651e2cfbb8082424ba5181 | ./runoff.1990_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                  |
+| 76d77c3ac9881521825d93c1c43af7d5 | ./runoff.1990_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                  |
+| 17dd60fa5964af322624e72d9b58ea7c | ./runoff.1990_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                  |
+| fcdd6121b4c1c94d1fe5018966deacac | ./runoff.1991_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                  |
+| 48c894ad8d7c95b5521892c18183ea41 | ./runoff.1991_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                  |
+| d405a62f91a201e3b7be931c12e1f678 | ./runoff.1991_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                  |
+| bcaadbf2e742b533a612417f748dd5f0 | ./runoff.1991_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                  |
+| acf9b55165baf20b613067383ea3d1fc | ./runoff_WJB_int.1988_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc                  |
+| 08d48cb9b85912742785fc089a8462bb | ./runoff_WJB_int.1988_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc                  |
+| 9c26be97b007d967bdcc48c34ad1c3ea | ./runoff_WJB_int.1988_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc                  |
+| 0673a072bd62d2957f01d5ca6c6cf570 | ./runoff_WJB_int.1988_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc                  |
+| c9d47dea1a7fe5317447734ac19b7faa | ./runoff_WJB_int.1989_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc                  |
+| 46b5f01a3dce922eee06f48f415ec9fb | ./runoff_WJB_int.1989_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc                  |
+| dbfdf673dc82d957b5109b34724db0a6 | ./runoff_WJB_int.1989_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc                  |
+| af207835fe80b60d58e06b5f6035bf18 | ./runoff_WJB_int.1989_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc                  |
+| land_5.5_km                      |                                                                            |
+| f60e7505e75e58133e82d381db5caa43 | ./runoff.1957.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                          |
+| 7b2de3637a9b79647aa600c8da7d2990 | ./runoff.1958.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                          |
+| cf60a1b81f84975ee741b483ddedb46c | ./runoff.1959.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                          |
+| fd74c2d30a0d6589303b8ccbc4679694 | ./runoff.1960.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                          |
+| d364c5db102ee36981d55e0b46277673 | ./runoff.1961.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                          |
+| fcb4b8154fce45145ba468c7b0c2a1e6 | ./runoff.1962.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                          |
+| b87dfb7d13426080a58745d9a917de2b | ./runoff.1963.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                          |
+| 3d055d1d9c0ddacae46acad23a421a9e | ./runoff.1964.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                          |
+| 32e7fa643ae40f346999e09c1b17a6d5 | ./runoff.2014.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                  |
+| 1a6d4fdbb8dd14aa5311b3d43954c331 | ./runoff.2015.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                  |
+| a5f91f7731fb2a7418a7e89e9f67fb43 | ./runoff.2016.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                  |
+| 90634adf3dd1b9ee409002a29ac3e08f | ./runoff.2017.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                  |
+| 906751f527cdb51f5448fd324a705a29 | ./runoff.2018.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                  |
+| 0e481615b966397f0a4c50f48ba1dab9 | ./runoff.2019.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                  |
+| a813eb69a66bd4c23cf15afcac592420 | ./runoff.2020.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                  |
+| c5ae487f3ecc5987a17c3c06083ebd5a | ./runoff.2021.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                  |
+| land_1_km                        |                                                                            |
+| 879f40c2e9c4598a83458ab93bcd2246 | ./Grid_regular_EPSG3413_1km.nc                                             |
+| c2caab22f5dc8b816d26b15b07c6c732 | ./Tundra_Mask_1km.nc                                                       |
+| c0c69a24c76cb909ea2ee463d79d10b6 | ./mask.nc                                                                  |
+| a3c0a6c3762155ad404fe6be75c49251 | ./out/runoff.1957.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc.1km-bilin.nc         |
+| 76d34a54d246b6872d913e7889f66772 | ./out/runoff.1958.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc.1km-bilin.nc         |
+| 5f1f04983c6f79fc1d89ccb15ec5946b | ./out/runoff.1959.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc.1km-bilin.nc         |
+| b5d9ffdd8b73d22d9b6bc7da5cbc3c0d | ./out/runoff.1960.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc.1km-bilin.nc         |
+| dc269d5d295640ed71f033bce1d30489 | ./out/runoff.1961.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc.1km-bilin.nc         |
+| 78000c74d9e9553e5237c20205b6f891 | ./out/runoff.2017.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc.1km-bilin.nc |
+| ced4b9dd79d5c2e0a612b01bd07d2afd | ./out/runoff.2018.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc.1km-bilin.nc |
+| 9f520292d3ab4dbf40246bc462cda4e3 | ./out/runoff.2019.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc.1km-bilin.nc |
+| 59b9237449e3c8dfe1b62e8a330bffbd | ./out/runoff.2020.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc.1km-bilin.nc |
+| c03ce8c3865abad695537b78e5fcbe13 | ./out/runoff.2021.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc.1km-bilin.nc |
+| 0d0023a324f077136cf8e69b96440617 | ./out/runoff.2022.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc.1km-bilin.nc |
+| c5e011d91b9feb6b7a533b9f146486f8 | ./weights_FGRN055_to_EPSG3413_1km_bilinear.nc                              |
+| 8f7bea66a91abcea8f2995a9d36b1132 | ./weights_FGRN055_to_EPSG3413_1km_neareststod.nc                           |
 
 **** ncdump
 
@@ -6456,7 +6136,7 @@ plt.savefig('./fig/watson_adjusted_south.png', transparent=True, bbox_inches='ti
 * README                                                :noexport:
 
 #+BEGIN_SRC org :tangle ./freshwater/README.txt :mkdirp ./freshwater :eval no
-README for "Greenland liquid water runoff from 1950 through September 2021"
+README for "Greenland liquid water runoff from 1950 through December 2022"
 
 Data DOI: doi:10.22008/promice/freshwater
 Source: https://github.com/GEUS-Glaciology-and-Climate/freshwater
