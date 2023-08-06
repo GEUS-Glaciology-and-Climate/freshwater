@@ -30,7 +30,7 @@ Changes to the code and manuscript can be seen at https://github.com/GEUS-Glacio
 * release_2022 vs release_2023 discharge
 
 ** Extract time series 
-#+BEGIN_SRC bash :results verbatim :exports results :wrap xml
+#+BEGIN_SRC bash :results verbatim :exports results :wrap xml :exports both
 mamba activate freshwater_user
 
 python ./discharge.py --base="/home/kdm/data/Mankoff_2020/water/release_2022" --roi="-51.50,66.93 -51.21,66.74 -49.44,66.91 -49.84,67.18" -d -u > ./dat/r2022_roi.csv
@@ -40,7 +40,7 @@ python ./discharge.py --base="/home/kdm/data/Mankoff_2020/water/release_2023" --
 
 ** Graphics
 
-#+BEGIN_SRC jupyter-python :kernel ds
+#+BEGIN_SRC jupyter-python :kernel ds :exports both
 df_r2022 = pd.read_csv('./dat/r2022_roi.csv', index_col=0)
 df_r2023 = pd.read_csv('./dat/r2023_roi.csv', index_col=0)
 
@@ -65,7 +65,7 @@ p = df.loc['2012-04-01':'2012-11-15']\
 
 *** r2023
 
-#+BEGIN_SRC jupyter-python :display plain :kernel ds
+#+BEGIN_SRC jupyter-python :display plain :kernel ds  :exports both
 df = pd.read_csv('./dat/r2023_roi.csv', index_col=0)
 df[['MAR_ice','RACMO_ice']]\
     .loc['2012-04-01':'2012-11-15']\
@@ -81,7 +81,7 @@ df[['MAR_ice','RACMO_ice']]\
 
 ** Recreate using 'old' data
 
-#+BEGIN_SRC jupyter-python :kernel ds
+#+BEGIN_SRC jupyter-python :kernel ds  :exports both
 df = pd.read_csv('./dat/r2022_roi.csv', index_col=0)
 p = df.loc['2012-04-01':'2012-11-15']\
       .rolling(5)\
@@ -94,7 +94,7 @@ p = df.loc['2012-04-01':'2012-11-15']\
 
 ** Recreate using 'new' data
 
-#+BEGIN_SRC jupyter-python :kernel ds
+#+BEGIN_SRC jupyter-python :kernel ds  :exports both
 df = pd.read_csv('./dat/r2023_roi.csv', index_col=0)
 p = df.loc['2012-04-01':'2012-11-15']\
       .rolling(5)\
