@@ -2672,8 +2672,13 @@ ds.to_netcdf(OUTFILE, unlimited_dims='time', encoding={'discharge': {'zlib': Tru
 
 *** Combine NetCDF 
 
+Note:
++ ~ln -s ice_100 ice~
++ ~ln -s land_100 land~
+
 #+BEGIN_SRC jupyter-python :tangle netcdf_combine.py
 import xarray as xr
+import numpy as np
 
 for d in ['ice','land']:
     for r in ['RACMO','MAR']:
