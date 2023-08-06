@@ -1,281 +1,107 @@
 
-* Table of contents                               :toc_2:noexport:
+#+PROPERTY: header-args:jupyter-python+ :kernel freshwater :session fw :exports both
+#+PROPERTY: :header-args:bash+ :session "*freshwater.update-shell*" :results verbatim :exports both
+
+* Table of contents                               :toc_5:noexport:
 - [[#introduction][Introduction]]
-- [[#racmo][RACMO]]
-  - [[#update][Update]]
-  - [[#old-files][Old files]]
-- [[#mar][MAR]]
-- [[#bedmachine-v5][BedMachine v5]]
+- [[#summary-of-differences][Summary of differences]]
+- [[#release_2022-vs-release_2023-discharge][release_2022 vs release_2023 discharge]]
+  - [[#extract-time-series][Extract time series]]
+  - [[#graphics][Graphics]]
+    - [[#r2023][r2023]]
+- [[#compare-using-upstream-basins][Compare using upstream basins]]
+  - [[#recreate-using-old-data][Recreate using 'old' data]]
+  - [[#recreate-using-new-data][Recreate using 'new' data]]
 
 * Introduction
 
-* RACMO
-:PROPERTIES:
-:header-args: :dir "/home/kdm/tmp/tmp/webspace.science.uu.nl/~noel0002/Share/Ken/runoff"
-:END:
+This document shows changes between the [[https://github.com/GEUS-Glaciology-and-Climate/freshwater/tree/release_2022][release_2022]] and [[https://github.com/GEUS-Glaciology-and-Climate/freshwater/tree/release_2023][release_2023]] freshwater discharge product.
 
-** Update
+Changes to the code and manuscript can be seen at https://github.com/GEUS-Glaciology-and-Climate/freshwater/compare/release_2022...release_2023
 
-Provided with the following files:
+* Summary of differences
 
-*** md5sum
++ Added 2022 RACMO data
++ Added 2022 MAR data
++ Updated MAR data from 3.12 to 3.13
++ Updated BedMachine from v4 to v5
++ Updated ArcticDEM from v3.0 to v4.1
 
-#+BEGIN_SRC bash :exports both :results verbatim
-md5sum *.nc.gz
+* release_2022 vs release_2023 discharge
+
+** Extract time series 
+#+BEGIN_SRC bash :results verbatim :exports results :wrap xml
+mamba activate freshwater_user
+
+python ./discharge.py --base="/home/kdm/data/Mankoff_2020/water/release_2022" --roi="-51.50,66.93 -51.21,66.74 -49.44,66.91 -49.84,67.18" -d -u > ./dat/r2022_roi.csv
+
+python ./discharge.py --base="/home/kdm/data/Mankoff_2020/water/release_2023" --roi="-51.50,66.93 -51.21,66.74 -49.44,66.91 -49.84,67.18" -d -u > ./dat/r2023_roi.csv
 #+END_SRC
 
-#+BEGIN_SRC bash :exports both :results verbatim
-parallel --progress gunzip {} ::: *.gz
-#+END_SRC
+** Graphics
 
-#+BEGIN_SRC bash :exports both :results verbatim
-md5sum *.nc
-#+END_SRC
+#+BEGIN_SRC jupyter-python :kernel ds
+df_r2022 = pd.read_csv('./dat/r2022_roi.csv', index_col=0)
+df_r2023 = pd.read_csv('./dat/r2023_roi.csv', index_col=0)
 
-#+RESULTS:
-: ad571c679a87c83ce909fad2b1b6e4bc  runoff.2022_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-: db31a4655a9bccb96b131841d1153e62  runoff.2022_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-: a449be8541fe5bdeea31a99c34f32936  runoff.2022_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-: fa554cbf0d760a8bb50813bbdf58d1e2  runoff.2022_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
+df_r2022 = df_r2022[['MAR_ice','RACMO_ice']]\
+    .rename(columns={'MAR_ice':'MAR_ice_2022',
+                     'RACMO_ice':'RACMO_ice_2022'})
 
-*** ncdump
-#+BEGIN_SRC bash :exports both :results verbatim
-ncdump -chs runoff.2022_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc
-#+END_SRC
+df_r2023 = df_r2023[['MAR_ice','RACMO_ice']]\
+    .rename(columns={'MAR_ice':'MAR_ice_2023',
+                     'RACMO_ice':'RACMO_ice_2023'})
 
-#+RESULTS:
-#+begin_example
-netcdf runoff.2022_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD {
-dimensions:
-	time = 92 ;
-	x = 1496 ;
-	y = 2700 ;
-variables:
-	float time(time) ;
-		time:units = "DAYS since 2022-10-01 00:00:00" ;
-		time:long_name = "time" ;
-		time:standard_name = "time" ;
-	float x(x) ;
-		x:units = "km" ;
-		x:long_name = "x" ;
-		x:standard_name = "x" ;
-	float y(y) ;
-		y:units = "km" ;
-		y:long_name = "y" ;
-		y:standard_name = "y" ;
-	float LON(y, x) ;
-		LON:units = "Degree" ;
-		LON:long_name = "Longitude" ;
-		LON:standard_name = "Longitude" ;
-		LON:actual_range = -639.4561f, 855.5441f ;
-		LON:missing_value = -1.e+30f ;
-	float LAT(y, x) ;
-		LAT:units = "Degree" ;
-		LAT:long_name = "Latitude" ;
-		LAT:standard_name = "Latitude" ;
-		LAT:actual_range = -3355.096f, -656.096f ;
-		LAT:missing_value = -1.e+30f ;
-	float runoffcorr(time, y, x) ;
-		runoffcorr:units = "mm w.e. per day" ;
-		runoffcorr:long_name = "1km Topography corrected runoff" ;
-		runoffcorr:standard_name = "1km_Topography_corrected_runoff" ;
-		runoffcorr:actual_range = 0.f, 80.17568f ;
-		runoffcorr:missing_value = -1.e+30f ;
+df = df_r2022.merge(df_r2023, left_index=True, right_index=True)
 
-// global attributes:
-		:title = "Daily mean runoff field at 1km (RACMO2.3p2 FGRN055 ERA)" ;
-		:institution = "IMAU (Brice Noel)" ;
-		:grid = "Map Projection:Polar Stereographic Ellipsoid - Map Reference Latitude: 90.0 - Map Reference Longitude: -39.0 - Map Second Reference Latitude: 71.0 - Map Eccentricity: 0.081819190843 ;wgs84 - Map Equatorial Radius: 6378137.0 ;wgs84 meters - Grid Map Origin Column: 160 - Grid Map Origin Row: -120 - Grid Map Units per Cell: 5000 - Grid Width: 301 - Grid Height: 561" ;
-		:history = "libUN (2013.05.22) - Tue Jan 10 13:09:27 2023" ;
-		:netcdf = "4.7.4 of Nov  4 2021 16:22:15 $" ;
-		:_Format = "classic" ;
-}
-#+end_example
-
-** Old files
-:PROPERTIES:
-:header-args: :dir "/home/kdm/data/RACMO/freshwater"
-:END:
-
-*** File list
-
-#+BEGIN_SRC bash :exports both :results verbatim
-ls -l
+p = df.loc['2012-04-01':'2012-11-15']\
+      .rolling(5)\
+      .mean()\
+      .plot(drawstyle='steps')
 #+END_SRC
 
 #+RESULTS:
-: total 70020
-: -rw-rw-r-- 1 kdm kdm  6953540 May 18  2022 FGRN055_Masks_5.5km.nc
-: -rw-rw-r-- 1 kdm kdm 64648132 May 16  2022 Icemask_Topo_Iceclasses_lon_lat_average_1km.nc
-: -rw-r--r-- 1 kdm kdm    41187 May  6  2022 README.org
-: drwxr-xr-x 2 kdm kdm    28672 May 16  2022 runoff_ice_1km
-: drwxrwxr-x 3 kdm kdm     4096 May 18  2022 runoff_land_1km_regrid
-: drwxrwxr-x 2 kdm kdm    12288 May 16  2022 runoff_land_5.5km
+[[file:./figs_tmp/14cac59c0cfaacfa5fcacdf5901b79d47e8870a5.png]]
 
-#+BEGIN_SRC bash :exports both :results verbatim
+*** r2023
 
-#+END_SRC
-
-* MAR
-:PROPERTIES:
-:header-args: :dir "/home/kdm/tmp/tmp/climato.be/fettweis/tmp/ken/1km"
-:END:
-
-Provided all files updated from =v3.12= to =v3.13=
-
-#+BEGIN_SRC bash :exports both :results verbatim
-ls
-#+END_SRC
-
-#+RESULTS:
-: MARv3.13-daily-ERA5-1950.nc
-
-#+BEGIN_SRC bash :exports both :results verbatim
-ncdump -h MARv3.13-daily-ERA5-1950.nc
+#+BEGIN_SRC jupyter-python :display plain :kernel ds
+df = pd.read_csv('./dat/r2023_roi.csv', index_col=0)
+df[['MAR_ice','RACMO_ice']]\
+    .loc['2012-04-01':'2012-11-15']\
+    .rolling(5)\
+    .mean()\
+    .plot(drawstyle='steps')
 #+END_SRC
 
 
-* BedMachine v5
-:PROPERTIES:
-:header-args: :dir "/home/kdm/data/Morlighem_2017"
-:END:
++ Note :: graphics appear roughly the same, but the x-axis has nearly doubled.
 
-#+BEGIN_SRC bash :exports both :results verbatim
-md5sum *v5*
+* Compare using upstream basins
+
+** Recreate using 'old' data
+
+#+BEGIN_SRC jupyter-python :kernel ds
+df = pd.read_csv('./dat/r2022_roi.csv', index_col=0)
+p = df.loc['2012-04-01':'2012-11-15']\
+      .rolling(5)\
+      .mean()\
+      .plot(drawstyle='steps')
 #+END_SRC
 
 #+RESULTS:
-: d78c1583d7a27c9d095de262fa16bc62  BedMachineGreenland-v5_bed.tif
-: 7387182a059dd8cad66ce7638eb0d7cd  BedMachineGreenland-v5.nc
+[[file:./figs_tmp/8e2135ab547341c90acc76e179fe45f340dc432b.png]]
 
-#+BEGIN_SRC bash :exports both :results verbatim
-ncdump -chs BedMachineGreenland-v5.nc
+** Recreate using 'new' data
+
+#+BEGIN_SRC jupyter-python :kernel ds
+df = pd.read_csv('./dat/r2023_roi.csv', index_col=0)
+p = df.loc['2012-04-01':'2012-11-15']\
+      .rolling(5)\
+      .mean()\
+      .plot(drawstyle='steps')
 #+END_SRC
 
 #+RESULTS:
-#+begin_example
-netcdf BedMachineGreenland-v5 {
-dimensions:
-	x = 10218 ;
-	y = 18346 ;
-variables:
-	char mapping ;
-		mapping:grid_mapping_name = "polar_stereographic" ;
-		mapping:latitude_of_projection_origin = 90. ;
-		mapping:standard_parallel = 70. ;
-		mapping:straight_vertical_longitude_from_pole = -45. ;
-		mapping:false_easting = 0. ;
-		mapping:false_northing = 0. ;
-		mapping:proj4text = "+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs" ;
-		mapping:crs_wkt = "PROJCS[\"WGS 84 / NSIDC Sea Ice Polar Stereographic North\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",70],PARAMETER[\"central_meridian\",-45],PARAMETER[\"scale_factor\",1],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"X\",EAST],AXIS[\"Y\",NORTH],AUTHORITY[\"EPSG\",\"3413\"]]" ;
-		mapping:_Storage = "contiguous" ;
-	int x(x) ;
-		x:long_name = "Cartesian x-coordinate" ;
-		x:standard_name = "projection_x_coordinate" ;
-		x:units = "meter" ;
-		x:_Storage = "contiguous" ;
-		x:_Endianness = "little" ;
-	int y(y) ;
-		y:long_name = "Cartesian y-coordinate" ;
-		y:standard_name = "projection_y_coordinate" ;
-		y:units = "meter" ;
-		y:_Storage = "contiguous" ;
-		y:_Endianness = "little" ;
-	byte mask(y, x) ;
-		mask:long_name = "mask (0 = ocean, 1 = ice-free land, 2 = grounded ice, 3 = floating ice, 4 = non-Greenland land)" ;
-		mask:grid_mapping = "mapping" ;
-		mask:valid_range = 0b, 4b ;
-		mask:flag_values = 0b, 1b, 2b, 3b, 4b ;
-		mask:flag_meanings = "ocean ice_free_land grounded_ice floating_ice non_greenland_land" ;
-		mask:source = "gimpmask v2.0 (https://byrd.osu.edu/research/groups/glacier-dynamics/data/icemask) combined with coastline from Jeremie Mouginot" ;
-		mask:_Storage = "contiguous" ;
-	float surface(y, x) ;
-		surface:long_name = "ice surface elevation" ;
-		surface:standard_name = "surface_altitude" ;
-		surface:units = "meters" ;
-		surface:grid_mapping = "mapping" ;
-		surface:source = "gimpdem v2.1 (https://byrd.osu.edu/research/groups/glacier-dynamics/data/gimpdem)" ;
-		surface:_Storage = "contiguous" ;
-		surface:_Endianness = "little" ;
-	float thickness(y, x) ;
-		thickness:long_name = "ice thickness" ;
-		thickness:standard_name = "land_ice_thickness" ;
-		thickness:units = "meters" ;
-		thickness:grid_mapping = "mapping" ;
-		thickness:source = "Mass conservation (Mathieu Morlighem)" ;
-		thickness:_Storage = "contiguous" ;
-		thickness:_Endianness = "little" ;
-	float bed(y, x) ;
-		bed:long_name = "bed topography" ;
-		bed:standard_name = "bedrock_altitude" ;
-		bed:units = "meters" ;
-		bed:grid_mapping = "mapping" ;
-		bed:source = "Mass conservation (Mathieu Morlighem)" ;
-		bed:_FillValue = -9999.f ;
-		bed:_Storage = "contiguous" ;
-		bed:_Endianness = "little" ;
-	short errbed(y, x) ;
-		errbed:long_name = "bed topography/ice thickness error" ;
-		errbed:units = "meters" ;
-		errbed:grid_mapping = "mapping" ;
-		errbed:source = "Mathieu Morlighem" ;
-		errbed:_FillValue = -9999s ;
-		errbed:_Storage = "chunked" ;
-		errbed:_ChunkSizes = 3670, 2044 ;
-		errbed:_DeflateLevel = 2 ;
-		errbed:_Shuffle = "true" ;
-		errbed:_Endianness = "little" ;
-	byte source(y, x) ;
-		source:long_name = "data source (0 = none, 1 = gimpdem, 2 = Mass conservation, 3 = synthetic, 4 = interpolation, 5 = hydrostatic equilibrium, 6 = kriging, 7 = RTOPO-2, 8 = gravity inversion, 9 = Millan et al. 2021, 10+ = bathymetry data)" ;
-		source:grid_mapping = "mapping" ;
-		source:valid_range = 0b, 50b ;
-		source:flag_values = 0b, 1b, 2b, 3b, 4b, 5b, 6b, 7b, 8b, 9b, 10b, 11b, 12b, 13b, 14b, 15b, 16b, 17b, 18b, 19b, 20b, 21b, 22b, 23b, 24b, 25b, 26b, 27b, 28b, 29b, 30b, 31b, 32b, 33b, 34b, 35b, 36b, 37b, 38b, 39b, 40b, 41b, 42b, 43b, 44b, 45b, 46b, 47b, 48b, 49b, 50b ;
-		source:flag_meanings = "none gimpdem mass_conservation synthetic interpolation hydrodstatic_equilibrium kriging RTopo_2 gravity_inversion millan_etal_2021 bathymetry1 bathymetry2 bathymetry3 bathymetry4 bathymetry5 bathymetry6 bathymetry7 bathymetry8 bathymetry9 bathymetry10 bathymetry11 bathymetry12 bathymetry13 bathymetry14 bathymetry15 bathymetry16 bathymetry17 bathymetry18 bathymetry19 bathymetry20 bathymetry21 bathymetry22 bathymetry23 bathymetry24 bathymetry25 bathymetry26 bathymetry27 bathymetry28 bathymetry29 bathymetry30 bathymetry31 bathymetry32 bathymetry33 bathymetry34 bathymetry35 bathymetry36 bathymetry37 bathymetry38 bathymetry39 bathymetry40 bathymetry41" ;
-		source:source = "Mathieu Morlighem" ;
-		source:_Storage = "contiguous" ;
-	byte dataid(y, x) ;
-		dataid:long_name = "data id" ;
-		dataid:grid_mapping = "mapping" ;
-		dataid:valid_range = 1b, 10b ;
-		dataid:flag_values = 1b, 2b, 7b, 10b ;
-		dataid:flag_meanings = "GIMPdem Radar seismic multibeam" ;
-		dataid:source = "Mathieu Morlighem" ;
-		dataid:_Storage = "chunked" ;
-		dataid:_ChunkSizes = 4587, 2555 ;
-		dataid:_DeflateLevel = 1 ;
-		dataid:_Shuffle = "true" ;
-	short geoid(y, x) ;
-		geoid:long_name = "EIGEN-6C4 Geoid - WGS84 Ellipsoid difference" ;
-		geoid:standard_name = "geoid_height_above_reference_ellipsoid" ;
-		geoid:units = "meters" ;
-		geoid:grid_mapping = "mapping" ;
-		geoid:geoid = "eigen-6c4 (Forste et al 2014)" ;
-		geoid:_Storage = "chunked" ;
-		geoid:_ChunkSizes = 3670, 2044 ;
-		geoid:_DeflateLevel = 2 ;
-		geoid:_Shuffle = "true" ;
-		geoid:_Endianness = "little" ;
+[[file:./figs_tmp/398db525122cda3d47e02e93fa4d1fcf60b6b0d9.png]]
 
-// global attributes:
-		:Conventions = "CF-1.7" ;
-		:Title = "BedMachine Greenland" ;
-		:Author = "Mathieu Morlighem" ;
-		:version = "28-Jul-2022 (v5.5)" ;
-		:nx = 10218. ;
-		:ny = 18346. ;
-		:Projection = "Polar Stereographic North (70N, 45W)" ;
-		:proj4 = "+init=epsg:3413" ;
-		:sea_water_density\ \(kg\ m-3\) = 1023. ;
-		:ice_density\ \(kg\ m-3\) = 917. ;
-		:xmin = -652925 ;
-		:ymax = -632675 ;
-		:spacing = 150 ;
-		:no_data = -9999. ;
-		:license = "No restrictions on access or use" ;
-		:Data_citation = "Morlighem M. et al., (2017), BedMachine v3: Complete bed topography and ocean bathymetry mapping of Greenland from multi-beam echo sounding combined with mass conservation, Geophys. Res. Lett., 44, doi:10.1002/2017GL074954. (http://onlinelibrary.wiley.com/doi/10.1002/2017GL074954/full)" ;
-		:_NCProperties = "version=2,netcdf=4.7.4,hdf5=1.8.12" ;
-		:_SuperblockVersion = 0 ;
-		:_IsNetcdf4 = 0 ;
-		:_Format = "netCDF-4 classic model" ;
-}
-#+end_example
