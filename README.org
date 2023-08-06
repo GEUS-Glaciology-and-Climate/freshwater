@@ -54,9 +54,13 @@ The source for this work is hosted on GitHub at https://github.com/GEUS-PROMICE/
 
 *** v 2023
 
-v 2023 has the following changes from v2022-10. See 2023 Milestone and git log for more details
-+ BedMachine updated to v5 from v4
-+ 
+[[https://github.com/GEUS-Glaciology-and-Climate/freshwater/tree/release_2023][release_2023]] has the following changes from [[https://github.com/GEUS-Glaciology-and-Climate/freshwater/tree/release_2022][v2022-08]]. See [[https://github.com/GEUS-Glaciology-and-Climate/freshwater/milestone/1][2023 Milestone]],  https://github.com/GEUS-Glaciology-and-Climate/freshwater/compare/release_2022...release_2023, and git log for more details
+
++ Added 2022 RACMO data
++ Added 2022 MAR data
++ Updated MAR data from 3.12 to 3.13
++ Updated BedMachine from v4 to v5
++ Updated ArcticDEM from v3.0 to v4.1
 
 *** v 2022-10
 
@@ -65,8 +69,8 @@ v 2022-10 has the following changes:
 + Data product has been reformatted to 4 NetCDF files: One per RCM (2) and domain (2), each containing all years of data
   + E.g., MAR_ice, MAR_land, RACMO_ice, RACMO_Land
 + Data files are now part of the dataset that contains the Geopackages of streams, outlets, and basins, rather than their own dataset on the dataverse
-  + DOI: .... has been Deaccesioned
-  + DOI: .... now contains the discharge data
+  + DOI: 10.22008/FK2/AA6MTB has been Deaccesioned
+  + DOI: [[https://doi.org/10.22008/FK2/XKQVL7][10.22008/FK2/XKQVL7]] now contains the discharge data
 + The README has been updated to show some additional examples using the metadata added in v3
 
 *** v 2022-08
@@ -122,7 +126,7 @@ As an example, it is easiest to begin working with the outlets, save subsetted d
 
 #+BEGIN_SRC jupyter-python :exports code
 import pandas as pd
-import geopandas as gpd
+import geopandas as gp
 
 df = pd.read_csv('./freshwater/ice/outlets.csv', index_col=0)
 gdf = gp.GeoDataFrame(df, geometry=gp.points_from_xy(df['lon'],df['lat']))
@@ -167,6 +171,7 @@ find ./freshwater/land/ ./freshwater/ice/ -maxdepth 1 | sort
 ./freshwater/ice/basins.csv
 ./freshwater/ice/basins_filled.gpkg
 ./freshwater/ice/basins.gpkg
+./freshwater/ice/discharge
 ./freshwater/ice/MAR.nc
 ./freshwater/ice/outlets.csv
 ./freshwater/ice/outlets.gpkg
@@ -177,6 +182,7 @@ find ./freshwater/land/ ./freshwater/ice/ -maxdepth 1 | sort
 ./freshwater/land/basins.csv
 ./freshwater/land/basins_filled.gpkg
 ./freshwater/land/basins.gpkg
+./freshwater/land/discharge
 ./freshwater/land/MAR.nc
 ./freshwater/land/outlets.csv
 ./freshwater/land/outlets.gpkg
@@ -257,7 +263,7 @@ python ./discharge.py --base ./freshwater --roi=-50.5,67.2 -o -q
 
 #+RESULTS:
 | index |     id |     lon |    lat |       x |        y | elev | Z2012_sector | Z2012_sector_dist | M2019_ID | M2019_ID_dist | M2019_basin        | M2019_region | M2020_gate | M2020_gate_dist | B2015_name        | B2015_dist | domain | upstream | coast_id | coast_lon | coast_lat | coast_x | coast_y |
-|     0 | 112448 | -51.233 | 67.156 | -272150 | -2491850 |   42 |           62 |             38911 |       71 |         38634 | ISUNNGUATA-RUSSELL | SW           |        195 |          193720 | Isunnguata Sermia |      46536 | land   | False    |       -1 |           |           |      -1 |      -1 |
+|     0 | 121108 | -51.219 | 67.153 | -271550 | -2492150 |    4 |           62 |             38320 |       71 |         38035 | ISUNNGUATA-RUSSELL | SW           |        195 |          193828 | Isunnguata Sermia |      45930 | land   | False    |       -1 |           |           |      -1 |      -1 |
 
 If we move 10° east to somewhere over the ice, there should be four rows: one for the land outlet and basin, and three more for the three ice scenario:
 
@@ -267,8 +273,8 @@ python ./discharge.py --base ./freshwater --roi=-40.5,67.2 -o -q
 
 #+RESULTS:
 | index |     id |     lon |    lat |      x |        y | elev | Z2012_sector | Z2012_sector_dist | M2019_ID | M2019_ID_dist | M2019_basin      | M2019_region | M2020_gate | M2020_gate_dist | B2015_name       | B2015_dist | domain | upstream | coast_id | coast_lon | coast_lat | coast_x |  coast_y |
-|     0 | 118180 | -38.071 |  66.33 | 313650 | -2580750 | -133 |           41 |              5796 |       63 |             0 | HELHEIMGLETSCHER | SE           |        231 |            9650 | Helheim Gletsjer |      11776 | land   | False    |       -1 |           |           |      -1 |       -1 |
-|     1 |  67065 |  -38.11 | 66.333 | 311850 | -2580650 |  -88 |           41 |              4177 |       63 |             0 | HELHEIMGLETSCHER | SE           |        231 |            7850 | Helheim Gletsjer |      10042 | ice    | False    |   118180 |   -38.071 |     66.33 |  313650 | -2580750 |
+|     0 | 126875 | -38.071 | 66.330 | 313650 | -2580750 | -187 |           41 |              5796 |       63 |             0 | HELHEIMGLETSCHER | SE           |        231 |            9650 | Helheim Gletsjer |      11776 | land   | False    |       -1 |           |           |      -1 |       -1 |
+|     1 |  67985 | -38.110 | 66.333 | 311850 | -2580650 | -244 |           41 |              4177 |       63 |             0 | HELHEIMGLETSCHER | SE           |        231 |            7850 | Helheim Gletsjer |      10042 | ice    | False    |   126875 |   -38.071 |    66.330 |  313650 | -2580750 |
 
 ***** Polygon covering multiple land and ice outlets
 
@@ -300,12 +306,11 @@ python ./discharge.py --base ./freshwater --roi="-51.50,66.93 -51.21,66.74 -49.4
 
 #+RESULTS:
 | index |     id |     lon |    lat |       x |        y | elev | Z2012_sector | Z2012_sector_dist | M2019_ID | M2019_ID_dist | M2019_basin                                   | M2019_region | M2020_gate | M2020_gate_dist | B2015_name        | B2015_dist | domain | upstream | coast_id | coast_lon | coast_lat | coast_x |  coast_y |
-|     0 | 113526 | -50.713 | 67.002 | -251250 | -2511450 |   17 |           62 |             22184 |       71 |         22906 | ISUNNGUATA-RUSSELL                            | SW           |        195 |          207779 | Isunnguata Sermia |      31644 | land   | False    |       -1 |           |           |      -1 |       -1 |
-|     1 | 113705 | -50.735 | 66.988 | -252350 | -2512850 |    7 |           62 |             23683 |       71 |         24427 | ISUNNGUATA-RUSSELL                            | SW           |        195 |          209355 | Isunnguata Sermia |      33360 | land   | False    |       -1 |           |           |      -1 |       -1 |
-|   200 |  67072 | -49.538 | 66.425 | -204850 | -2580850 |  792 |           62 |                 0 |       40 |             0 | SAQQAP-MAJORQAQ-SOUTHTERRUSSEL_SOUTHQUARUSSEL | SW           |        262 |          198569 | Quantum Gletsjer  |      78854 | ice    | True     |   114921 |   -50.652 |    66.868 | -250050 | -2526750 |
-|   201 |  67096 | -49.544 | 66.419 | -205150 | -2581550 |  825 |           62 |                 0 |       40 |           184 | SAQQAP-MAJORQAQ-SOUTHTERRUSSEL_SOUTHQUARUSSEL | SW           |        262 |          197830 | Quantum Gletsjer  |      78386 | ice    | True     |   114921 |   -50.652 |    66.868 | -250050 | -2526750 |
-|   202 |  67140 | -49.537 | 66.407 | -204950 | -2582950 |  873 |           62 |                 0 |       40 |             0 | SAQQAP-MAJORQAQ-SOUTHTERRUSSEL_SOUTHQUARUSSEL | SW           |        262 |          196481 | Quantum Gletsjer  |      78243 | ice    | True     |   114921 |   -50.652 |    66.868 | -250050 | -2526750 |
-
+|     0 | 122055 | -50.713 | 67.002 | -251250 | -2511450 |   20 |           62 |             22184 |       71 |         22906 | ISUNNGUATA-RUSSELL                            | SW           |        195 |          207779 | Isunnguata Sermia |      31644 | land   | False    |       -1 |           |           |      -1 |       -1 |
+|     1 | 122222 | -50.735 | 66.988 | -252350 | -2512850 |    7 |           62 |             23683 |       71 |         24427 | ISUNNGUATA-RUSSELL                            | SW           |        195 |          209355 | Isunnguata Sermia |      33360 | land   | False    |       -1 |           |           |      -1 |       -1 |
+|   203 |  67946 | -49.521 | 66.438 | -203950 | -2579550 |  767 |           62 |                 0 |       40 |             0 | SAQQAP-MAJORQAQ-SOUTHTERRUSSEL_SOUTHQUARUSSEL | SW           |        262 |          199999 | Quantum Gletsjer  |      80065 | ice    | True     |   123466 |   -50.652 |    66.868 | -250050 | -2526750 |
+|   204 |  68014 | -49.544 | 66.419 | -205150 | -2581550 |  825 |           62 |                 0 |       40 |           184 | SAQQAP-MAJORQAQ-SOUTHTERRUSSEL_SOUTHQUARUSSEL | SW           |        262 |          197830 | Quantum Gletsjer  |      78386 | ice    | True     |   123466 |   -50.652 |    66.868 | -250050 | -2526750 |
+|   205 |  68056 | -49.535 | 66.407 | -204850 | -2582950 |  859 |           62 |                 0 |       40 |             0 | SAQQAP-MAJORQAQ-SOUTHTERRUSSEL_SOUTHQUARUSSEL | SW           |        262 |          196497 | Quantum Gletsjer  |      78340 | ice    | True     |   123466 |   -50.652 |    66.868 | -250050 | -2526750 |
 
 **** Discharge
 
