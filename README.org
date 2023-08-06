@@ -171,7 +171,6 @@ find ./freshwater/land/ ./freshwater/ice/ -maxdepth 1 | sort
 ./freshwater/ice/basins.csv
 ./freshwater/ice/basins_filled.gpkg
 ./freshwater/ice/basins.gpkg
-./freshwater/ice/discharge
 ./freshwater/ice/MAR.nc
 ./freshwater/ice/outlets.csv
 ./freshwater/ice/outlets.gpkg
@@ -182,7 +181,6 @@ find ./freshwater/land/ ./freshwater/ice/ -maxdepth 1 | sort
 ./freshwater/land/basins.csv
 ./freshwater/land/basins_filled.gpkg
 ./freshwater/land/basins.gpkg
-./freshwater/land/discharge
 ./freshwater/land/MAR.nc
 ./freshwater/land/outlets.csv
 ./freshwater/land/outlets.gpkg
