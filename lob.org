@@ -10,6 +10,7 @@
 import numpy as np
 import pandas as pd
 import xarray as xr
+import datetime
 
 import statsmodels.api as sm
 from statsmodels.sandbox.regression.predstd import wls_prediction_std
@@ -453,12 +454,15 @@ plt.savefig("./fig/scatter_daily.svg", bbox_inches='tight', dpi=300)
 #+END_SRC
 
 #+RESULTS:
-: <ipython-input-96-bfb4386988f7>:91: RuntimeWarning: invalid value encountered in log10
+:RESULTS:
+: <ipython-input-9-87af816dbe85>:92: RuntimeWarning: invalid value encountered in log10
 :   df = np.log10(df)
-: <ipython-input-96-bfb4386988f7>:101: RuntimeWarning: divide by zero encountered in log10
+: <ipython-input-9-87af816dbe85>:102: RuntimeWarning: divide by zero encountered in log10
 :   df = np.log10(df)
-: <ipython-input-96-bfb4386988f7>:135: RuntimeWarning: divide by zero encountered in log10
+: <ipython-input-9-87af816dbe85>:136: RuntimeWarning: divide by zero encountered in log10
 :   df = np.log10(df)
+[[file:./figs_tmp/93671e18051782ffcc1dc7ce5411bf8600b027d4.png]]
+:END:
 
 
 ** NOTDONE Tukey - all daily data
@@ -588,15 +592,15 @@ df = np.log10(df)
 df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]
 
 THRESH=3
-df['y_MAR'] = df['y_MAR'].apply(lambda x: x if abs(x) < THRESH else sign(x)*THRESH)
-df['y_RACMO'] = df['y_RACMO'].apply(lambda x: x if abs(x) < THRESH else sign(x)*THRESH)
+df['y_MAR'] = df['y_MAR'].apply(lambda x: x if abs(x) < THRESH else np.sign(x)*THRESH)
+df['y_RACMO'] = df['y_RACMO'].apply(lambda x: x if abs(x) < THRESH else np.sign(x)*THRESH)
 
 kw = {'mincnt':1,
       'bins':'log',
       'clip_on':True,
       'gridsize':20,
       'extent':[-THRESH,THRESH,-THRESH,THRESH],
-      'cmap':cm.cividis}
+      'cmap':plt.cm.cividis}
 
 # plot all to get max of both for colorbar range
 h_MAR = ax1.hexbin(df['x'], df['y_MAR'], alpha=0, **kw)
@@ -678,8 +682,11 @@ plt.savefig("./fig/tukey_daily3.png", bbox_inches='tight', dpi=300)
 #+END_SRC
 
 #+RESULTS:
-: <ipython-input-315-e807cb86f54a>:180: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+:RESULTS:
+: <ipython-input-15-40314a40c313>:181: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
 :   plt.savefig("./fig/tukey_daily3.png", bbox_inches='tight', dpi=300)
+[[file:./figs_tmp/dbfa672f4298cb45bd4b7c09f380aa39b32461a8.png]]
+:END:
 
 
 ** Merge Tukey
@@ -1009,8 +1016,11 @@ plt.savefig("./fig/scatter_yearsum.png", bbox_inches='tight', dpi=300)
 #+END_SRC
 
 #+RESULTS:
-: <ipython-input-5-c6851b185ea3>:99: RuntimeWarning: divide by zero encountered in log10
+:RESULTS:
+: <ipython-input-16-336652539ae4>:109: RuntimeWarning: divide by zero encountered in log10
 :   df = np.log10(df)
+[[file:./figs_tmp/7b46ac803049bed776caa5f52f4fdeaa28a29a44.png]]
+:END:
 
 
 
@@ -1032,21 +1042,21 @@ for k in obs.keys():
 
 #+RESULTS:
 #+begin_example
-Kb -0.3311528507543031 0.15196649185125832
-L -1.9704279766951291 -3.1758415237024353
-Ks -9.961143379662456 -7.873864723176627
-Q 0.28474326943825123 -0.046580716974496506
-R -3.530503129196984 -3.0086507560529707
-T 0.12399308048237867 -0.36693117237732453
-W 0.38793291557573695 0.39388939202744044
-Z -0.3324706532094066 0.23826737271958642
-<ipython-input-33-b21cf7fdada4>:52: SettingWithCopyWarning: 
+Kb -0.009592928458694416 0.17006953639985956
+L -16.526392451495386 -18.59517733303472
+Ks -4.556831747771903 -8.030281139746917
+Q 0.7097415865150036 0.035738326992420855
+R -0.40674989972565867 -1.8629574587737756
+T -0.13163149112307582 0.06475239787855824
+W 0.6777534889116503 0.6918724387348874
+Z 0.10664228419267718 0.1704314586041613
+<ipython-input-19-b21cf7fdada4>:52: SettingWithCopyWarning: 
 A value is trying to be set on a copy of a slice from a DataFrame.
 Try using .loc[row_indexer,col_indexer] = value instead
 
 See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
   df['model'] = df['MAR_ice_upstream'] + df['MAR_land']
-<ipython-input-33-b21cf7fdada4>:54: SettingWithCopyWarning: 
+<ipython-input-19-b21cf7fdada4>:54: SettingWithCopyWarning: 
 A value is trying to be set on a copy of a slice from a DataFrame.
 Try using .loc[row_indexer,col_indexer] = value instead
 
