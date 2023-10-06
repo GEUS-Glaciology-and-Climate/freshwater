@@ -908,7 +908,8 @@ for k in obs.keys():
     df = obs[k]
     name = df.attrs['name']
     df = df.replace(0, np.nan).dropna()
-    df = df.resample('A').sum()
+    # m^3/s summed by year -> km^3/yr
+    df = df.resample('A').sum() * 86400
     df = np.log10(df)
     ax1.scatter(df['obs'], df['MAR'], marker='$\mathrm{'+k+'}$', alpha=0.9, 
                 label=name, clip_on=False, zorder=99)
@@ -923,7 +924,9 @@ for k in obs.keys():
     o = np.append(o, obs[k]['obs'].resample('A').sum())
     MAR = np.append(MAR, obs[k]['MAR'].resample('A').sum())
     RACMO = np.append(RACMO, obs[k]['RACMO'].resample('A').sum())
-df = pd.DataFrame((o,MAR,RACMO), index=['obs','MAR','RACMO']).T
+
+# m^3/s -> m^3/yr
+df = pd.DataFrame((o,MAR,RACMO), index=['obs','MAR','RACMO']).T * 86400
 
 
 df = np.log10(df)
@@ -960,14 +963,14 @@ for ax in [ax1,ax2]:
     ax.set_xlabel('Observed [m$^{3}$]')
 
     kw = {'alpha':0.5, 'linewidth':1, 'color':'k', 'linestyle':'-'}
-    ax.plot(np.log10([1E1,1E5]), np.log10([1E1,1E5]), **kw)
-    ax.plot(np.log10([1E1,1E5]), np.log10([1E1/2,1E5/2]), **kw)
-    ax.plot(np.log10([1E1,1E5]), np.log10([1E1*2,1E5*2]), **kw)
+    ax.plot(np.log10([1E6,1E10]), np.log10([1E6,1E10]), **kw)
+    ax.plot(np.log10([1E6,1E10]), np.log10([1E6/2,1E10/2]), **kw)
+    ax.plot(np.log10([1E6,1E10]), np.log10([1E6*2,1E10*2]), **kw)
 
-    ax.set_ylim([1,5])
+    ax.set_ylim([6,10])
     ax.set_xlim(ax.get_ylim())
-    ax.set_yticks([1,2,3,4,5])
-    ax.set_yticklabels(['10$^{1}$','10$^{2}$','10$^{3}$','10$^{4}$','10$^{5}$'])
+    ax.set_yticks([6,7,8,9,10])
+    ax.set_yticklabels(['10$^{6}$','10$^{7}$','10$^{8}$','10$^{9}$','10$^{10}$'])
     ax.set_xticks(ax.get_yticks())
     ax.set_xticklabels(ax.get_yticklabels())
 
