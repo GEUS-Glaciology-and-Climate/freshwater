@@ -26,6 +26,7 @@ class discharge(object):
        If point: Accesses nearest outlet
        If ring: Accesses all outlets within ring
     upstream: If True, include all upstream ice outlets for any land outlet
+    quiet: If False, print the progress of the current operation
 
     Outputs
     --------
@@ -33,14 +34,8 @@ class discharge(object):
     Returns xarray Dataset if discharge() called
     """
 
-    def __init__(self, base=None, roi=None, upstream=False, quiet=True):
-        if roi is None:
-            print("Error: Not initialized with ROI")
-            return
+    def __init__(self, base, roi, upstream=False, quiet=True):
         self._roi = roi
-        if base is None:
-            print("Error: Not initialized with 'base' folder")
-            return
         self._base = base
         self._quiet = quiet
         self._upstream = upstream
