@@ -7,8 +7,10 @@ import pandas as pd
 import xarray as xr
 import geopandas as gp
 from shapely.geometry import Point, Polygon
+from shapely.ops import unary_union
 from argparse import ArgumentParser
 import fiona
+
 
 fiona.drvsupport.supported_drivers["KML"] = "rw" # https://gis.stackexchange.com/a/258370/609
 fiona.drvsupport.supported_drivers["LIBKML"] = "rw" # https://gis.stackexchange.com/a/258370/609
@@ -85,19 +87,16 @@ class discharge(object):
         #        [aaaa] represents one basins with two parts, so it gets 2 table rows. We want 1.
         # df.groupby('id').first() solves this, except for the basin column that needs a custom aggregate fuction.
         # except we need to aggregate the 'basin' column to convert to multipolygon
-        def p2mp(da): # polygon to multipolygon
-            from shapely.ops import unary_union # cascaded_union deprecated, replace with unary_union
-            return unary_union(da)  # https://stackoverflow.com/questions/36774049/
-            
+        # See also https://stackoverflow.com/questions/36774049/
         for key in self._outlets.keys():
             if self._outlets[key] is not None:
                 aggdict = dict(zip(self._outlets[key].columns,['first']*self._outlets[key].columns.size))
-                aggdict['basin'] = p2mp
+                aggdict['basin'] = unary_union
                 self._outlets[key] = self._outlets[key].groupby('cat').agg(aggdict)
         for key in self._outlets_u.keys():
             if self._outlets_u[key] is not None:
                 aggdict = dict(zip(self._outlets_u[key].columns,['first']*self._outlets_u[key].columns.size))
-                aggdict['basin'] = p2mp
+                aggdict['basin'] = unary_union
                 self._outlets_u[key] = self._outlets_u[key].groupby('cat').agg(aggdict)
 
         # Return datastructure
