@@ -12,7 +12,7 @@
 - [[#accessing-this-data][Accessing this data]]
   - [[#introduction][Introduction]]
     - [[#database-format][Database Format]]
-    - [[#warnings][Warnings]]
+    - [[#notes][Notes]]
     - [[#requirements][Requirements]]
   - [[#examples][Examples]]
     - [[#command-line-interface][Command line interface]]
@@ -85,7 +85,10 @@ v 2022-08 has the following changes (see GitHub diff above for more details):
 
 * WARNING
 
+#+BEGIN_QUOTE
+[!WARNING] 
 + Bugs may exist in this data or the [[./discharge.py]] access script. All known bugs will be documented at [[https://github.com/GEUS-PROMICE/freshwater/issues]]. Before using this software or finalizing results, you should check if any [[https://github.com/mankoff/freshwater/issues][open issues]] impact your results, or if any issue have been [[https://github.com/mankoff/freshwater/issues?q=is%3Aissue+is%3Aclosed][closed]] since you downloaded the data or script.
+#+END_QUOTE
 
 * Related Work  
 
@@ -213,7 +216,7 @@ find ./freshwater/land/ ./freshwater/ice/ -maxdepth 1 | sort
 ./freshwater/land/streams.gpkg
 #+end_example
 
-*** Warnings
+*** Notes
 
 + The script takes a few seconds to query the outlets and basins. The script takes ~10s of seconds to query each of the discharge time series datasets. Because there may be up to 6 discharge queries (2 RCMs for each of 1 land domain + ice domain + upstream ice), it can several minutes on a fast laptop to extract the data. To track progress, do not set the =quiet= flag to =True=.
 
