@@ -328,7 +328,7 @@ if __name__ == '__main__':
         print(df.drop(columns=["outlet","basin"]).to_csv(float_format='%.3f'))
     elif args.discharge:
         ds = r.discharge()
-        d = [_ for _ in ds.dims.keys() if _ != 'time'] # sum outlets by dimension
+        d = [_ for _ in ds.sizes.keys() if _ != 'time'] # sum outlets by dimension
         print(ds.sum(dim=d).to_dataframe().to_csv(float_format='%.6f'))
 
 else:

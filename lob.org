@@ -43,11 +43,12 @@ from adjust_spines import adjust_spines
 import matplotlib.patheffects as pe
 
 import seaborn as sns
+
+import matplotlib.pyplot as plt
+plt.style.use('tableau-colorblind10')
 #+END_SRC
 
 #+RESULTS: py_init_graphics
-
-#+RESULTS: init_graphics
 
 *** Data Dir
 
@@ -345,13 +346,13 @@ X = sm.add_constant(x)
 model = sm.OLS(y_MAR, X)
 results = model.fit()
 prstd, iv_l, iv_u = wls_prediction_std(results)
-ax1.fill_between(x, iv_u, iv_l, color="grey", alpha=0.25)
+ax1.fill_between(x, iv_u, iv_l, color="grey", alpha=0.15)
 ax1.text(0.6, 0.05, 'r$^{2}$:' + str(round(results.rsquared,2)), transform=ax1.transAxes, horizontalalignment='left')
 
 model = sm.OLS(y_RACMO, X)
 results = model.fit()
 prstd, iv_l, iv_u = wls_prediction_std(results)
-ax2.fill_between(x, iv_u, iv_l, color="grey", alpha=0.25)
+ax2.fill_between(x, iv_u, iv_l, color="grey", alpha=0.15)
 ax2.text(0.6, 0.05, 'r$^{2}$:' + str(round(results.rsquared,2)), transform=ax2.transAxes, horizontalalignment='left')
 
 
@@ -454,15 +455,7 @@ plt.savefig("./fig/scatter_daily.svg", bbox_inches='tight', dpi=300)
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-: <ipython-input-9-87af816dbe85>:92: RuntimeWarning: invalid value encountered in log10
-:   df = np.log10(df)
-: <ipython-input-9-87af816dbe85>:102: RuntimeWarning: divide by zero encountered in log10
-:   df = np.log10(df)
-: <ipython-input-9-87af816dbe85>:136: RuntimeWarning: divide by zero encountered in log10
-:   df = np.log10(df)
-[[file:./figs_tmp/93671e18051782ffcc1dc7ce5411bf8600b027d4.png]]
-:END:
+[[file:./figs_tmp/1cfe3432c6360fef8518183ccc32d44cf94f2b07.png]]
 
 
 ** NOTDONE Tukey - all daily data
@@ -943,13 +936,13 @@ X = sm.add_constant(x)
 model = sm.OLS(y_MAR, X)
 results = model.fit()
 prstd, iv_l, iv_u = wls_prediction_std(results)
-ax1.fill_between(x, iv_u, iv_l, color="grey", alpha=0.25)
+ax1.fill_between(x, iv_u, iv_l, color="grey", alpha=0.15)
 ax1.text(0.6, 0.05, 'r$^{2}$:' + str(round(results.rsquared,2)), transform=ax1.transAxes, horizontalalignment='left')
 
 model = sm.OLS(y_RACMO, X)
 results = model.fit()
 prstd, iv_l, iv_u = wls_prediction_std(results)
-ax2.fill_between(x, iv_u, iv_l, color="grey", alpha=0.25)
+ax2.fill_between(x, iv_u, iv_l, color="grey", alpha=0.15)
 ax2.text(0.6, 0.05, 'r$^{2}$:' + str(round(results.rsquared,2)), transform=ax2.transAxes, horizontalalignment='left')
 
 
@@ -1019,11 +1012,7 @@ plt.savefig("./fig/scatter_yearsum.png", bbox_inches='tight', dpi=300)
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-: <ipython-input-16-336652539ae4>:109: RuntimeWarning: divide by zero encountered in log10
-:   df = np.log10(df)
-[[file:./figs_tmp/7b46ac803049bed776caa5f52f4fdeaa28a29a44.png]]
-:END:
+[[file:./figs_tmp/ce00706ce05524bff7028e0f0955b088092a5122.png]]
 
 
 

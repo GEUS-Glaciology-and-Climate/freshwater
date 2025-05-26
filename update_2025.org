@@ -1,0 +1,111 @@
+
+#+PROPERTY: header-args:jupyter-python+ :kernel freshwater :session fw :exports both
+#+PROPERTY: :header-args:bash+ :session "*freshwater.update-shell*" :results verbatim :exports both
+
+* Table of contents                               :toc_5:noexport:
+- [[#introduction][Introduction]]
+- [[#summary-of-differences][Summary of differences]]
+- [[#release_2023-vs-release_2025-discharge][release_2023 vs release_2025 discharge]]
+  - [[#extract-time-series][Extract time series]]
+  - [[#graphics][Graphics]]
+    - [[#r2023][r2023]]
+- [[#compare-using-upstream-basins][Compare using upstream basins]]
+  - [[#recreate-using-old-data][Recreate using 'old' data]]
+  - [[#recreate-using-new-data][Recreate using 'new' data]]
+
+* Introduction
+
+This document shows changes between the [[https://github.com/GEUS-Glaciology-and-Climate/freshwater/tree/release_2023][release_2023]] and [[https://github.com/GEUS-Glaciology-and-Climate/freshwater/tree/release_2025][release_2025]] freshwater discharge product.
+
+Changes to the code and manuscript can be seen at https://github.com/GEUS-Glaciology-and-Climate/freshwater/compare/release_2023...release_2025
+
+Previous updates between [[https://github.com/GEUS-Glaciology-and-Climate/freshwater/tree/release_2022][release_2022]] and [[https://github.com/GEUS-Glaciology-and-Climate/freshwater/tree/release_2023][release_2023]] are document at https://github.com/GEUS-Glaciology-and-Climate/freshwater/blob/main/update_2023.org
+
+* Summary of differences
+
++ Added 2023 and 2024 RACMO data
++ Added 2023 and 2024 MAR data
++ Updated MAR data from 3.13 to 3.14
+
+* release_2023 vs release_2025 discharge
+
+** Extract time series 
+#+BEGIN_SRC bash :results verbatim :exports results :wrap xml :exports both
+mamba activate freshwater_user
+
+python ./discharge.py --base="/home/kdm/data/Mankoff_2020/water/release_2023" --roi="-51.50,66.93 -51.21,66.74 -49.44,66.91 -49.84,67.18" -d -u > ./dat/r2023_roi.csv
+
+python ./discharge.py --base="/home/kdm/data/Mankoff_2020/water/release_2025" --roi="-51.50,66.93 -51.21,66.74 -49.44,66.91 -49.84,67.18" -d -u > ./dat/r2025_roi.csv
+#+END_SRC
+
+** Graphics
+
+#+BEGIN_SRC jupyter-python :kernel ds :exports both
+df_r2025 = pd.read_csv('./dat/r2025_roi.csv', index_col=0)
+df_r2023 = pd.read_csv('./dat/r2023_roi.csv', index_col=0)
+
+df_r2025 = df_r2025[['MAR_ice','RACMO_ice']]\
+    .rename(columns={'MAR_ice':'MAR_ice_2025',
+                     'RACMO_ice':'RACMO_ice_2025'})
+
+df_r2023 = df_r2023[['MAR_ice','RACMO_ice']]\
+    .rename(columns={'MAR_ice':'MAR_ice_2023',
+                     'RACMO_ice':'RACMO_ice_2023'})
+
+df = df_r2025.merge(df_r2023, left_index=True, right_index=True)
+
+p = df.loc['2012-04-01':'2012-11-15']\
+      .rolling(5)\
+      .mean()\
+      .plot(drawstyle='steps')
+#+END_SRC
+
+#+RESULTS:
+[[file:./figs_tmp/0a23dc2adf1cad9ec57f7c548490ac328c4541cb.png]]
+
+*** r2023
+
+#+BEGIN_SRC jupyter-python :kernel ds  :exports both
+df = pd.read_csv('./dat/r2025_roi.csv', index_col=0)
+df[['MAR_ice','RACMO_ice']]\
+    .loc['2012-04-01':'2012-11-15']\
+    .rolling(5)\
+    .mean()\
+    .plot(drawstyle='steps')
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: <Axes: xlabel='time'>
+[[file:./figs_tmp/c101a2df3955dabb0bdcbe726d74e6593e15dad5.png]]
+:END:
+
+
+* Compare using upstream basins
+
+** Recreate using 'old' data
+
+#+BEGIN_SRC jupyter-python :kernel ds  :exports both
+df = pd.read_csv('./dat/r2023_roi.csv', index_col=0)
+p = df.loc['2012-04-01':'2012-11-15']\
+      .rolling(5)\
+      .mean()\
+      .plot(drawstyle='steps')
+#+END_SRC
+
+#+RESULTS:
+[[file:./figs_tmp/ae4ccb34d9bf1da26efdc7bb123f70601bca8b22.png]]
+
+** Recreate using 'new' data
+
+#+BEGIN_SRC jupyter-python :kernel ds  :exports both
+df = pd.read_csv('./dat/r2025_roi.csv', index_col=0)
+p = df.loc['2012-04-01':'2012-11-15']\
+      .rolling(5)\
+      .mean()\
+      .plot(drawstyle='steps')
+#+END_SRC
+
+#+RESULTS:
+[[file:./figs_tmp/7adcc1a03e93fd761a2e1da041857c3cb47ccd3f.png]]
+
