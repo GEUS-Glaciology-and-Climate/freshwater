@@ -2012,7 +2012,7 @@ r.univar -t map=model zones=basins@land_${k_pct} \
 log_info "Using EXTRA GNU parallel options via \${PARALLEL}: ${PARALLEL:-Not set}"
 
 k_pct=100
-for y in $(seq 1940 2024); do
+for y in $(seq 1940 2025); do
   file_base=MAR_runoff_ice_${y}
   infile=${file_base}.nc
   outfile=${file_base}_${k_pct}.bsv
@@ -2078,7 +2078,7 @@ print(isum/osum)
 log_info "Using EXTRA GNU parallel options via \${PARALLEL}: ${PARALLEL:-Not set}"
 
 k_pct=100
-for y in $(seq 1940 2024); do
+for y in $(seq 1940 2025); do
   file_base=MAR_runoff_land_${y}
   infile=${file_base}.nc
   outfile=${file_base}_${k_pct}.bsv
@@ -2587,6 +2587,9 @@ for d in ['ice','land']:
         print(d,r)
         ds = xr.open_mfdataset('./freshwater/'+d+'/discharge/'+r+'_*.nc', combine='by_coords')
 
+        # don't include this year which is updated NRT in separate file
+        ds = ds.where(ds['time'].dt.year < 2025, drop=True)
+
         for v in ['Z2012_sector', 'Z2012_sector_dist',
                   'M2019_ID','M2019_ID_dist','M2019_region','M2019_basin',
                   'M2020_gate','M2020_gate_dist',
@@ -2668,6 +2671,14 @@ output:
 	# create end-user data product
 	parallel --bar "python bsv2netcdf.py {}" ::: $$(ls dat/*_runoff_*.bsv)
 	python netcdf_combine.py
+
+update:
+	wget http://ftp.climato.be/fettweis/tmp/ken/1km/MARv3.14-daily-ERA5-2025.nc -O ${DATADIR}/MAR/3.14-daily-1km/MARv3.14-daily-ERA5-2025.nc
+	rm tmp/MAR_runoff_*_2025.nc
+	python ./rcm_preprocess.py
+	rm dat/MAR_runoff_*_2025_100.bsv
+	grass ./G/PERMANENT --exec ./rcm.sh
+	parallel --bar "python bsv2netcdf.py {}" ::: $$(ls dat/*_runoff_*2025*.bsv)
 
 dist: freshwater.zip
 	zip -r freshwater.zip freshwater
