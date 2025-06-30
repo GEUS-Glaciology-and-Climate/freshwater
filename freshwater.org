@@ -6116,7 +6116,7 @@ plt.savefig('./fig/watson_adjusted_south.png', transparent=True, bbox_inches='ti
 * README                                                :noexport:
 
 #+BEGIN_SRC org :tangle ./freshwater/README.txt :mkdirp ./freshwater :eval no
-README for "Greenland liquid water runoff from 1940 through December 2024"
+README for "Greenland liquid water discharge from 1940 through December 2024"
 
 Data DOI: doi:10.22008/promice/freshwater
 Source: https://github.com/GEUS-Glaciology-and-Climate/freshwater
@@ -6127,7 +6127,7 @@ Data sets released as part of this work include:
 + Streams
 + Outlets
 + Basins
-+ Runoff
++ Discharge
 
 ,** Streams, outlets, and basins
 
@@ -6140,27 +6140,27 @@ Outlets are marked where streams leave the domain
 
 Basins are the usptream grid cells that feed into each outlet.
 
-,** Runoff
+,** Discharge
 
-Runoff comes from daily MAR and RACMO RCM runoff, partitioned into each basin, and assigned to each outlet.
+Discharge comes from daily MAR and RACMO RCM runoff, partitioned into each basin, and assigned to each outlet.
 
-The ice dataset report the ice runoff. The land dataset report the the land runoff. The land dataset includes the ID of the upstream ice basins that drain into each land basin, allowing one to find the ice melt runoff at any land outlet.
+The ice dataset report the ice discharge. The land dataset report the the land discharge. The land dataset includes the ID of the upstream ice basins that drain into each land basin, allowing one to find the ice melt discharge at any land outlet.
 
 ,* Datasets
 
 Each dataset is in a folder named <domain>, where =domain= is one of "ice" or "land". Within each folder the following files and sub-folders are provided:
 
-| Filename     | Description                           |
-|--------------+---------------------------------------|
-| streams.gpkg | GeoPackage of stream locations        |
-| streams.csv  | Metadata for streams                  |
-| outlets.gpkg | GeoPackage of outlet locations        |
-| outlets.csv  | Metadata for outlets                  |
-| basins.gpkg  | GeoPackage of basin locations         |
-| basins.csv   | Metadata for basins                   |
-| runoff       | NetCDF files of runoff at each outlet |
+| Filename     | Description                              |
+|--------------+------------------------------------------|
+| streams.gpkg | GeoPackage of stream locations           |
+| streams.csv  | Metadata for streams                     |
+| outlets.gpkg | GeoPackage of outlet locations           |
+| outlets.csv  | Metadata for outlets                     |
+| basins.gpkg  | GeoPackage of basin locations            |
+| basins.csv   | Metadata for basins                      |
+| discharge    | NetCDF files of discharge at each outlet |
 
-In the runoff sub-folders, files are named <RCM>_<YYYY>.nc, where =RCM= is one of "MAR" or "RACMO", and =YYYY= is the year of the data. Within each file are daily runoff values at each outlet.
+In the discharge sub-folders, files are named <RCM>_<YYYY>.nc, where =RCM= is one of "MAR" or "RACMO", and =YYYY= is the year of the data. Within each file are daily discharge values at each outlet.
 
 ,* Database access software
 
