@@ -34,9 +34,10 @@ class discharge(object):
     Returns xarray Dataset if discharge() called
     """
 
-    def __init__(self, base, roi, upstream=False, quiet=True):
+    def __init__(self, base, roi, year="*", upstream=False, quiet=True):
         self._roi = roi
         self._base = base
+        self._year = str(year)
         self._quiet = quiet
         self._upstream = upstream
         
@@ -133,7 +134,7 @@ class discharge(object):
             r,d = key.split("_")
             self.msg("    Loading %s" % key)
             # load all discharge at all outlets
-            fname = self._base + "/" + d + "/" + r + ".nc"
+            fname = self._base + "/" + d + "/discharge/" + r + "*" + self._year + "*.nc"
             self._discharge[key] = xr.open_mfdataset(fname, engine='netcdf4').rename({"discharge": key})
 
         self.outlets()           # load outlets, and subset them to ROI
@@ -307,6 +308,7 @@ def parse_arguments():
     parser.add_argument("--roi", required=True, type=str, 
                         help="x,y OR lon,lat OR x0,y0 x1,y1 ... xn,yn " + \
                         "OR lon0,lat0 lon1,lat1 ... lon_n,lat_n. [lon: degrees E]")
+    parser.add_argument("-y", "--year", type=str, default="*", help="YYYY OR YYY? or YY*")
     parser.add_argument("-u", "--upstream", action='store_true', 
                         help="Include upstream ice outlets draining into land basins")
     group = parser.add_mutually_exclusive_group(required=True)
@@ -322,7 +324,7 @@ def parse_arguments():
 if __name__ == '__main__':
     """Executed from the command line"""
     args = parse_arguments()
-    r = discharge(base=args.base, roi=args.roi, upstream=args.upstream, quiet=args.quiet)
+    r = discharge(base=args.base, roi=args.roi, year=args.year, upstream=args.upstream, quiet=args.quiet)
     if args.outlets:
         df = r.outlets()
         print(df.drop(columns=["outlet","basin"]).to_csv(float_format='%.3f'))

@@ -2375,24 +2375,14 @@ for model in ['RACMO', 'MAR']:
 :header-args:jupyter-python+: :tangle bsv2netcdf.py
 :END:
 
+Note:
++ ~ln -s ice_100 ice~
++ ~ln -s land_100 land~
+
 Convert annual BSV files to annual NetCDF format files
-
-Want to produce CF-compliant and user-friendly NetCDF that will work with nco and panoply. 
-+ SEE: https://www.nodc.noaa.gov/data/formats/netcdf/v2.0/ timeSeriesProfile
-+ https://www.nodc.noaa.gov/data/formats/netcdf/v2.0/timeSeriesOrthogonal.cdl
-+ http://cfconventions.org/cf-conventions/cf-conventions.html#time-series-data
-
-Also modeling after:
-+ ~/data/Bamber_2018/FWF17.v3_a.nc
-+ See also: https://gis.stackexchange.com/questions/67012/using-netcdf-for-point-time-series-observations
-
-This code:
-+ Can be run 1x within Org to produce =ds.nc= for testing purposes
-+ Is also included in the tangled =bsv2netcdf.py= script
 
 In the =bsv2netcdf.py= script, pass the input file in, and the output file is determined from the input file name.
 Can be run in parallel (for example in the Makefile) with: =parallel --bar "python bsv2netcdf.py {}" ::: $(ls dat/*_runoff_*.bsv)=
-
 
 #+NAME: bsv2xarray
 #+BEGIN_SRC jupyter-python :session freshwater :exports both :results raw drawer :tangle no
@@ -2645,55 +2635,6 @@ ds.to_netcdf(OUTFILE, unlimited_dims='time', encoding=enc, engine='netcdf4', mod
 
 #+RESULTS:
 
-*** Combine NetCDF 
-
-Note:
-+ ~ln -s ice_100 ice~
-+ ~ln -s land_100 land~
-
-#+BEGIN_SRC jupyter-python :tangle netcdf_combine.py
-import xarray as xr
-import numpy as np
-
-for d in ['ice','land']:
-    for r in ['RACMO','MAR']:
-        print(d,r)
-        ds = xr.open_mfdataset('./freshwater/'+d+'/discharge/'+r+'_*.nc', combine='by_coords')
-
-        # don't include this year which is updated NRT in separate file
-        ds = ds.where(ds['time'].dt.year < 2025, drop=True)
-
-        for v in ['Z2012_sector', 'Z2012_sector_dist',
-                  'M2019_ID','M2019_ID_dist','M2019_region','M2019_basin',
-                  'M2020_gate','M2020_gate_dist',
-                  'B2015_name','B2015_dist']:
-            ds[v] = ds[v].isel({'time':1}).squeeze()
-            
-        if d == 'ice':
-            for v in ['coast_id','coast_lat','coast_lon','coast_alt']:
-                ds[v] = ds[v].isel({'time':1}).squeeze()
-            
-        for v in ['M2019_basin','M2019_region','B2015_name']:
-            ds[v] = ds[v].astype(str)
-
-        for v in ['B2015_dist','M2020_gate_dist','M2020_gate',
-                  'M2019_ID_dist','M2019_ID','Z2012_sector_dist']:
-            ds[v] = ds[v].astype(np.uint32)
-        
-        ds.to_netcdf('./freshwater/'+d+'/'+r+'.nc',
-                     unlimited_dims='time', 
-                     encoding={'discharge': {'zlib': True, 'complevel': 2},
-                     #           'Z2012_sector': {'zlib': True, 'complevel': 2},
-                     #           'M2019_ID': {'zlib': True, 'complevel': 2},
-                     #           #'M2019_basin': {'zlib': True, 'complevel': 2},
-                     #           #'M2019_region': {'zlib': True, 'complevel': 2},
-                     #           'B2015_name': {'zlib': True, 'complevel': 2},
-                     #           'M2020_gate': {'zlib': True, 'complevel': 2},
-                               }, 
-                     engine='netcdf4', mode='w')
-        
-#+END_SRC
-
 ** Makefile
 :PROPERTIES:
 :CUSTOM_ID: sec:makefile
@@ -2743,7 +2684,6 @@ coverage:
 output:
 	# create end-user data product
 	parallel --bar "python bsv2netcdf.py {}" ::: $$(ls dat/*_runoff_*.bsv)
-	python netcdf_combine.py
 
 update:
 	wget http://ftp.climato.be/fettweis/tmp/ken/1km/MARv3.14-daily-ERA5-2025.nc -O ${DATADIR}/MAR/3.14-daily-1km/MARv3.14-daily-ERA5-2025.nc

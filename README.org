@@ -58,12 +58,14 @@ The source for this work is hosted on GitHub at https://github.com/GEUS-PROMICE/
 
 *** v 2025
 
-[[https://github.com/GEUS-Glaciology-and-Climate/freshwater/tree/release_2025][release_2025]] has the following changes from [[https://github.com/GEUS-Glaciology-and-Climate/freshwater/tree/release_2023][v2023]]. See  https://github.com/GEUS-Glaciology-and-Climate/freshwater/compare/release_2023...release_2025, and git log for more details
+[[https://github.com/GEUS-Glaciology-and-Climate/freshwater/tree/release_2025][release_2025]] has the following changes from [[https://github.com/GEUS-Glaciology-and-Climate/freshwater/tree/release_2023][v2023]]. See https://github.com/GEUS-Glaciology-and-Climate/freshwater/compare/release_2023...release_2025, and git log for more details
 
 + Updated MAR data from 3.13 to 3.14
 + Added MAR 2023 and 2024
 + Added MAR 1940 through 1958 
 + Added RACMO 2023 and 2024
++ One file per year per RCM
++ Add API support (discharge.py) for =year= option. Subsetting to specific years (or looping over years) makes things much faster
 
 *** v 2023
 
@@ -201,7 +203,8 @@ The folder structure required is a =root= folder (named =freshwater= in the exam
 Example:
 
 #+BEGIN_SRC bash :results verbatim :exports results
-find ./freshwater/land/ ./freshwater/ice/ -maxdepth 1 | sort
+find ./freshwater/land/ ./freshwater/ice/ -maxdepth 2 | sort
+# CUT most of the RCM_YYYY.nc files...
 #+END_SRC
 
 #+RESULTS:
@@ -210,20 +213,30 @@ find ./freshwater/land/ ./freshwater/ice/ -maxdepth 1 | sort
 ./freshwater/ice/basins.csv
 ./freshwater/ice/basins_filled.gpkg
 ./freshwater/ice/basins.gpkg
-./freshwater/ice/MAR.nc
+./freshwater/ice/discharge
+./freshwater/ice/discharge/MAR_1940.nc
+...
+./freshwater/ice/discharge/MAR_2024.nc
+./freshwater/ice/discharge/RACMO_1958.nc
+...
+./freshwater/ice/discharge/RACMO_2024.nc
 ./freshwater/ice/outlets.csv
 ./freshwater/ice/outlets.gpkg
-./freshwater/ice/RACMO.nc
 ./freshwater/ice/streams.csv
 ./freshwater/ice/streams.gpkg
 ./freshwater/land/
 ./freshwater/land/basins.csv
 ./freshwater/land/basins_filled.gpkg
 ./freshwater/land/basins.gpkg
-./freshwater/land/MAR.nc
+./freshwater/land/discharge
+./freshwater/land/discharge/MAR_1940.nc
+...
+./freshwater/land/discharge/MAR_2024.nc
+./freshwater/land/discharge/RACMO_1958.nc
+...
+./freshwater/land/discharge/RACMO_2024.nc
 ./freshwater/land/outlets.csv
 ./freshwater/land/outlets.gpkg
-./freshwater/land/RACMO.nc
 ./freshwater/land/streams.csv
 ./freshwater/land/streams.gpkg
 #+end_example
@@ -356,10 +369,10 @@ The discharge examples here use the same code as the "outlets and basins" exampl
 
 ***** One point
 
-The simplest example is a point, in this case near the Watson River outlet. Because we select one point over land and do not request upstream outlets and basins, two time series should be returned: =MAR_land= and =RACMO_land=. Rather than showing results for every day from 1958 through 2019, we limit to the header and the first 10 days of June, 2012.
+The simplest example is a point, in this case near the Watson River outlet. Because we select one point over land and do not request upstream outlets and basins, two time series should be returned: =MAR_land= and =RACMO_land=. Rather than showing results for every day from 1958 through 2019, we limit to the header and the first 9 days of June, 2012.
 
 #+BEGIN_SRC bash :exports both :results table
-python ./discharge.py --base ./freshwater --roi=-50.5,67.2 -q -d | (head -n1; grep -A9 "^2012-06-01")
+python ./discharge.py --base ./freshwater --roi=-50.5,67.2 --year=2012 -q -d | grep -E 'time|^2012-06-0'
 #+END_SRC
 
 #+RESULTS:
@@ -373,7 +386,6 @@ python ./discharge.py --base ./freshwater --roi=-50.5,67.2 -q -d | (head -n1; gr
 | 2012-06-07 | 0.459563 |  12.371853 |
 | 2012-06-08 | 3.035036 |  12.999544 |
 | 2012-06-09 | 0.207011 |  13.737736 |
-| 2012-06-10 | 0.201187 |  14.613457 |
 
 + If we move 10° east to somewhere over the ice we add two columns: One for each of the two RCMs over the ice domain.
 + If the =--upstream= flag is set, we add two columns: One for each of the RCMs over the *upstream* ice domains. Results are summed across outlets per domain.
@@ -485,11 +497,11 @@ The code here is the same as above from the "Outlets and basins" section, but we
 
 The simplest example is a point, in this case near the Watson River outlet. Because we select one point over land and do not request upstream outlets and basins, only one row (the nearest) should be returned.
 
-+ WARNING :: The following command may take a few minutes to complete.
++ WARNING :: The following command should be fast because it is subset to one decade. If run with no =year= it may take a few minutes to complete.
 
 #+BEGIN_SRC jupyter-python :session using
 from discharge import discharge
-ds = discharge(base="./freshwater", roi="-50.5,67.2", quiet=False).discharge()
+ds = discharge(base="./freshwater", roi="-50.5,67.2", year="201*", quiet=False).discharge()
 #+END_SRC
 
 #+RESULTS:
@@ -506,7 +518,6 @@ Loading outlets and basins...
 Subsetting data by ROI...
 Parsing ROI...
     ROI appears to be point in EPSG:4326 coordinates
-ROI is point... finding basins that contain point
 Selecting discharge at outlets...
     Selecting from: MAR_land
     Selecting from: MAR_ice
@@ -521,14 +532,14 @@ print(ds)
 #+END_SRC
 
 #+RESULTS:
-: <xarray.Dataset> Size: 745kB
-: Dimensions:     (time: 31047, land: 1)
+: <xarray.Dataset>
+: Dimensions:     (time: 3652, land: 1)
 : Coordinates:
-:   * time        (time) datetime64[ns] 248kB 1940-01-01 1940-01-02 ... 2024-12-31
-:   * land        (land) uint64 8B 121108
+:   * time        (time) datetime64[ns] 2010-01-01 2010-01-02 ... 2019-12-31
+:   * land        (land) int64 121108
 : Data variables:
-:     MAR_land    (time, land) float64 248kB 0.5157 0.5159 ... 0.3332 0.3337
-:     RACMO_land  (time, land) float64 248kB nan nan nan nan ... nan nan nan nan
+:     MAR_land    (time, land) float64 0.2173 0.2174 0.2174 ... 0.1728 0.1728
+:     RACMO_land  (time, land) float64 0.1586 0.07255 0.06398 ... 0.03842 0.04766
 
 Display the time series. Unlike the command line interface, here the outlets are not merged.
 
@@ -584,7 +595,7 @@ Here a polygon covers several land outlets near the end of a fjord, and several 
 
 #+BEGIN_SRC jupyter-python :session using
 from discharge import discharge
-ds = discharge(base="./freshwater", roi="-51.50,66.93 -51.21,66.74 -49.44,66.91 -49.84,67.18", quiet=False, upstream=True).discharge()
+ds = discharge(base="./freshwater", roi="-51.50,66.93 -51.21,66.74 -49.44,66.91 -49.84,67.18", year=2012, quiet=False, upstream=True).discharge()
 #+END_SRC
 
 #+RESULTS:
@@ -622,20 +633,20 @@ print(ds)
 
 #+RESULTS:
 #+begin_example
-<xarray.Dataset> Size: 103MB
-Dimensions:             (time: 31047, land: 88, ice: 33, ice_upstream: 85)
+<xarray.Dataset>
+Dimensions:             (ice_upstream: 85, time: 366, land: 88, ice: 33)
 Coordinates:
-  ,* time                (time) datetime64[ns] 248kB 1940-01-01 ... 2024-12-31
-  ,* land                (land) uint64 704B 122055 122222 ... 123897 123926
-  ,* ice                 (ice) uint64 264B 66425 66427 66444 ... 66596 66639
-  ,* ice_upstream        (ice_upstream) uint64 680B 66407 66414 ... 68014 68056
+  ,* ice_upstream        (ice_upstream) int64 66407 66414 66416 ... 68014 68056
+  ,* time                (time) datetime64[ns] 2012-01-01 ... 2012-12-31
+  ,* land                (land) int64 122055 122222 122251 ... 123897 123926
+  ,* ice                 (ice) int64 66425 66427 66444 ... 66595 66596 66639
 Data variables:
-    MAR_land            (time, land) float64 22MB 0.4137 0.08922 ... 0.01501
-    MAR_ice             (time, ice) float64 8MB 2.967e-16 ... 2.217e-17
-    RACMO_land          (time, land) float64 22MB nan nan nan ... nan nan nan
-    RACMO_ice           (time, ice) float64 8MB nan nan ... 0.0001426 0.005093
-    MAR_ice_upstream    (time, ice_upstream) float64 21MB 1.239e-17 ... 1.927...
-    RACMO_ice_upstream  (time, ice_upstream) float64 21MB nan nan ... 7.002e-05
+    MAR_land            (time, land) float64 0.1818 0.0297 ... 0.0009867 0.01252
+    MAR_ice             (time, ice) float64 2.967e-16 2.181e-17 ... 2.444e-17
+    RACMO_land          (time, land) float64 0.03464 0.04381 ... 0.0006684 0.043
+    RACMO_ice           (time, ice) float64 9.655e-05 0.0005714 ... 0.002169
+    MAR_ice_upstream    (time, ice_upstream) float64 1.239e-17 ... 1.927e-17
+    RACMO_ice_upstream  (time, ice_upstream) float64 0.0002795 ... 3.105e-05
 #+end_example
 
 With these results:
@@ -654,7 +665,6 @@ r = ds.sum(dim=d)\
 
 import matplotlib.pyplot as plt
 import seaborn as sns
-sns.set_theme()
 
 for d in r.data_vars:
   r[d].sel(time=slice('2012-04-01','2012-11-15')).plot(drawstyle='steps', label=d)
