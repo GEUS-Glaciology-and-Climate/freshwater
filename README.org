@@ -1,7 +1,10 @@
 
+#+PROPERTY: header-args:jupyter-python+ :kernel freshwater_user
+
 * Table of contents                               :toc_5:noexport:
-- [[#greenland-liquid-water-discharge-from-1950-through-2021][Greenland liquid water discharge from 1950 through 2021]]
+- [[#greenland-liquid-water-discharge-from-1950-through-2024][Greenland liquid water discharge from 1950 through 2024]]
   - [[#updates-since-last-publication][Updates since last publication]]
+    - [[#v-2025][v 2025]]
     - [[#v-2023][v 2023]]
     - [[#v-2022-10][v 2022-10]]
     - [[#v-2022-08][v 2022-08]]
@@ -31,7 +34,7 @@
         - [[#one-point-3][One point]]
         - [[#polygon-covering-multiple-land-and-ice-outlets-3][Polygon covering multiple land and ice outlets]]
 
-* Greenland liquid water discharge from 1950 through 2021
+* Greenland liquid water discharge from 1950 through 2024
 
 This is the source for "Greenland liquid water discharge from 1958 through 2019" and subsequent versions. 
 
@@ -52,6 +55,17 @@ The source for this work is hosted on GitHub at https://github.com/GEUS-PROMICE/
 + The source for the published paper can be viewed at https://github.com/GEUS-PROMICE/freshwater/tree/10.5194/essd-12-2811-2020
 
 ** Updates since last publication
+
+*** v 2025
+
+[[https://github.com/GEUS-Glaciology-and-Climate/freshwater/tree/release_2025][release_2025]] has the following changes from [[https://github.com/GEUS-Glaciology-and-Climate/freshwater/tree/release_2023][v2023]]. See https://github.com/GEUS-Glaciology-and-Climate/freshwater/compare/release_2023...release_2025, and git log for more details
+
++ Updated MAR data from 3.13 to 3.14
++ Added MAR 2023 and 2024
++ Added MAR 1940 through 1958 
++ Added RACMO 2023 and 2024
++ One file per year per RCM
++ Add API support (discharge.py) for =year= option. Subsetting to specific years (or looping over years) makes things much faster
 
 *** v 2023
 
@@ -156,7 +170,7 @@ import pandas as pd
 import geopandas as gp
 
 df = pd.read_csv('./freshwater/ice/outlets.csv', index_col=0)
-gdf = gp.GeoDataFrame(df, geometry=gp.points_from_xy(df['lon'],df['lat']))
+gdf = gp.GeoDataFrame(df, geometry=gp.points_from_xy(df['lon'],df['lat']), crs='EPSG:4326')
 
 # select subglacial discharge within 2.5 km of basins
 gdf = gdf[(gdf['elev'] < -10) &
@@ -189,7 +203,8 @@ The folder structure required is a =root= folder (named =freshwater= in the exam
 Example:
 
 #+BEGIN_SRC bash :results verbatim :exports results
-find ./freshwater/land/ ./freshwater/ice/ -maxdepth 1 | sort
+find ./freshwater/land/ ./freshwater/ice/ -maxdepth 2 | sort
+# CUT most of the RCM_YYYY.nc files...
 #+END_SRC
 
 #+RESULTS:
@@ -198,20 +213,30 @@ find ./freshwater/land/ ./freshwater/ice/ -maxdepth 1 | sort
 ./freshwater/ice/basins.csv
 ./freshwater/ice/basins_filled.gpkg
 ./freshwater/ice/basins.gpkg
-./freshwater/ice/MAR.nc
+./freshwater/ice/discharge
+./freshwater/ice/discharge/MAR_1940.nc
+...
+./freshwater/ice/discharge/MAR_2024.nc
+./freshwater/ice/discharge/RACMO_1958.nc
+...
+./freshwater/ice/discharge/RACMO_2024.nc
 ./freshwater/ice/outlets.csv
 ./freshwater/ice/outlets.gpkg
-./freshwater/ice/RACMO.nc
 ./freshwater/ice/streams.csv
 ./freshwater/ice/streams.gpkg
 ./freshwater/land/
 ./freshwater/land/basins.csv
 ./freshwater/land/basins_filled.gpkg
 ./freshwater/land/basins.gpkg
-./freshwater/land/MAR.nc
+./freshwater/land/discharge
+./freshwater/land/discharge/MAR_1940.nc
+...
+./freshwater/land/discharge/MAR_2024.nc
+./freshwater/land/discharge/RACMO_1958.nc
+...
+./freshwater/land/discharge/RACMO_2024.nc
 ./freshwater/land/outlets.csv
 ./freshwater/land/outlets.gpkg
-./freshwater/land/RACMO.nc
 ./freshwater/land/streams.csv
 ./freshwater/land/streams.gpkg
 #+end_example
@@ -242,13 +267,13 @@ find ./freshwater/land/ ./freshwater/ice/ -maxdepth 1 | sort
 See =environment.yml= file in Git repository, or
 
 #+BEGIN_SRC bash
-mamba create -n freshwater_user python=3.7 xarray=0.20.2 fiona=1.8.21 shapely=1.8.2 geopandas=0.7.0 netcdf4=1.6.0 dask=2.15.0
+mamba create -n freshwater_user python=3.13 xarray=2025.1.2 fiona=1.10.1 shapely=2.0.7 geopandas=1.0.1 netcdf4=1.7.2 dask=2025.2.0 pandas=2.2.3
 mamba activate freshwater_user
 #+END_SRC
 
 ** Examples
 :PROPERTIES:
-:header-args:jupyter-python: :kernel freshwater :session using :eval no-export :exports both
+:header-args:jupyter-python: :kernel freshwater_user :session using :eval no-export :exports both
 :header-args:bash: :eval no-export :session "*freshwater-shell*" :results verbatim :exports both :prologue conda activate freshwater_user
 :END:
 
@@ -267,10 +292,11 @@ usage: discharge.py [-h] --base BASE --roi ROI [-u] (-o | -d) [-q]
 
 Discharge data access
 
-optional arguments:
+options:
   -h, --help       show this help message and exit
   --base BASE      Folder containing freshwater data
-  --roi ROI        x,y OR lon,lat OR x0,y0 x1,y1 ... xn,yn OR lon0,lat0 lon1,lat1 ... lon_n,lat_n. [lon: degrees E]
+  --roi ROI        x,y OR lon,lat OR x0,y0 x1,y1 ... xn,yn OR lon0,lat0 lon1,lat1 ...
+                   lon_n,lat_n. [lon: degrees E]
   -u, --upstream   Include upstream ice outlets draining into land basins
   -o, --outlets    Return outlet IDs (same as basin IDs)
   -d, --discharge  Return RCM discharge for each domain (outlets merged)
@@ -298,8 +324,8 @@ python ./discharge.py --base ./freshwater --roi=-40.5,67.2 -o -q
 
 #+RESULTS:
 | index |     id |     lon |    lat |      x |        y | elev | Z2012_sector | Z2012_sector_dist | M2019_ID | M2019_ID_dist | M2019_basin      | M2019_region | M2020_gate | M2020_gate_dist | B2015_name       | B2015_dist | domain | upstream | coast_id | coast_lon | coast_lat | coast_x |  coast_y |
-|     0 | 126875 | -38.071 | 66.330 | 313650 | -2580750 | -187 |           41 |              5796 |       63 |             0 | HELHEIMGLETSCHER | SE           |        231 |            9650 | Helheim Gletsjer |      11776 | land   | False    |       -1 |           |           |      -1 |       -1 |
-|     1 |  67985 | -38.110 | 66.333 | 311850 | -2580650 | -244 |           41 |              4177 |       63 |             0 | HELHEIMGLETSCHER | SE           |        231 |            7850 | Helheim Gletsjer |      10042 | ice    | False    |   126875 |   -38.071 |    66.330 |  313650 | -2580750 |
+|     0 | 126875 | -38.071 |  66.33 | 313650 | -2580750 | -187 |           41 |              5796 |       63 |             0 | HELHEIMGLETSCHER | SE           |        231 |            9650 | Helheim Gletsjer |      11776 | land   | False    |       -1 |           |           |      -1 |       -1 |
+|     1 |  67985 |  -38.11 | 66.333 | 311850 | -2580650 | -244 |           41 |              4177 |       63 |             0 | HELHEIMGLETSCHER | SE           |        231 |            7850 | Helheim Gletsjer |      10042 | ice    | False    |   126875 |   -38.071 |     66.33 |  313650 | -2580750 |
 
 ***** Polygon covering multiple land and ice outlets
 
@@ -343,24 +369,23 @@ The discharge examples here use the same code as the "outlets and basins" exampl
 
 ***** One point
 
-The simplest example is a point, in this case near the Watson River outlet. Because we select one point over land and do not request upstream outlets and basins, two time series should be returned: =MAR_land= and =RACMO_land=. Rather than showing results for every day from 1958 through 2019, we limit to the header and the first 10 days of June, 2012.
+The simplest example is a point, in this case near the Watson River outlet. Because we select one point over land and do not request upstream outlets and basins, two time series should be returned: =MAR_land= and =RACMO_land=. Rather than showing results for every day from 1958 through 2019, we limit to the header and the first 9 days of June, 2012.
 
 #+BEGIN_SRC bash :exports both :results table
-python ./discharge.py --base ./freshwater --roi=-50.5,67.2 -q -d | (head -n1; grep -A9 "^2012-06-01")
+python ./discharge.py --base ./freshwater --roi=-50.5,67.2 --year=2012 -q -d | grep -E 'time|^2012-06-0'
 #+END_SRC
 
 #+RESULTS:
-|       time |  MAR_land | RACMO_land |
-| 2012-06-01 | 11.893755 |   0.029936 |
-| 2012-06-02 | 10.126999 |   0.001237 |
-| 2012-06-03 |  8.114753 |   0.001323 |
-| 2012-06-04 |  3.970580 |   0.000000 |
-| 2012-06-05 |  0.313908 |  -0.001191 |
-| 2012-06-06 |  0.478592 |   0.303289 |
-| 2012-06-07 |  0.330184 |   0.007452 |
-| 2012-06-08 |  2.857732 |   0.193424 |
-| 2012-06-09 |  0.308489 |   0.087070 |
-| 2012-06-10 |  0.308755 |   0.024483 |
+|       time | MAR_land | RACMO_land |
+| 2012-06-01 | 0.992653 |  17.264986 |
+| 2012-06-02 | 0.482055 |  18.857117 |
+| 2012-06-03 | 0.427311 |  15.771883 |
+| 2012-06-04 | 0.202514 |  14.800671 |
+| 2012-06-05 | 0.322577 |  16.908742 |
+| 2012-06-06 | 0.362114 |  10.081777 |
+| 2012-06-07 | 0.459563 |  12.371853 |
+| 2012-06-08 | 3.035036 |  12.999544 |
+| 2012-06-09 | 0.207011 |  13.737736 |
 
 + If we move 10° east to somewhere over the ice we add two columns: One for each of the two RCMs over the ice domain.
 + If the =--upstream= flag is set, we add two columns: One for each of the RCMs over the *upstream* ice domains. Results are summed across outlets per domain.
@@ -384,6 +409,9 @@ The python API is similar to the command line interface, but rather than printin
 
 The simplest example is a point, in this case near the Watson River outlet. Because we select one point over land and do not request upstream outlets and basins, only one row should be returned.
 
+# import os
+# os.environ["PROJ_DATA"] = "/home/kdm/local/mambaforge/envs/freshwater_user/share/proj"
+
 #+BEGIN_SRC jupyter-python :session using
 from discharge import discharge 
 df = discharge(base="./freshwater", roi="-50.5,67.2", quiet=True).outlets()
@@ -404,9 +432,9 @@ df.drop(columns=["outlet","basin"])
 #+END_SRC
 
 #+RESULTS:
-| index |     id |      lon |     lat |       x |        y | elev | Z2012_sector | Z2012_sector_dist | M2019_ID | M2019_ID_dist | M2019_basin        | M2019_region | M2020_gate | M2020_gate_dist | B2015_name        | B2015_dist | domain | upstream | coast_id | coast_lon | coast_lat | coast_x | coast_y |
-|-------+--------+----------+---------+---------+----------+------+--------------+-------------------+----------+---------------+--------------------+--------------+------------+-----------------+-------------------+------------+--------+----------+----------+-----------+-----------+---------+---------|
-|     0 | 121108 | -51.2185 | 67.1535 | -271550 | -2492150 |    4 |           62 |             38320 |       71 |         38035 | ISUNNGUATA-RUSSELL | SW           |        195 |          193828 | Isunnguata Sermia |      45930 | land   | False    |       -1 |       nan |       nan |      -1 |      -1 |
+|   index |     id |      lon |     lat |       x |        y |   elev |   Z2012_sector |   Z2012_sector_dist |   M2019_ID |   M2019_ID_dist | M2019_basin        | M2019_region   |   M2020_gate |   M2020_gate_dist | B2015_name        |   B2015_dist | domain   | upstream   |   coast_id |   coast_lon |   coast_lat |   coast_x |   coast_y |
+|---------+--------+----------+---------+---------+----------+--------+----------------+---------------------+------------+-----------------+--------------------+----------------+--------------+-------------------+-------------------+--------------+----------+------------+------------+-------------+-------------+-----------+-----------|
+|       0 | 121108 | -51.2185 | 67.1535 | -271550 | -2492150 |      4 |             62 |               38320 |         71 |           38035 | ISUNNGUATA-RUSSELL | SW             |          195 |            193828 | Isunnguata Sermia |        45930 | land     | False      |         -1 |         nan |         nan |        -1 |        -1 |
 
 ***** Polygon covering multiple land and ice outlets
 
@@ -426,13 +454,13 @@ df.drop(columns=["outlet","basin"]).head()
 #+END_SRC
 
 #+RESULTS:
-| index |     id |      lon |     lat |       x |        y | elev | Z2012_sector | Z2012_sector_dist | M2019_ID | M2019_ID_dist | M2019_basin        | M2019_region | M2020_gate | M2020_gate_dist | B2015_name        | B2015_dist | domain | upstream | coast_id | coast_lon | coast_lat | coast_x | coast_y |
-|-------+--------+----------+---------+---------+----------+------+--------------+-------------------+----------+---------------+--------------------+--------------+------------+-----------------+-------------------+------------+--------+----------+----------+-----------+-----------+---------+---------|
-|     0 | 122055 |  -50.713 | 67.0017 | -251250 | -2511450 |   20 |           62 |             22184 |       71 |         22906 | ISUNNGUATA-RUSSELL | SW           |        195 |          207779 | Isunnguata Sermia |      31644 | land   | False    |       -1 |       nan |       nan |      -1 |      -1 |
-|     1 | 122222 | -50.7346 | 66.9884 | -252350 | -2512850 |    7 |           62 |             23683 |       71 |         24427 | ISUNNGUATA-RUSSELL | SW           |        195 |          209355 | Isunnguata Sermia |      33360 | land   | False    |       -1 |       nan |       nan |      -1 |      -1 |
-|     2 | 122251 | -50.7748 |  66.985 | -254150 | -2513050 |   -1 |           62 |             25444 |       71 |         26179 | ISUNNGUATA-RUSSELL | SW           |        195 |          209887 | Isunnguata Sermia |      34934 | land   | False    |       -1 |       nan |       nan |      -1 |      -1 |
-|     3 | 122275 | -50.8707 | 66.9767 | -258450 | -2513550 |    4 |           62 |             29682 |       71 |         30397 | ISUNNGUATA-RUSSELL | SW           |        195 |          211236 | Isunnguata Sermia |      38789 | land   | False    |       -1 |       nan |       nan |      -1 |      -1 |
-|     4 | 122285 | -50.8569 | 66.9764 | -257850 | -2513650 |   15 |           62 |             29141 |       71 |         29862 | ISUNNGUATA-RUSSELL | SW           |        195 |          211209 | Isunnguata Sermia |      38336 | land   | False    |       -1 |       nan |       nan |      -1 |      -1 |
+|   index |     id |      lon |     lat |       x |        y |   elev |   Z2012_sector |   Z2012_sector_dist |   M2019_ID |   M2019_ID_dist | M2019_basin        | M2019_region   |   M2020_gate |   M2020_gate_dist | B2015_name        |   B2015_dist | domain   | upstream   |   coast_id |   coast_lon |   coast_lat |   coast_x |   coast_y |
+|---------+--------+----------+---------+---------+----------+--------+----------------+---------------------+------------+-----------------+--------------------+----------------+--------------+-------------------+-------------------+--------------+----------+------------+------------+-------------+-------------+-----------+-----------|
+|       0 | 122055 | -50.713  | 67.0017 | -251250 | -2511450 |     20 |             62 |               22184 |         71 |           22906 | ISUNNGUATA-RUSSELL | SW             |          195 |            207779 | Isunnguata Sermia |        31644 | land     | False      |         -1 |         nan |         nan |        -1 |        -1 |
+|       1 | 122222 | -50.7346 | 66.9884 | -252350 | -2512850 |      7 |             62 |               23683 |         71 |           24427 | ISUNNGUATA-RUSSELL | SW             |          195 |            209355 | Isunnguata Sermia |        33360 | land     | False      |         -1 |         nan |         nan |        -1 |        -1 |
+|       2 | 122251 | -50.7748 | 66.985  | -254150 | -2513050 |     -1 |             62 |               25444 |         71 |           26179 | ISUNNGUATA-RUSSELL | SW             |          195 |            209887 | Isunnguata Sermia |        34934 | land     | False      |         -1 |         nan |         nan |        -1 |        -1 |
+|       3 | 122275 | -50.8707 | 66.9767 | -258450 | -2513550 |      4 |             62 |               29682 |         71 |           30397 | ISUNNGUATA-RUSSELL | SW             |          195 |            211236 | Isunnguata Sermia |        38789 | land     | False      |         -1 |         nan |         nan |        -1 |        -1 |
+|       4 | 122285 | -50.8569 | 66.9764 | -257850 | -2513650 |     15 |             62 |               29141 |         71 |           29862 | ISUNNGUATA-RUSSELL | SW             |          195 |            211209 | Isunnguata Sermia |        38336 | land     | False      |         -1 |         nan |         nan |        -1 |        -1 |
 
 View the last few rows:
 
@@ -443,21 +471,23 @@ df.drop(columns=["outlet","basin"]).tail()
 #+END_SRC
 
 #+RESULTS:
-| index |    id |      lon |     lat |       x |        y | elev | Z2012_sector | Z2012_sector_dist | M2019_ID | M2019_ID_dist | M2019_basin                                   | M2019_region | M2020_gate | M2020_gate_dist | B2015_name       | B2015_dist | domain | upstream | coast_id | coast_lon | coast_lat | coast_x |  coast_y |
-|-------+-------+----------+---------+---------+----------+------+--------------+-------------------+----------+---------------+-----------------------------------------------+--------------+------------+-----------------+------------------+------------+--------+----------+----------+-----------+-----------+---------+----------|
-|   201 | 67919 | -49.4996 | 66.4435 | -202950 | -2578950 |  791 |           62 |                 0 |       40 |             6 | SAQQAP-MAJORQAQ-SOUTHTERRUSSEL_SOUTHQUARUSSEL | SW           |        262 |          200758 | Quantum Gletsjer |      81191 | ice    | True     |   123466 |  -50.6517 |   66.8677 | -250050 | -2526750 |
-|   202 | 67935 | -49.5385 | 66.4378 | -204750 | -2579450 |  764 |           62 |                 0 |       40 |             0 | SAQQAP-MAJORQAQ-SOUTHTERRUSSEL_SOUTHQUARUSSEL | SW           |        262 |          199967 | Quantum Gletsjer |      79323 | ice    | True     |   123466 |  -50.6517 |   66.8677 | -250050 | -2526750 |
-|   203 | 67946 | -49.5206 | 66.4375 | -203950 | -2579550 |  767 |           62 |                 0 |       40 |             0 | SAQQAP-MAJORQAQ-SOUTHTERRUSSEL_SOUTHQUARUSSEL | SW           |        262 |          199999 | Quantum Gletsjer |      80065 | ice    | True     |   123466 |  -50.6517 |   66.8677 | -250050 | -2526750 |
-|   204 | 68014 | -49.5436 |  66.419 | -205150 | -2581550 |  825 |           62 |                 0 |       40 |           184 | SAQQAP-MAJORQAQ-SOUTHTERRUSSEL_SOUTHQUARUSSEL | SW           |        262 |          197830 | Quantum Gletsjer |      78386 | ice    | True     |   123466 |  -50.6517 |   66.8677 | -250050 | -2526750 |
-|   205 | 68056 | -49.5346 | 66.4068 | -204850 | -2582950 |  859 |           62 |                 0 |       40 |             0 | SAQQAP-MAJORQAQ-SOUTHTERRUSSEL_SOUTHQUARUSSEL | SW           |        262 |          196497 | Quantum Gletsjer |      78340 | ice    | True     |   123466 |  -50.6517 |   66.8677 | -250050 | -2526750 |
+|   index |    id |      lon |     lat |       x |        y |   elev |   Z2012_sector |   Z2012_sector_dist |   M2019_ID |   M2019_ID_dist | M2019_basin                                   | M2019_region   |   M2020_gate |   M2020_gate_dist | B2015_name       |   B2015_dist | domain   | upstream   |   coast_id |   coast_lon |   coast_lat |   coast_x |   coast_y |
+|---------+-------+----------+---------+---------+----------+--------+----------------+---------------------+------------+-----------------+-----------------------------------------------+----------------+--------------+-------------------+------------------+--------------+----------+------------+------------+-------------+-------------+-----------+-----------|
+|     201 | 67919 | -49.4996 | 66.4435 | -202950 | -2578950 |    791 |             62 |                   0 |         40 |               6 | SAQQAP-MAJORQAQ-SOUTHTERRUSSEL_SOUTHQUARUSSEL | SW             |          262 |            200758 | Quantum Gletsjer |        81191 | ice      | True       |     123466 |    -50.6517 |     66.8677 |   -250050 |  -2526750 |
+|     202 | 67935 | -49.5385 | 66.4378 | -204750 | -2579450 |    764 |             62 |                   0 |         40 |               0 | SAQQAP-MAJORQAQ-SOUTHTERRUSSEL_SOUTHQUARUSSEL | SW             |          262 |            199967 | Quantum Gletsjer |        79323 | ice      | True       |     123466 |    -50.6517 |     66.8677 |   -250050 |  -2526750 |
+|     203 | 67946 | -49.5206 | 66.4375 | -203950 | -2579550 |    767 |             62 |                   0 |         40 |               0 | SAQQAP-MAJORQAQ-SOUTHTERRUSSEL_SOUTHQUARUSSEL | SW             |          262 |            199999 | Quantum Gletsjer |        80065 | ice      | True       |     123466 |    -50.6517 |     66.8677 |   -250050 |  -2526750 |
+|     204 | 68014 | -49.5436 | 66.419  | -205150 | -2581550 |    825 |             62 |                   0 |         40 |             184 | SAQQAP-MAJORQAQ-SOUTHTERRUSSEL_SOUTHQUARUSSEL | SW             |          262 |            197830 | Quantum Gletsjer |        78386 | ice      | True       |     123466 |    -50.6517 |     66.8677 |   -250050 |  -2526750 |
+|     205 | 68056 | -49.5346 | 66.4068 | -204850 | -2582950 |    859 |             62 |                   0 |         40 |               0 | SAQQAP-MAJORQAQ-SOUTHTERRUSSEL_SOUTHQUARUSSEL | SW             |          262 |            196497 | Quantum Gletsjer |        78340 | ice      | True       |     123466 |    -50.6517 |     66.8677 |   -250050 |  -2526750 |
 
 Finally, write data to various file formats. GeoPandas DataFrames can only have one geometry, so we must select one and drop the other before writing the file.
 
 #+BEGIN_SRC jupyter-python :session using
 df.drop(columns=["outlet","basin"]).to_csv("outlets.csv")
-df.set_geometry("outlet").drop(columns="basin").to_file("outlets.gpkg", driver="GPKG")
-df.set_geometry("basin").drop(columns="outlet").to_file("basins.gpkg", driver="GPKG")
+df.set_geometry("outlet", crs=df.crs).drop(columns="basin").to_file("outlets.gpkg", driver="GPKG")
+df.set_geometry("basin", crs=df.crs).drop(columns="outlet").to_file("basins.gpkg", driver="GPKG")
 #+END_SRC
+
+#+RESULTS:
 
 **** Discharge
 
@@ -465,12 +495,35 @@ The code here is the same as above from the "Outlets and basins" section, but we
 
 ***** One point
 
-The simplest example is a point, in this case near the Watson River outlet. Because we select one point over land and do not request upstream outlets and basins, only one row should be returned.
+The simplest example is a point, in this case near the Watson River outlet. Because we select one point over land and do not request upstream outlets and basins, only one row (the nearest) should be returned.
+
++ WARNING :: The following command should be fast because it is subset to one decade. If run with no =year= it may take a few minutes to complete.
 
 #+BEGIN_SRC jupyter-python :session using
 from discharge import discharge
-ds = discharge(base="./freshwater", roi="-50.5,67.2").discharge()
+ds = discharge(base="./freshwater", roi="-50.5,67.2", year="201*", quiet=False).discharge()
 #+END_SRC
+
+#+RESULTS:
+#+begin_example
+Using './freshwater' as base folder
+Loading discharge data...
+    Loading MAR_land
+    Loading MAR_ice
+    Loading RACMO_land
+    Loading RACMO_ice
+Loading outlets and basins...
+    Loading land
+    Loading ice
+Subsetting data by ROI...
+Parsing ROI...
+    ROI appears to be point in EPSG:4326 coordinates
+Selecting discharge at outlets...
+    Selecting from: MAR_land
+    Selecting from: MAR_ice
+    Selecting from: RACMO_land
+    Selecting from: RACMO_ice
+#+end_example
 
 Print the =xarray= =Dataset=:
 
@@ -480,13 +533,13 @@ print(ds)
 
 #+RESULTS:
 : <xarray.Dataset>
-: Dimensions:     (land: 1, time: 26663)
+: Dimensions:     (time: 3652, land: 1)
 : Coordinates:
-:   * time        (time) datetime64[ns] 1950-01-01 1950-01-02 ... 2022-12-31
-:   * land        (land) uint64 121108
+:   * time        (time) datetime64[ns] 2010-01-01 2010-01-02 ... 2019-12-31
+:   * land        (land) int64 121108
 : Data variables:
-:     MAR_land    (time, land) float64 0.0007218 0.0007235 ... 0.6995 0.7007
-:     RACMO_land  (time, land) float64 nan nan nan nan ... 0.1555 0.1591 0.1549
+:     MAR_land    (time, land) float64 0.2173 0.2174 0.2174 ... 0.1728 0.1728
+:     RACMO_land  (time, land) float64 0.1586 0.07255 0.06398 ... 0.03842 0.04766
 
 Display the time series. Unlike the command line interface, here the outlets are not merged.
 
@@ -495,24 +548,24 @@ ds.sel(time=slice('2012-06-01','2012-06-10')).to_dataframe()
 #+END_SRC
 
 #+RESULTS:
-|                                                      | MAR_land | RACMO_land |
-|------------------------------------------------------+----------+------------|
-| (121108, Timestamp('2012-06-01 00:00:00', freq='D')) |  11.8938 |   0.029936 |
-| (121108, Timestamp('2012-06-02 00:00:00', freq='D')) |   10.127 | 0.00123702 |
-| (121108, Timestamp('2012-06-03 00:00:00', freq='D')) |  8.11475 | 0.00132286 |
-| (121108, Timestamp('2012-06-04 00:00:00', freq='D')) |  3.97058 |          0 |
-| (121108, Timestamp('2012-06-05 00:00:00', freq='D')) | 0.313908 | -0.0011907 |
-| (121108, Timestamp('2012-06-06 00:00:00', freq='D')) | 0.478592 |   0.303289 |
-| (121108, Timestamp('2012-06-07 00:00:00', freq='D')) | 0.330184 | 0.00745243 |
-| (121108, Timestamp('2012-06-08 00:00:00', freq='D')) |  2.85773 |   0.193424 |
-| (121108, Timestamp('2012-06-09 00:00:00', freq='D')) | 0.308489 |  0.0870701 |
-| (121108, Timestamp('2012-06-10 00:00:00', freq='D')) | 0.308755 |  0.0244829 |
+|                                            |   MAR_land |   RACMO_land |
+|--------------------------------------------+------------+--------------|
+| (Timestamp('2012-06-01 00:00:00'), 121108) |   0.992653 |      17.265  |
+| (Timestamp('2012-06-02 00:00:00'), 121108) |   0.482055 |      18.8571 |
+| (Timestamp('2012-06-03 00:00:00'), 121108) |   0.427311 |      15.7719 |
+| (Timestamp('2012-06-04 00:00:00'), 121108) |   0.202514 |      14.8007 |
+| (Timestamp('2012-06-05 00:00:00'), 121108) |   0.322577 |      16.9087 |
+| (Timestamp('2012-06-06 00:00:00'), 121108) |   0.362114 |      10.0818 |
+| (Timestamp('2012-06-07 00:00:00'), 121108) |   0.459563 |      12.3719 |
+| (Timestamp('2012-06-08 00:00:00'), 121108) |   3.03504  |      12.9995 |
+| (Timestamp('2012-06-09 00:00:00'), 121108) |   0.207011 |      13.7377 |
+| (Timestamp('2012-06-10 00:00:00'), 121108) |   0.201187 |      14.6135 |
 
 
 In order to merge the outlets, select all coordinates that are *not time* and merge them. Also, apply a rolling mean:
 
 #+BEGIN_SRC jupyter-python :session using
-dims = [_ for _ in ds.dims.keys() if _ != 'time']  # get all dimensions except the time dimension
+dims = [_ for _ in ds.dims if _ != 'time']  # get all dimensions except the time dimension
 ds.sum(dim=dims)\
   .rolling(time=7)\
   .mean()\
@@ -521,27 +574,56 @@ ds.sum(dim=dims)\
 #+END_SRC
 
 #+RESULTS:
-| time                | MAR_land | RACMO_land |
-|---------------------+----------+------------|
-| 2012-06-01 00:00:00 |   30.644 |    1.39377 |
-| 2012-06-02 00:00:00 |  31.1031 |     1.2407 |
-| 2012-06-03 00:00:00 |  27.5909 |   0.458691 |
-| 2012-06-04 00:00:00 |  21.0425 |   0.157925 |
-| 2012-06-05 00:00:00 |  14.3486 |  0.0893565 |
-| 2012-06-06 00:00:00 |  8.40202 |  0.0880673 |
-| 2012-06-07 00:00:00 |  5.03268 |  0.0488637 |
-| 2012-06-08 00:00:00 |  3.74182 |  0.0722192 |
-| 2012-06-09 00:00:00 |  2.33918 |   0.084481 |
-| 2012-06-10 00:00:00 |  1.22403 |  0.0877896 |
+| time                |   MAR_land |   RACMO_land |
+|---------------------+------------+--------------|
+| 2012-06-01 00:00:00 |  16.5737   |      15.9245 |
+| 2012-06-02 00:00:00 |  16.1488   |      18.4651 |
+| 2012-06-03 00:00:00 |  10.4139   |      18.2211 |
+| 2012-06-04 00:00:00 |   4.78399  |      17.2268 |
+| 2012-06-05 00:00:00 |   0.557635 |      16.8658 |
+| 2012-06-06 00:00:00 |   0.509367 |      15.8811 |
+| 2012-06-07 00:00:00 |   0.464112 |      15.151  |
+| 2012-06-08 00:00:00 |   0.755881 |      14.5417 |
+| 2012-06-09 00:00:00 |   0.716589 |      13.8103 |
+| 2012-06-10 00:00:00 |   0.684286 |      13.6448 |
 
 ***** Polygon covering multiple land and ice outlets
 
 Here a polygon covers several land outlets near the end of a fjord, and several ice outlets of the nearby ice margin. In addition, we request all ice outlets upstream of all selected land basins.
 
++ WARNING :: The following command may take a few minutes to complete.
+
 #+BEGIN_SRC jupyter-python :session using
 from discharge import discharge
-ds = discharge(base="./freshwater", roi="-51.50,66.93 -51.21,66.74 -49.44,66.91 -49.84,67.18", quiet=True, upstream=True).discharge()
+ds = discharge(base="./freshwater", roi="-51.50,66.93 -51.21,66.74 -49.44,66.91 -49.84,67.18", year=2012, quiet=False, upstream=True).discharge()
 #+END_SRC
+
+#+RESULTS:
+#+begin_example
+Using './freshwater' as base folder
+Loading discharge data...
+    Loading MAR_land
+    Loading MAR_ice
+    Loading RACMO_land
+    Loading RACMO_ice
+Loading outlets and basins...
+    Loading land
+    Loading ice
+Subsetting data by ROI...
+Parsing ROI...
+    ROI appears to be boundary (from points) in EPSG:4326 coordinates
+ROI is geometry... finding all points inside geometry
+    Finding basins upstream of land basins within ROI
+        ice
+Selecting upstream discharge at outlets...
+    Selecting from: MAR_ice
+    Selecting from: RACMO_ice
+Selecting discharge at outlets...
+    Selecting from: MAR_land
+    Selecting from: MAR_ice
+    Selecting from: RACMO_land
+    Selecting from: RACMO_ice
+#+end_example
 
 What are the dimensions (i.e. how many outlets in each domain?)
 
@@ -552,19 +634,19 @@ print(ds)
 #+RESULTS:
 #+begin_example
 <xarray.Dataset>
-Dimensions:             (ice: 33, ice_upstream: 85, land: 88, time: 26663)
+Dimensions:             (ice_upstream: 85, time: 366, land: 88, ice: 33)
 Coordinates:
-  ,* ice_upstream        (ice_upstream) uint64 66407 66414 66416 ... 68014 68056
-  ,* time                (time) datetime64[ns] 1950-01-01 ... 2022-12-31
-  ,* land                (land) uint64 122055 122222 122251 ... 123897 123926
-  ,* ice                 (ice) uint64 66425 66427 66444 ... 66595 66596 66639
+  ,* ice_upstream        (ice_upstream) int64 66407 66414 66416 ... 68014 68056
+  ,* time                (time) datetime64[ns] 2012-01-01 ... 2012-12-31
+  ,* land                (land) int64 122055 122222 122251 ... 123897 123926
+  ,* ice                 (ice) int64 66425 66427 66444 ... 66595 66596 66639
 Data variables:
-    MAR_land            (time, land) float64 0.0002109 1.244e-06 ... 0.005236
-    MAR_ice             (time, ice) float64 2.94e-16 2.026e-17 ... 2.785e-18
-    RACMO_land          (time, land) float64 nan nan nan ... 0.001346 0.1365
-    RACMO_ice           (time, ice) float64 nan nan nan ... 0.0001123 0.004071
-    MAR_ice_upstream    (time, ice_upstream) float64 1.261e-17 ... 1.855e-17
-    RACMO_ice_upstream  (time, ice_upstream) float64 nan nan ... 5.79e-05
+    MAR_land            (time, land) float64 0.1818 0.0297 ... 0.0009867 0.01252
+    MAR_ice             (time, ice) float64 2.967e-16 2.181e-17 ... 2.444e-17
+    RACMO_land          (time, land) float64 0.03464 0.04381 ... 0.0006684 0.043
+    RACMO_ice           (time, ice) float64 9.655e-05 0.0005714 ... 0.002169
+    MAR_ice_upstream    (time, ice_upstream) float64 1.239e-17 ... 1.927e-17
+    RACMO_ice_upstream  (time, ice_upstream) float64 0.0002795 ... 3.105e-05
 #+end_example
 
 With these results:
@@ -573,8 +655,8 @@ With these results:
 + Apply a 5-day rolling mean
 + Plot 2012 discharge season
 
-#+BEGIN_SRC jupyter-python :session using
-d = [_ for _ in ds.dims.keys() if _ != 'time'] # dims for summing (don't sum time dimension)
+#+BEGIN_SRC jupyter-python :session using :file ./fig/api_example.png
+d = [_ for _ in ds.dims if _ != 'time'] # dims for summing (don't sum time dimension)
 v = [_ for _ in ds.data_vars if ('land' in _) | ('_u' in _)] # vars containing '_u'
 
 r = ds.sum(dim=d)\
@@ -582,13 +664,14 @@ r = ds.sum(dim=d)\
       .rolling(time=5).mean()
 
 import matplotlib.pyplot as plt
-plt.style.use('seaborn')
+import seaborn as sns
 
-for d in r.data_vars: r[d].sel(time=slice('2012-04-01','2012-11-15')).plot(drawstyle='steps', label=d)
+for d in r.data_vars:
+  r[d].sel(time=slice('2012-04-01','2012-11-15')).plot(drawstyle='steps', label=d)
+    
 _ = plt.legend()
-plt.savefig("./fig/api_example.png", bbox_inches='tight')
 #+END_SRC
 
 #+RESULTS:
+[[file:./fig/api_example.png]]
 
-[[./fig/api_example.png]]
