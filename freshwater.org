@@ -3265,68 +3265,64 @@ variables:
 #+NAME: RACMO_QC_md5sum
 #+BEGIN_SRC bash :results table :exports both
 echo 'ice'
-(cd ${DATADIR}/RACMO/freshwater/runoff_ice_1km; find . -type f -name "*.nc" | LC_ALL=C sort | head -n8 | parallel --keep-order md5sum)
-(cd ${DATADIR}/RACMO/freshwater/runoff_ice_1km; find . -type f -name "*.nc" | LC_ALL=C sort | tail -n8 | parallel --keep-order md5sum)
+(cd ${DATADIR}/RACMO/freshwater/runoff_ice_1km; find . -maxdepth 1 -type f -name "*.nc" | LC_ALL=C sort | head -n8 | parallel --keep-order md5sum)
+(cd ${DATADIR}/RACMO/freshwater/runoff_ice_1km; find . -maxdepth 1 -type f -name "*.nc" | LC_ALL=C sort | tail -n8 | parallel --keep-order md5sum)
 echo 'land_5.5_km'
-(cd ${DATADIR}/RACMO/freshwater/runoff_land_5.5km; find . -type f -name "*.nc" | LC_ALL=C sort | head -n8 | parallel --keep-order md5sum)
-(cd ${DATADIR}/RACMO/freshwater/runoff_land_5.5km; find . -type f -name "*.nc" | LC_ALL=C sort | tail -n8 | parallel --keep-order md5sum)
+(cd ${DATADIR}/RACMO/freshwater/runoff_land_5.5km; find . -maxdepth 1 -type f -name "*.nc" | LC_ALL=C sort | head -n8 | parallel --keep-order md5sum)
+(cd ${DATADIR}/RACMO/freshwater/runoff_land_5.5km; find . -maxdepth 1 -type f -name "*.nc" | LC_ALL=C sort | tail -n8 | parallel --keep-order md5sum)
 echo 'land_1_km'
-(cd ${DATADIR}/RACMO/freshwater/runoff_land_1km_regrid; find . -type f -name "*.nc" | LC_ALL=C sort | head -n8 | parallel --keep-order md5sum)
-(cd ${DATADIR}/RACMO/freshwater/runoff_land_1km_regrid; find . -type f -name "*.nc" | LC_ALL=C sort | tail -n8 | parallel --keep-order md5sum)
+(cd ${DATADIR}/RACMO/freshwater/runoff_land_1km_regrid; find . -maxdepth 2 -type f -name "*.nc" | LC_ALL=C sort | head -n8 | parallel --keep-order md5sum)
+(cd ${DATADIR}/RACMO/freshwater/runoff_land_1km_regrid; find . -maxdepth 2 -type f -name "*.nc" | LC_ALL=C sort | tail -n8 | parallel --keep-order md5sum)
 #+END_SRC
 
 #+RESULTS: RACMO_QC_md5sum
-| ice                              |                                                                            |
-| 219834ba9f1bc98e0a87ab37ea88863d | ./runoff.1990_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                  |
-| 7bde9226e0651e2cfbb8082424ba5181 | ./runoff.1990_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                  |
-| 76d77c3ac9881521825d93c1c43af7d5 | ./runoff.1990_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                  |
-| 17dd60fa5964af322624e72d9b58ea7c | ./runoff.1990_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                  |
-| fcdd6121b4c1c94d1fe5018966deacac | ./runoff.1991_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                  |
-| 48c894ad8d7c95b5521892c18183ea41 | ./runoff.1991_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                  |
-| d405a62f91a201e3b7be931c12e1f678 | ./runoff.1991_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                  |
-| bcaadbf2e742b533a612417f748dd5f0 | ./runoff.1991_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                  |
-| acf9b55165baf20b613067383ea3d1fc | ./runoff_WJB_int.1988_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc                  |
-| 08d48cb9b85912742785fc089a8462bb | ./runoff_WJB_int.1988_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc                  |
-| 9c26be97b007d967bdcc48c34ad1c3ea | ./runoff_WJB_int.1988_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc                  |
-| 0673a072bd62d2957f01d5ca6c6cf570 | ./runoff_WJB_int.1988_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc                  |
-| c9d47dea1a7fe5317447734ac19b7faa | ./runoff_WJB_int.1989_AMJ.BN_RACMO2.3p2_FGRN055_1km.DD.nc                  |
-| 46b5f01a3dce922eee06f48f415ec9fb | ./runoff_WJB_int.1989_JAS.BN_RACMO2.3p2_FGRN055_1km.DD.nc                  |
-| dbfdf673dc82d957b5109b34724db0a6 | ./runoff_WJB_int.1989_JFM.BN_RACMO2.3p2_FGRN055_1km.DD.nc                  |
-| af207835fe80b60d58e06b5f6035bf18 | ./runoff_WJB_int.1989_OND.BN_RACMO2.3p2_FGRN055_1km.DD.nc                  |
-| land_5.5_km                      |                                                                            |
-| f60e7505e75e58133e82d381db5caa43 | ./runoff.1957.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                          |
-| 7b2de3637a9b79647aa600c8da7d2990 | ./runoff.1958.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                          |
-| cf60a1b81f84975ee741b483ddedb46c | ./runoff.1959.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                          |
-| fd74c2d30a0d6589303b8ccbc4679694 | ./runoff.1960.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                          |
-| d364c5db102ee36981d55e0b46277673 | ./runoff.1961.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                          |
-| fcb4b8154fce45145ba468c7b0c2a1e6 | ./runoff.1962.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                          |
-| b87dfb7d13426080a58745d9a917de2b | ./runoff.1963.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                          |
-| 3d055d1d9c0ddacae46acad23a421a9e | ./runoff.1964.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                          |
-| 32e7fa643ae40f346999e09c1b17a6d5 | ./runoff.2014.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                  |
-| 1a6d4fdbb8dd14aa5311b3d43954c331 | ./runoff.2015.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                  |
-| a5f91f7731fb2a7418a7e89e9f67fb43 | ./runoff.2016.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                  |
-| 90634adf3dd1b9ee409002a29ac3e08f | ./runoff.2017.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                  |
-| 906751f527cdb51f5448fd324a705a29 | ./runoff.2018.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                  |
-| 0e481615b966397f0a4c50f48ba1dab9 | ./runoff.2019.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                  |
-| a813eb69a66bd4c23cf15afcac592420 | ./runoff.2020.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                  |
-| c5ae487f3ecc5987a17c3c06083ebd5a | ./runoff.2021.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                  |
-| land_1_km                        |                                                                            |
-| 879f40c2e9c4598a83458ab93bcd2246 | ./Grid_regular_EPSG3413_1km.nc                                             |
-| c2caab22f5dc8b816d26b15b07c6c732 | ./Tundra_Mask_1km.nc                                                       |
-| c0c69a24c76cb909ea2ee463d79d10b6 | ./mask.nc                                                                  |
-| a3c0a6c3762155ad404fe6be75c49251 | ./out/runoff.1957.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc.1km-bilin.nc         |
-| 76d34a54d246b6872d913e7889f66772 | ./out/runoff.1958.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc.1km-bilin.nc         |
-| 5f1f04983c6f79fc1d89ccb15ec5946b | ./out/runoff.1959.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc.1km-bilin.nc         |
-| b5d9ffdd8b73d22d9b6bc7da5cbc3c0d | ./out/runoff.1960.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc.1km-bilin.nc         |
-| dc269d5d295640ed71f033bce1d30489 | ./out/runoff.1961.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc.1km-bilin.nc         |
-| 78000c74d9e9553e5237c20205b6f891 | ./out/runoff.2017.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc.1km-bilin.nc |
-| ced4b9dd79d5c2e0a612b01bd07d2afd | ./out/runoff.2018.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc.1km-bilin.nc |
-| 9f520292d3ab4dbf40246bc462cda4e3 | ./out/runoff.2019.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc.1km-bilin.nc |
-| 59b9237449e3c8dfe1b62e8a330bffbd | ./out/runoff.2020.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc.1km-bilin.nc |
-| c03ce8c3865abad695537b78e5fcbe13 | ./out/runoff.2021.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc.1km-bilin.nc |
-| 0d0023a324f077136cf8e69b96440617 | ./out/runoff.2022.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc.1km-bilin.nc |
-| c5e011d91b9feb6b7a533b9f146486f8 | ./weights_FGRN055_to_EPSG3413_1km_bilinear.nc                              |
-| 8f7bea66a91abcea8f2995a9d36b1132 | ./weights_FGRN055_to_EPSG3413_1km_neareststod.nc                           |
+| ice                              |                                                                                 |
+| b00d1b3a5c42f6dc78c3144c2e90bfa4 | ./runoff.2020_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                       |
+| fabb09b9d21cb336f56afc53874be9b6 | ./runoff.2020_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                       |
+| 4aa15a29c9e7a4efe1a85dda6e61c03f | ./runoff.2020_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                       |
+| b3551ac17004b87d91f7a0c19d6e02fe | ./runoff.2020_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                       |
+| a4552c9fb6c22fe26d029f9c96ec1f56 | ./runoff.2021_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                       |
+| 10e7a6ea8bc0ea7f992a82ec5d4e8697 | ./runoff.2021_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                       |
+| a1cedf549858058f1b30afc8995282b0 | ./runoff.2021_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                       |
+| f5cb36ae6e5f76d8b986de27f8f12f2d | ./runoff.2021_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                       |
+| 8c8fb315a533acd89385d44037bcde93 | ./runoff.2023_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                       |
+| fe6180f34550c198502555949ad12da4 | ./runoff.2023_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                       |
+| e90b3a046313c57992600ce39a57ee72 | ./runoff.2023_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                       |
+| 751a5bbb24b7b3b34239560c6026fab1 | ./runoff.2023_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                       |
+| 9ee04d4e83d2c6f16dbbd58b00bffd1e | ./runoff.2024_AMJ.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                       |
+| 6202537047abc8c8c80866950fe5ee03 | ./runoff.2024_JAS.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                       |
+| 87daec365a1757a5402b67a5759c64b4 | ./runoff.2024_JFM.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                       |
+| 20b347c46b48cb959a7a25a0090f1679 | ./runoff.2024_OND.BN_RACMO2.3p2_ERA5_3h_FGRN055.1km.DD.nc                       |
+| land_5.5_km                      |                                                                                 |
+| f60e7505e75e58133e82d381db5caa43 | ./runoff.1957.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                               |
+| 7b2de3637a9b79647aa600c8da7d2990 | ./runoff.1958.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                               |
+| cf60a1b81f84975ee741b483ddedb46c | ./runoff.1959.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                               |
+| fd74c2d30a0d6589303b8ccbc4679694 | ./runoff.1960.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                               |
+| d364c5db102ee36981d55e0b46277673 | ./runoff.1961.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                               |
+| fcb4b8154fce45145ba468c7b0c2a1e6 | ./runoff.1962.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                               |
+| b87dfb7d13426080a58745d9a917de2b | ./runoff.1963.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                               |
+| 3d055d1d9c0ddacae46acad23a421a9e | ./runoff.1964.FGRN055_BN_RACMO2.3p2_FGRN055.DD.nc                               |
+| ec4a06930113b258a28793a20f7198f2 | ./runoff.2017.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                       |
+| 83c572ee8ee802438d65bcbc06195710 | ./runoff.2018.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                       |
+| b9b0c6254e230162c2c2501f2f0f8762 | ./runoff.2019.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                       |
+| 667456a9101d26a596e3923ee686e0ee | ./runoff.2020.FGRN055_BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                       |
+| 7bac4e84d81a127962433af3a03f97a6 | ./runoff.2021.FGRN055.BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                       |
+| d92bdfc9ac610c22f39368d253c82ec3 | ./runoff.2022.FGRN055.BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                       |
+| 1f35d833464d34cc13c8267c9fc42932 | ./runoff.2023.FGRN055.BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc                       |
+| 51e5ace65655b5cb1ce4846318edc06b | ./runoff.2024.FGRN055.BN_RACMO2.3p2_ERA5_3h_1940_FGRN055.DD.nc                  |
+| land_1_km                        |                                                                                 |
+| 22130f323d8e857089c27c767d4c8e8e | ./Tundra_Mask_1km.nc                                                            |
+| 97e38a78ea7bb394d63365dde0a3fd3f | ./Weight_files/weights_FGRN055_to_EPSG3413_1km_bilinear.nc                      |
+| c66a9484dd7bc180921590c26da3733c | ./out/runoff.2021.FGRN055.BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc.1km-bilin.nc      |
+| 7245fce87f6cbefef7f1c3fc93f77795 | ./out/runoff.2022.FGRN055.BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc.1km-bilin.nc      |
+| 30f3ea2808738914969d1ff4658024bc | ./out/runoff.2023.FGRN055.BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc.1km-bilin.nc      |
+| 622c1b9780ee493aca468e7437fc4714 | ./out/runoff.2024.FGRN055.BN_RACMO2.3p2_ERA5_3h_1940_FGRN055.DD.nc.1km-bilin.nc |
+| 22130f323d8e857089c27c767d4c8e8e | ./Tundra_Mask_1km.nc                                                            |
+| 97e38a78ea7bb394d63365dde0a3fd3f | ./Weight_files/weights_FGRN055_to_EPSG3413_1km_bilinear.nc                      |
+| c66a9484dd7bc180921590c26da3733c | ./out/runoff.2021.FGRN055.BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc.1km-bilin.nc      |
+| 7245fce87f6cbefef7f1c3fc93f77795 | ./out/runoff.2022.FGRN055.BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc.1km-bilin.nc      |
+| 30f3ea2808738914969d1ff4658024bc | ./out/runoff.2023.FGRN055.BN_RACMO2.3p2_ERA5_3h_FGRN055.DD.nc.1km-bilin.nc      |
+| 622c1b9780ee493aca468e7437fc4714 | ./out/runoff.2024.FGRN055.BN_RACMO2.3p2_ERA5_3h_1940_FGRN055.DD.nc.1km-bilin.nc |
 
 **** ncdump
 
