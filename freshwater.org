@@ -898,6 +898,7 @@ Using =r.stream.basins=, we can get basins for every outlet.
 #+NAME: basins
 #+BEGIN_SRC bash :results verbatim
 log_info "r.stream.basins..."
+g.extension extension=r.stream.basins #url=https://github.com/OSGeo/grass-addons
 
 r.stream.basins -m direction=dir points=outlets_uniq basins=basins_uniq memory=16384 --verbose
 
@@ -1076,6 +1077,7 @@ v.to.db map=basins option=area column=area
 #+NAME: add_stream_indices
 #+BEGIN_SRC bash :results verbatim
 log_info "r.stream.order: BEGIN"
+g.extension extension=r.stream.order
 date
 time r.stream.order -m stream_rast=streams direction=dir elevation=head accumulation=ones@PERMANENT stream_vect=stream_vect strahler=strahler horton=horton shreve=shreve hack=hack topo=topological memory=16384
 date
@@ -1191,6 +1193,8 @@ https://grass.osgeo.org/grass74/manuals/variables.html
 #+BEGIN_SRC bash :results verbatim :tangle no
 export GRASS_VERBOSE=3
 # export GRASS_MESSAGE_FORMAT=silent
+unset LD_LIBRARY_PATH
+export PROJ_LIB=/usr/share/proj
 
 if [ -z ${DATADIR+x} ]; then
     echo "DATADIR environment varible is unset."
@@ -3755,7 +3759,7 @@ md5sum ${DATADIR}/Hawkings_2016/NarsarsuaqDischarge2013.xlsx
 #+NAME: GIMP_0714
 #+BEGIN_SRC bash :results verbatim
 g.mapset -c GIMP_0714
-r.in.gdal -o input=${DATADIR}/NSIDC/NSIDC-0714.001/1999.07.01/GimpOceanMask_90m_2000_v1.2.tif output=mask_ocean_lakes
+r.in.gdal -o input=${DATADIR}/MEaSUREs/NSIDC-0714.001/GimpOceanMask_90m_2000_v1.2.tif output=mask_ocean_lakes
 # ocean mask has some cut-off oceans a.k.a lakes. See for example near -274731,-2747470.
 g.region raster=mask_ocean_lakes
 
