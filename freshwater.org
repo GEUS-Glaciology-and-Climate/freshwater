@@ -1527,7 +1527,7 @@ for y in years:
 
     infile = ROOT+"/MARv3.14-daily-ERA5-" + y + ".nc"
     print("infile: ", infile, "outfile: ", outfile)
-    ds = xr.open_mfdataset(infile, combine='by_coords')
+    ds = xr.open_mfdataset(infile, combine='by_coords',engine='h5netcdf', parallel=False)
     ds['RUcorr'] = ds['RUcorr'].where((ds['RUcorr'] >= ds['RUcorr'].attrs['actual_range'][0]) &
                                       (ds['RUcorr'] <= ds['RUcorr'].attrs['actual_range'][1]))
     da = (ds['RUcorr'] * (ds['MSK'] >= 2) * area['Band1'].values)   # runoff over ice
@@ -1544,7 +1544,7 @@ for y in years:
 
     infile = ROOT+"/MARv3.14-daily-ERA5-" + y + ".nc"
     print("infile: ", infile, "outfile: ", outfile)
-    ds = xr.open_mfdataset(infile, combine='by_coords')
+    ds = xr.open_mfdataset(infile, combine='by_coords',engine='h5netcdf', parallel=False)
     ds['RU2'] = ds['RU2'].where((ds['RU2'] >= ds['RU2'].attrs['actual_range'][0]) &
                                 (ds['RU2'] <= ds['RU2'].attrs['actual_range'][1]))
     da = ds['RU2'] * (ds['MSK'] == 1) * area['Band1'].values       # runoff over land
@@ -2016,7 +2016,7 @@ r.univar -t map=model zones=basins@land_${k_pct} \
 log_info "Using EXTRA GNU parallel options via \${PARALLEL}: ${PARALLEL:-Not set}"
 
 k_pct=100
-for y in $(seq 1940 2025); do
+for y in $(seq 1940 2026); do
   file_base=MAR_runoff_ice_${y}
   infile=${file_base}.nc
   outfile=${file_base}_${k_pct}.bsv
@@ -2028,8 +2028,12 @@ for y in $(seq 1940 2025); do
   else
     cp ./tmp/header_ice_${k_pct}.bsv ./dat/${outfile}
 
-    T1=$(ncdump -v time ./tmp/${infile} | grep -A 100000 "^ time =" | tr -dc [0-9,] | rev | cut -d, -f1 | rev)
-    seq 0 ${T1} \
+    #T1=$(ncdump -v time ./tmp/${infile} | grep -A 100000 "^ time =" | tr -dc [0-9,] | rev | cut -d, -f1 | rev)
+    NT=$(ncdump -h ./tmp/${infile} | sed -n 's/.*time = \([0-9]\+\) ;/\1/p')
+    #seq 0 ${T1} \
+    #  | parallel --nice 9 --keep-order --bar basin_partition {#} {%} basins@ice_${k_pct} "${infile}:runoff" MAR@MAR \
+    #		 >> ./dat/${outfile}
+    seq 0 $((NT - 1)) \
       | parallel --nice 9 --keep-order --bar basin_partition {#} {%} basins@ice_${k_pct} "${infile}:runoff" MAR@MAR \
 		 >> ./dat/${outfile}
   fi
@@ -2082,7 +2086,7 @@ print(isum/osum)
 log_info "Using EXTRA GNU parallel options via \${PARALLEL}: ${PARALLEL:-Not set}"
 
 k_pct=100
-for y in $(seq 1940 2025); do
+for y in $(seq 1940 2026); do
   file_base=MAR_runoff_land_${y}
   infile=${file_base}.nc
   outfile=${file_base}_${k_pct}.bsv
@@ -2094,8 +2098,12 @@ for y in $(seq 1940 2025); do
   else
     cp ./tmp/header_land_${k_pct}.bsv ./dat/${outfile}
     
-    T1=$(ncdump -v time ./tmp/${infile} | grep -A 100000 "^ time =" | tr -dc [0-9,] | rev | cut -d, -f1 | rev)
-    seq 0 ${T1} \
+    #T1=$(ncdump -v time ./tmp/${infile} | grep -A 100000 "^ time =" | tr -dc [0-9,] | rev | cut -d, -f1 | rev)
+    NT=$(ncdump -h ./tmp/${infile} | sed -n 's/.*time = \([0-9]\+\) ;/\1/p')
+    #seq 0 ${T1} \
+    #  | parallel --nice 9 --keep-order --bar basin_partition {#} {%} basins@land_${k_pct} "${infile}:runoff" MAR@MAR \
+    #		 >> ./dat/${outfile}
+    seq 0 $((NT - 1)) \
       | parallel --nice 9 --keep-order --bar basin_partition {#} {%} basins@land_${k_pct} "${infile}:runoff" MAR@MAR \
 		 >> ./dat/${outfile}
   fi
@@ -2589,7 +2597,7 @@ ds.attrs["Conventions"] = "CF-1.8, ACDD-1.3"
 ds.attrs["source"] = "git commit: " + \
     subprocess.check_output(["git", "describe", "--always"]).strip().decode("UTF-8")
 ds.attrs["DOI"] = "10.22008/promice/freshwater"
-ds.attrs["product_version"] = "2025"
+ds.attrs["product_version"] = "daily updates"
 #+END_SRC
 
 #+RESULTS: bsv2xarray
@@ -2626,7 +2634,7 @@ BSVFILE=f
 cf = "coverage_" + RCM + "_" + domain +"_" + k + ".nc"
 c = xr.open_dataset("./tmp/"+cf)
 c = c.where(c['runoff'] != 0, np.nan, drop=False)
-ds['discharge'].values = ds['discharge']/c['runoff'] # apply coverage
+ds['discharge'].values = ds['discharge']/c['runoff'].expand_dims(time=ds["time"]) # apply coverage
 
 enc = {}
 for v in ['discharge','alt','Z2012_sector','M2019_ID','M2020_gate']:
@@ -2690,12 +2698,12 @@ output:
 	parallel --bar "python bsv2netcdf.py {}" ::: $$(ls dat/*_runoff_*.bsv)
 
 update:
-	wget http://ftp.climato.be/fettweis/tmp/ken/1km/MARv3.14-daily-ERA5-2025.nc -O ${DATADIR}/MAR/3.14-daily-1km/MARv3.14-daily-ERA5-2025.nc
-	rm tmp/MAR_runoff_*_2025.nc
+	wget http://ftp.climato.be/fettweis/tmp/ken/1km/MARv3.14-daily-ERA5-2026.nc -O ${DATADIR}/MAR/3.14-daily-1km/MARv3.14-daily-ERA5-2026.nc
+	rm -f tmp/MAR_runoff_*_2026.nc
 	python ./rcm_preprocess.py
-	rm dat/MAR_runoff_*_2025_100.bsv
+	rm dat/MAR_runoff_*_2026_100.bsv
 	grass ./G/PERMANENT --exec ./rcm.sh
-	parallel --bar "python bsv2netcdf.py {}" ::: $$(ls dat/*_runoff_*2025*.bsv)
+	parallel --bar "python bsv2netcdf.py {}" ::: $$(ls dat/*_runoff_*2026*.bsv)
 
 dist: freshwater.zip
 	zip -r freshwater.zip freshwater
