@@ -2154,11 +2154,19 @@ for y in $(seq 1958 2024); do
   else
     cp ./tmp/header_ice_${k_pct}.bsv ./dat/${outfile}
 
-    T0=$(ncdump -v time ./tmp/${infile} | grep -A 100000 "^ time =" | tr -dc [0-9,] | cut -d, -f1)
-    T1=$(ncdump -v time ./tmp/${infile} | grep -A 100000 "^ time =" | tr -dc [0-9,] | rev | cut -d, -f1 | rev)
-    seq ${T0} ${T1} \
+#    T0=$(ncdump -v time ./tmp/${infile} | grep -A 100000 "^ time =" | tr -dc [0-9,] | cut -d, -f1)
+#    T1=$(ncdump -v time ./tmp/${infile} | grep -A 100000 "^ time =" | tr -dc [0-9,] | rev | cut -d, -f1 | rev)
+#    seq ${T0} ${T1} \
+#      | parallel --nice 9 --keep-order --bar basin_partition {#} {%} basins@ice_${k_pct} "${infile}:runoff" RACMO@RACMO \
+#                 >> ./dat/${outfile}
+
+
+    NT=$(ncdump -h ./tmp/${infile} | sed -n 's/.*time = \([0-9]\+\) ;/\1/p')
+    seq 0 $((NT - 1)) \
       | parallel --nice 9 --keep-order --bar basin_partition {#} {%} basins@ice_${k_pct} "${infile}:runoff" RACMO@RACMO \
-                 >> ./dat/${outfile}
+		 >> ./dat/${outfile}
+
+
   fi
 done
 
@@ -2176,11 +2184,18 @@ for y in $(seq 1958 2024); do
   else
     cp ./tmp/header_land_${k_pct}.bsv ./dat/${outfile}
     
-    T0=$(ncdump -v time ./tmp/${infile} | grep -A 100000 "^ time =" | tr -dc [0-9,] | cut -d, -f1)
-    T1=$(ncdump -v time ./tmp/${infile} | grep -A 100000 "^ time =" | tr -dc [0-9,] | rev | cut -d, -f1 | rev)
-    seq ${T0} ${T1} \
+#    T0=$(ncdump -v time ./tmp/${infile} | grep -A 100000 "^ time =" | tr -dc [0-9,] | cut -d, -f1)
+#    T1=$(ncdump -v time ./tmp/${infile} | grep -A 100000 "^ time =" | tr -dc [0-9,] | rev | cut -d, -f1 | rev)
+#    seq ${T0} ${T1} \
+#      | parallel --nice 9 --keep-order --bar basin_partition {#} {%} basins@land_${k_pct} "${infile}:runoff" RACMO@RACMO \
+#                 >> ./dat/${outfile}
+
+    NT=$(ncdump -h ./tmp/${infile} | sed -n 's/.*time = \([0-9]\+\) ;/\1/p')
+    seq 0 $((NT - 1)) \
       | parallel --nice 9 --keep-order --bar basin_partition {#} {%} basins@land_${k_pct} "${infile}:runoff" RACMO@RACMO \
-                 >> ./dat/${outfile}
+		 >> ./dat/${outfile}
+
+
   fi
 done
 
