@@ -1,0 +1,27 @@
+# Build artifacts
+stamps/
+G/
+tmp/
+dat/
+freshwater/
+freshwater.zip
+
+# Log files
+*.log
+stderr
+stdout
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# Figures (generated outputs)
+fig/*.png
+fig/*.eps
+fig/*.ps
+
+# Conda environment directories
+env/
+.env/
