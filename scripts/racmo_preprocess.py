@@ -38,10 +38,9 @@ for i, y in enumerate(tqdm(years)):
                          'long_name': 'Downscaled corrected snowmelt',
                          'standard_name': 'Downscaled_corrected_snowmelt'}
     ds_sub = da.to_dataset(name='runoff')
-    delayed_obj = ds_sub.to_netcdf(outfile, compute=False, format="NETCDF4", engine="netcdf4")
     with ProgressBar():
-        results = delayed_obj.compute()
-    del ds, da, ds_sub, delayed_obj
+        ds_sub.to_netcdf(outfile, format="NETCDF4", engine="netcdf4")
+    del ds, da, ds_sub
 
 # Land runoff (variable runoff, tundra mask)
 ROOT_REGRID = ROOT + "/runoff_land_1km_regrid"
@@ -69,9 +68,7 @@ for i, y in enumerate(tqdm(years)):
     this_year = ds['time'].dt.year.values[0]
     ds_sub['time'].encoding['units'] = f'days since {this_year}-01-01'
 
-    delayed_obj = ds_sub.to_netcdf(outfile, compute=False,
-                                   encoding={'runoff': {'dtype': 'float32'}},
-                                   format="NETCDF4", engine="netcdf4")
     with ProgressBar():
-        results = delayed_obj.compute()
-    del ds, da, ds_sub, delayed_obj
+        ds_sub.to_netcdf(outfile, encoding={'runoff': {'dtype': 'float32'}},
+                         format="NETCDF4", engine="netcdf4")
+    del ds, da, ds_sub

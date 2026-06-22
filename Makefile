@@ -57,7 +57,7 @@ stamps/coverage: $(SCRIPTS)/coverage_calc.sh $(SCRIPTS)/coverage_csv2nc.py
 
 stamps/output: $(SCRIPTS)/bsv2netcdf.py
 	# create end-user data product
-	parallel --bar "python $(SCRIPTS)/bsv2netcdf.py {}" ::: $$(ls dat/*_runoff_*.bsv)
+	parallel "python $(SCRIPTS)/bsv2netcdf.py {}" ::: $$(ls dat/*_runoff_*.bsv)
 	@mkdir -p stamps && touch $@
 
 update:
@@ -66,7 +66,7 @@ update:
 	python $(SCRIPTS)/mar_preprocess.py
 	rm dat/MAR_runoff_*_2026_100.bsv
 	grass ./G/PERMANENT --exec $(SCRIPTS)/rcm_mar.sh
-	parallel --bar "python $(SCRIPTS)/bsv2netcdf.py {}" ::: $$(ls dat/*_runoff_*2026*.bsv)
+	parallel "python $(SCRIPTS)/bsv2netcdf.py {}" ::: $$(ls dat/*_runoff_*2026*.bsv)
 
 dist: freshwater.zip
 	zip -r freshwater.zip freshwater
