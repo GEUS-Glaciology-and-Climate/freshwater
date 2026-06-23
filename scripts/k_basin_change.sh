@@ -64,7 +64,7 @@ r.out.xyz input=${LIST} output=- >> ./tmp/cells_elev.bsv
 g.region -d
 
 log_info "Calculating cell outlet statistics..."
-python ./scripts/k_basin_change.py
+/home/shl/miniconda3/envs/freshwater/bin/python ./scripts/k_basin_change.py
 
 log_info "Re-importing rasters."
 log_warn "Reduced resolution."

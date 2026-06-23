@@ -1,4 +1,5 @@
 SCRIPTS = scripts
+PYTHON  = /home/shl/miniconda3/envs/freshwater/bin/python
 
 .PHONY: G all sob k_basin_change err RCM coverage output update dist clean_all clean_RCM clean_sob FORCE
 
@@ -43,30 +44,30 @@ stamps/RCM: $(SCRIPTS)/mar_preprocess.py $(SCRIPTS)/rcm_mar.sh \
             $(SCRIPTS)/racmo_preprocess.py $(SCRIPTS)/rcm_racmo.sh
 	# RCM
 	mkdir -p dat
-	python $(SCRIPTS)/mar_preprocess.py
+	$(PYTHON) $(SCRIPTS)/mar_preprocess.py
 	grass ./G/PERMANENT --exec $(SCRIPTS)/rcm_mar.sh
-	python $(SCRIPTS)/racmo_preprocess.py
+	$(PYTHON) $(SCRIPTS)/racmo_preprocess.py
 	grass ./G/PERMANENT --exec $(SCRIPTS)/rcm_racmo.sh
 	@mkdir -p stamps && touch $@
 
 stamps/coverage: $(SCRIPTS)/coverage_calc.sh $(SCRIPTS)/coverage_csv2nc.py
 	# coverage
 	grass ./G/PERMANENT --exec $(SCRIPTS)/coverage_calc.sh
-	python $(SCRIPTS)/coverage_csv2nc.py
+	$(PYTHON) $(SCRIPTS)/coverage_csv2nc.py
 	@mkdir -p stamps && touch $@
 
 stamps/output: $(SCRIPTS)/bsv2netcdf.py
 	# create end-user data product
-	parallel "python $(SCRIPTS)/bsv2netcdf.py {}" ::: $$(ls dat/*_runoff_*.bsv)
+	parallel "$(PYTHON) $(SCRIPTS)/bsv2netcdf.py {}" ::: $$(ls dat/*_runoff_*.bsv)
 	@mkdir -p stamps && touch $@
 
 update:
 	wget http://ftp.climato.be/fettweis/tmp/ken/1km/MARv3.14-daily-ERA5-2026.nc -O ${DATADIR}/MAR/3.14-daily-1km/MARv3.14-daily-ERA5-2026.nc
 	rm -f tmp/MAR_runoff_*_2026.nc
-	python $(SCRIPTS)/mar_preprocess.py
+	$(PYTHON) $(SCRIPTS)/mar_preprocess.py
 	rm dat/MAR_runoff_*_2026_100.bsv
 	grass ./G/PERMANENT --exec $(SCRIPTS)/rcm_mar.sh
-	parallel "python $(SCRIPTS)/bsv2netcdf.py {}" ::: $$(ls dat/*_runoff_*2026*.bsv)
+	parallel "$(PYTHON) $(SCRIPTS)/bsv2netcdf.py {}" ::: $$(ls dat/*_runoff_*2026*.bsv)
 
 dist: freshwater.zip
 	zip -r freshwater.zip freshwater
