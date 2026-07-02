@@ -1,33 +1,7 @@
 #!/usr/bin/env bash
 # Generate basin difference maps showing how outlet routing changes across k values.
 
-set -o nounset
-set -o pipefail
-
-# set -o errexit
-
-red='\033[0;31m'; orange='\033[0;33m'; green='\033[0;32m'; nc='\033[0m'
-log_info() { echo -e "${green}[$(date --iso-8601=seconds)] [INFO] ${@}${nc}"; }
-log_warn() { echo -e "${orange}[$(date --iso-8601=seconds)] [WARN] ${@}${nc}"; }
-log_err()  { echo -e "${red}[$(date --iso-8601=seconds)] [ERR] ${@}${nc}" >&2; }
-
-trap ctrl_c INT
-function ctrl_c() {
-  log_warn "Caught CTRL-C, killing process"
-  kill -term $$
-}
-
-debug() { if [[ debug:- == 1 ]]; then log_warn "debug:"; echo $@; fi; }
-
-export GRASS_VERBOSE=3
-unset LD_LIBRARY_PATH
-export PROJ_LIB=/usr/share/proj
-
-if [ -z ${DATADIR+x} ]; then
-    echo "DATADIR environment variable is unset."
-    echo "Fix with: \"export DATADIR=/path/to/data\""
-    exit 255
-fi
+source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
 set -x
 
@@ -64,7 +38,7 @@ r.out.xyz input=${LIST} output=- >> ./tmp/cells_elev.bsv
 g.region -d
 
 log_info "Calculating cell outlet statistics..."
-/home/shl/miniconda3/envs/freshwater/bin/python ./scripts/k_basin_change.py
+"${PYTHON}" ./scripts/k_basin_change.py
 
 log_info "Re-importing rasters."
 log_warn "Reduced resolution."

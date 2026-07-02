@@ -7,33 +7,7 @@
 # Also builds the shared BSV column headers (./tmp/header_{ice|land}_{k}.bsv)
 # used by all RCM partitioning scripts. Run this before rcm_racmo.sh.
 
-set -o nounset
-set -o pipefail
-
-# set -o errexit
-### uncomment above to help find errors. When rerunning and counting on
-### GRASS failing w/ overwrite issues for speed, leave it commented.
-
-red='\033[0;31m'; orange='\033[0;33m'; green='\033[0;32m'; nc='\033[0m'
-log_info() { echo -e "${green}[$(date --iso-8601=seconds)] [INFO] ${@}${nc}"; }
-log_warn() { echo -e "${orange}[$(date --iso-8601=seconds)] [WARN] ${@}${nc}"; }
-log_err()  { echo -e "${red}[$(date --iso-8601=seconds)] [ERR] ${@}${nc}" >&2; }
-
-trap ctrl_c INT
-function ctrl_c() {
-  log_warn "Caught CTRL-C, killing process"
-  kill -term $$
-}
-
-export GRASS_VERBOSE=3
-unset LD_LIBRARY_PATH
-export PROJ_LIB=/usr/share/proj
-
-if [ -z ${DATADIR+x} ]; then
-    echo "DATADIR environment variable is unset."
-    echo "Fix with: \"export DATADIR=/path/to/data\""
-    exit 255
-fi
+source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
 set -x
 
