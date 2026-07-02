@@ -1,7 +1,18 @@
 #+Latex_Class: copernicus
-#+AUTHOR: 
+#+AUTHOR:
 #+LaTeX_CLASS_OPTIONS: [essd, manuscript]
 #+Options: toc:nil ^:t {}:t
+
+# ============================================================================
+# STALE / REFERENCE ONLY — DO NOT TANGLE
+#
+# The runnable pipeline now lives as plain files in scripts/ (canonical),
+# driven by the Makefile. This org file is kept only for the prose and
+# background information not recorded elsewhere. Its code blocks reflect an
+# older, pre-restructure layout and are intentionally NOT tangled: every
+# block is set to ":tangle no", and the global default below reinforces it.
+# Do not regenerate scripts/ from here.
+# ============================================================================
 
 :BEGIN_header:
 # #+LATEX_HEADER_EXTRA: \usepackage{showlabels}
@@ -12,6 +23,8 @@
 #+PROPERTY: header-args:bash+ :session (concat "*" (file-name-sans-extension (buffer-name)) "-shell*")
 #+PROPERTY: header-args:bash+ :tangle-mode (identity #o544) :shebang #!/usr/bin/env bash
 #+PROPERTY: header-args:jupyter-python+ :session freshwater
+# Reference-only: default every block to no-tangle (see banner at top).
+#+PROPERTY: header-args+ :tangle no
 #+PROPERTY: header-args:jupyter-python+ :eval no-export :noweb yes :comments both :kernel freshwater
 #+PROPERTY: header-args:elisp+ :eval no-export :noweb yes
 #+PROPERTY: header-args:python+ :eval no-export :noweb yes
@@ -833,7 +846,7 @@ Putting it all together, we want to calculate streams, outlets, and basins to th
 
 + Note :: land domain run first, because ice domains need info from land domain (downstream land outlet)
 
-#+BEGIN_SRC bash :results verbatim :tangle sob.sh
+#+BEGIN_SRC bash :results verbatim :tangle no
 <<init>>
 
 for domain in land ice; do
@@ -1221,13 +1234,13 @@ g.mapset ${MAPSET}
 
 **** COMMENT Map projection distortion
 
-#+BEGIN_SRC bash :results verbatim :tangle distortion.sh
+#+BEGIN_SRC bash :results verbatim :tangle no
 <<init>>
 log_info "Calculating distortion"
 #+END_SRC
 
 #+NAME: distortion
-#+BEGIN_SRC bash :results verbatim :tangle distortion.sh
+#+BEGIN_SRC bash :results verbatim :tangle no
 ORIG_MAPSET=$(g.mapset -p)
 MAPSET=distortion
 g.mapset -c ${MAPSET}
@@ -1363,7 +1376,7 @@ g.region -p
 ** Model output routing
 *** Area correction for EPSG:3413
 :PROPERTIES:
-:header-args:bash+: :tangle area_error.sh
+:header-args:bash+: :tangle no
 :END:
 
 + This correction needs to be applied to any model data.
@@ -1461,7 +1474,7 @@ fi
 
 *** RCM preprocessing
 :PROPERTIES:
-:header-args:jupyter-python+: :tangle rcm_preprocess.py
+:header-args:jupyter-python+: :tangle no
 :header-args:jupyter-python+: :shebang #!/usr/bin/env python
 :END:
 
@@ -1827,7 +1840,7 @@ rm ./tmp/{MAR,RACMO}_Y2K_tmp.nc
 
 *** Freshwater flow rates from RCMs
 :PROPERTIES:
-:header-args:bash+: :tangle rcm.sh
+:header-args:bash+: :tangle no
 :END:
 
 #+BEGIN_SRC bash :results verbatim
@@ -2299,7 +2312,7 @@ d.rast map
 #+END_SRC
 *** Calculate and prepare coverage
 :PROPERTIES:
-:header-args:bash+: :tangle coverage_calc.sh
+:header-args:bash+: :tangle no
 :END:
 
 **** Calculate
@@ -2378,7 +2391,7 @@ da = xr.DataArray.from_series(cov)
 
 
 #+NAME: coverage_prepare
-#+BEGIN_SRC jupyter-python :session coverage_prepare :exports results :results drawer :tangle coverage_csv2nc.py
+#+BEGIN_SRC jupyter-python :session coverage_prepare :exports results :results drawer :tangle no
 import pandas as pd
 import xarray as xr
 import numpy as np
@@ -2399,7 +2412,7 @@ for model in ['RACMO', 'MAR']:
 
 *** BSV to NC
 :PROPERTIES:
-:header-args:jupyter-python+: :tangle bsv2netcdf.py
+:header-args:jupyter-python+: :tangle no
 :END:
 
 Note:
@@ -2669,7 +2682,7 @@ ds.to_netcdf(OUTFILE, unlimited_dims='time', encoding=enc, engine='netcdf4', mod
 
 This code, and all code files in this project, are derived products tangled from the =freshwater.org= source file.
 
-#+BEGIN_SRC makefile :tangle Makefile
+#+BEGIN_SRC makefile :tangle no
 freshwater.zip: G all
 # dist
 
@@ -3770,7 +3783,7 @@ md5sum ${DATADIR}/Hawkings_2016/NarsarsuaqDischarge2013.xlsx
 
 ** Import Data
 :PROPERTIES:
-:header-args:bash+: :tangle import.sh :eval no
+:header-args:bash+: :tangle no :eval no
 :END:
 
 #+BEGIN_SRC bash :results verbatim
@@ -4558,7 +4571,7 @@ o ./fig/basin_MAR_align.png
 #+RESULTS:
 
 #+NAME: basin_MAR_align_psmap
-#+BEGIN_SRC bash :results verbatim :tangle ./tmp/basin_MAR_align.psmap :mkdirp tmp
+#+BEGIN_SRC bash :results verbatim :tangle no :mkdirp tmp
 border n
 # scale 1:1000000
 paper a4
@@ -4750,7 +4763,7 @@ plt.savefig("./fig/overview.png", bbox_inches='tight', dpi=300, pad_inches=0)
 
 ** Basin changes with changing k
 :PROPERTIES:
-:header-args:bash+: :tangle k_basin_change.sh
+:header-args:bash+: :tangle no
 :header-args:bash+: :comments both
 :header-args:bash+: :tangle-mode (identity #o544)
 :header-args:bash+: :shebang #!/usr/bin/env bash
@@ -4833,7 +4846,7 @@ g.region -d
 
 **** Import & process in Python
 
-#+BEGIN_SRC jupyter-python :tangle k_basin_change.py
+#+BEGIN_SRC jupyter-python :tangle no
 import pandas as pd
 import numpy as np
 
@@ -4885,7 +4898,7 @@ df_out.to_csv("./tmp/cells_xy_ice_stats.bsv", sep="|", float_format='%d')
 
 NO - Now that only doing 1x land_100, this method no longer works
 
-# #+header: :tangle k_basin_change.py
+# #+header: :tangle no
 #+BEGIN_SRC jupyter-python 
 cols_in = header.columns[['land' in _ for _ in header.columns]]
 df = pd.read_csv("./tmp/cells_xy.bsv", delimiter="|", usecols=cols_in)
@@ -4934,7 +4947,7 @@ r.in.xyz input=./tmp/cells_xy_ice_stats.bsv output=ice_avg method=mean x=4 y=5 z
 
 *** Visualize Maps                                      :noexport:
 # :PROPERTIES:
-# :header-args:bash+: :tangle k_basin_change_graphics.sh
+# :header-args:bash+: :tangle no
 # :header-args:bash+: :comments both
 # :header-args:bash+: :tangle-mode (identity #o544)
 # :header-args:bash+: :shebang #!/usr/bin/env bash
@@ -4947,7 +4960,7 @@ r.in.xyz input=./tmp/cells_xy_ice_stats.bsv output=ice_avg method=mean x=4 y=5 z
 
 **** Color the difference maps
 
-# # #+BEGIN_SRC ascii :tangle ./tmp/categories.txt :mkdirp t :eval no :comments nil
+# # #+BEGIN_SRC ascii :tangle no :mkdirp t :eval no :comments nil
 # #+BEGIN_SRC ascii :tangle no
 # 0 = 1 no change
 # 0 thru 999 = 1 < 1 km
@@ -4958,7 +4971,7 @@ r.in.xyz input=./tmp/cells_xy_ice_stats.bsv output=ice_avg method=mean x=4 y=5 z
 # 100000 thru 10000000 = 6 > 100 km
 # #+END_SRC
 
-#+BEGIN_SRC ascii :tangle ./tmp/categories.txt :mkdirp t :eval no :comments nil
+#+BEGIN_SRC ascii :tangle no :mkdirp t :eval no :comments nil
 -1 = -1
 0 thru 2999 = 1 0 to < 3 km
 3000 thru 10000 = 2 3 to < 10 km
@@ -5112,7 +5125,7 @@ done
 :END:
 ***** Import & process in Python
 
-#+BEGIN_SRC jupyter-python :tangle k_basin_change.py
+#+BEGIN_SRC jupyter-python :tangle no
 import pandas as pd
 import numpy as np
 
@@ -6142,7 +6155,7 @@ plt.savefig('./fig/watson_adjusted_south.png', transparent=True, bbox_inches='ti
 
 * README                                                :noexport:
 
-#+BEGIN_SRC org :tangle ./freshwater/README.txt :mkdirp ./freshwater :eval no
+#+BEGIN_SRC org :tangle no :mkdirp ./freshwater :eval no
 README for "Greenland liquid water discharge from 1940 through December 2024"
 
 Data DOI: doi:10.22008/promice/freshwater
